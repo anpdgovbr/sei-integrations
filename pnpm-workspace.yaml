@@ -2,7 +2,7 @@ packages:
   - "packages/*"
 
 allowBuilds:
-  '@anpdgovbr/shared-scripts': true
+  "@anpdgovbr/shared-scripts": true
   esbuild: true
   sonar-scanner: true
 
