@@ -95,6 +95,20 @@ test:
         pnpm install --frozen-lockfile --prefer-offline
       fi
     - pnpm test:coverage
+    - |
+      COBERTURA_XML="coverage/cobertura-coverage.xml"
+      if [ ! -f "$COBERTURA_XML" ]; then
+        echo "⚠️ Cobertura XML não encontrado; coverage não será extraído"
+        exit 1
+      fi
+      LINE_RATE=$(grep -m1 -o 'line-rate="[^"]*"' "$COBERTURA_XML" | cut -d'"' -f2 || true)
+      if [ -z "$LINE_RATE" ]; then
+        echo "⚠️ Cobertura XML ilegível (line-rate ausente)"
+        exit 1
+      fi
+      PCT=$(awk "BEGIN {printf \"%.2f\", (${LINE_RATE})*100}")
+      echo "Total Coverage: ${PCT}%"
+  coverage: '/Total Coverage:\s+([\d\.]+)%/'
   artifacts:
     when: always
     reports:

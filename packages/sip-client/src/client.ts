@@ -39,7 +39,7 @@ type ClientOptions = Readonly<{
 const systemIdAsLong = (config: SipConfig): number => {
   const systemId = Number(config.systemId)
   if (!Number.isSafeInteger(systemId)) {
-    throw new Error(`IdSistema invalido para o SIP: ${config.systemId}`)
+    throw new TypeError(`IdSistema invalido para o SIP: ${config.systemId}`)
   }
   return systemId
 }
