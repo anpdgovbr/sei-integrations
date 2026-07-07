@@ -5,6 +5,20 @@
   "type": "module",
   "description": "Monorepo de clientes TypeScript para integrações SEI e SIP da ANPD.",
   "license": "MIT",
+  "author": {
+    "name": "Luciano Édipo Pereira da Silva",
+    "email": "luciano.psilva@anpd.gov.br",
+    "url": "https://github.com/lucianoedipo"
+  },
+  "bugs": {
+    "url": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/issues",
+    "email": "desenvolvimento@anpd.gov.br"
+  },
+  "homepage": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.anpd.gov.br/publico/libs/sei-integrations.git"
+  },
   "packageManager": "pnpm@11.10.0",
   "engines": {
     "node": ">=22.0.0",
@@ -30,7 +44,7 @@
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "publish:sip": "pnpm --filter @anpdgovbr/sip-client publish --access public",
-    "publish:sei": "pnpm --filter @anpdgovbr/sei-client publish --access public"
+    "publish:sei": "echo \"@anpdgovbr/sei-client ainda esta reservado e private; publicacao desabilitada\""
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",

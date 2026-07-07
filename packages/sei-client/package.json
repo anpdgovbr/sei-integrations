@@ -1,7 +1,7 @@
 {
   "name": "@anpdgovbr/sei-client",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "type": "module",
   "description": "Cliente TypeScript reservado para integração direta com SEI.",
   "license": "MIT",
@@ -36,10 +36,6 @@
   },
   "engines": {
     "node": ">=22.0.0"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://npm.anpd.gov.br"
   },
   "sideEffects": false
 }

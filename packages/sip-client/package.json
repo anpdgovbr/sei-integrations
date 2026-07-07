@@ -4,6 +4,13 @@
   "private": false,
   "type": "module",
   "description": "Cliente TypeScript para integração SOAP com o SIP.",
+  "keywords": [
+    "anpd",
+    "sei",
+    "sip",
+    "soap",
+    "typescript"
+  ],
   "license": "MIT",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -33,10 +40,13 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp README.md LICENSE CHANGELOG.md CONTRIBUTING.md dist/",
     "clean": "rimraf dist coverage",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -60,5 +70,20 @@
     "access": "public",
     "registry": "https://npm.anpd.gov.br"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "author": {
+    "name": "Luciano Édipo Pereira da Silva",
+    "email": "luciano.psilva@anpd.gov.br",
+    "url": "https://github.com/lucianoedipo"
+  },
+  "bugs": {
+    "url": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/issues",
+    "email": "desenvolvimento@anpd.gov.br"
+  },
+  "homepage": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.anpd.gov.br/publico/libs/sei-integrations.git",
+    "directory": "packages/sip-client"
+  }
 }
