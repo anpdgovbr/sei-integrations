@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="sipns" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <ns1:listarPermissaoResponse>
+      <parametros SOAP-ENC:arrayType="ns1:Permissao[2]" xsi:type="ns1:ArrayOfPermissoes">
+        <item xsi:type="ns1:Permissao">
+          <IdSistema xsi:type="xsd:string">100000100</IdSistema>
+          <IdOrgaoUsuario xsi:type="xsd:string">0</IdOrgaoUsuario>
+          <IdUsuario xsi:type="xsd:string">100000103</IdUsuario>
+          <IdOrigemUsuario xsi:nil="true"/>
+          <IdOrgaoUnidade xsi:type="xsd:string">0</IdOrgaoUnidade>
+          <IdUnidade xsi:type="xsd:string">110000068</IdUnidade>
+          <IdOrigemUnidade xsi:nil="true"/>
+          <IdPerfil xsi:type="xsd:string">100000938</IdPerfil>
+          <DataInicial xsi:type="xsd:string">08/08/2024</DataInicial>
+          <DataFinal xsi:nil="true"/>
+          <SinSubunidades xsi:type="xsd:string">S</SinSubunidades>
+        </item>
+        <item xsi:type="ns1:Permissao">
+          <IdSistema xsi:type="xsd:string">100000100</IdSistema>
+          <IdOrgaoUsuario xsi:type="xsd:string">0</IdOrgaoUsuario>
+          <IdUsuario xsi:type="xsd:string">100000103</IdUsuario>
+          <IdOrigemUsuario xsi:nil="true"/>
+          <IdOrgaoUnidade xsi:type="xsd:string">0</IdOrgaoUnidade>
+          <IdUnidade xsi:type="xsd:string">110000030</IdUnidade>
+          <IdOrigemUnidade xsi:nil="true"/>
+          <IdPerfil xsi:type="xsd:string">100000938</IdPerfil>
+          <DataInicial xsi:type="xsd:string">16/09/2024</DataInicial>
+          <DataFinal xsi:type="xsd:string">17/09/2024</DataFinal>
+          <SinSubunidades xsi:type="xsd:string">N</SinSubunidades>
+        </item>
+      </parametros>
+    </ns1:listarPermissaoResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

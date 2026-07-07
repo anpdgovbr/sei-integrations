@@ -33,12 +33,86 @@ const requiredEnv = (name: string): string => {
 
 loadDotenv()
 
-const siglaUsuario = process.env.SIP_SMOKE_SIGLA_USUARIO
+const personaSlug = process.env.SIP_SMOKE_PERSONA
+const personaPrefix = personaSlug
+  ? `SIP_PERSONA_${personaSlug.toUpperCase().replaceAll("-", "_")}_`
+  : null
+
+const personaEnv = (name: string, fallbackName: string): string | undefined => {
+  const personaValue = personaPrefix ? process.env[`${personaPrefix}${name}`] : undefined
+  return personaValue || process.env[fallbackName]
+}
+
+const requiredPersonaEnv = (name: string, fallbackName: string): string => {
+  const value = personaEnv(name, fallbackName)
+  if (!value) {
+    throw new Error(
+      `Variavel obrigatoria ausente: ${personaPrefix ? `${personaPrefix}${name}` : fallbackName}`,
+    )
+  }
+  return value
+}
+
+const maskSoapXml = (xml: string): string => {
+  const accessKeys = [
+    process.env.SIP_ACCESS_KEY,
+    personaEnv("ACCESS_KEY", "SIP_ACCESS_KEY"),
+  ].filter((value): value is string => Boolean(value))
+  const withoutKnownSecret = accessKeys.reduce(
+    (masked, accessKey) => masked.replaceAll(accessKey, "***"),
+    xml,
+  )
+  return withoutKnownSecret.replaceAll(
+    /(<ChaveAcesso\b[^>]*>)([\s\S]*?)(<\/ChaveAcesso>)/g,
+    "$1***$3",
+  )
+}
+
+const getSoapOperation = (xml: string): string | null => {
+  const match = xml.match(/<sip:([A-Za-z0-9_]+)/)
+  return match?.[1] ?? null
+}
+
+const installSmokeDebugFetch = () => {
+  if (process.env.SIP_SMOKE_DEBUG_SOAP !== "1") {
+    return
+  }
+
+  const debugOperation = process.env.SIP_SMOKE_DEBUG_OPERATION
+  const originalFetch = globalThis.fetch
+
+  globalThis.fetch = async (input, init) => {
+    const operation = typeof init?.body === "string" ? getSoapOperation(init.body) : null
+    if (typeof init?.body === "string") {
+      if (!debugOperation || debugOperation === operation) {
+        console.error(`\n--- SIP SOAP request: ${operation ?? "unknown"} ---`)
+        console.error(maskSoapXml(init.body))
+        console.error("--- end SIP SOAP request ---\n")
+      }
+    }
+    const response = await originalFetch(input, init)
+    if (!debugOperation || debugOperation === operation) {
+      const contentType = response.headers.get("content-type") ?? ""
+      if (contentType.includes("xml")) {
+        const responseText = await response.clone().text()
+        console.error(`\n--- SIP SOAP response: ${operation ?? "unknown"} (${response.status}) ---`)
+        console.error(responseText)
+        console.error("--- end SIP SOAP response ---\n")
+      }
+    }
+    return response
+  }
+}
+
+installSmokeDebugFetch()
+
+const siglaUsuario = personaEnv("SIGLA_USUARIO", "SIP_SMOKE_SIGLA_USUARIO")
+const expected = personaEnv("EXPECTED", "SIP_SMOKE_EXPECTED") ?? "success"
 
 const sip = createSipClient({
   endpointUrl: requiredEnv("SIP_SOAP_ENDPOINT"),
-  accessKey: requiredEnv("SIP_ACCESS_KEY"),
-  systemId: requiredEnv("SIP_SYSTEM_ID"),
+  accessKey: requiredPersonaEnv("ACCESS_KEY", "SIP_ACCESS_KEY"),
+  systemId: requiredPersonaEnv("SYSTEM_ID", "SIP_SYSTEM_ID"),
   requestTimeoutMs: Number(process.env.SIP_REQUEST_TIMEOUT_MS ?? 30_000),
 })
 
@@ -72,15 +146,31 @@ if (siglaUsuario) {
     } else {
       usuarioErro = { message: String(error) }
     }
-    process.exitCode = 1
+    if (expected !== "fault") {
+      process.exitCode = 1
+    }
   }
+}
+
+if (expected === "success" && siglaUsuario && !usuario) {
+  process.exitCode = 1
+}
+
+if (expected === "empty" && (usuario || permissoes.length > 0 || usuarioErro)) {
+  process.exitCode = 1
+}
+
+if (expected === "fault" && !usuarioErro) {
+  process.exitCode = 1
 }
 
 console.log(
   JSON.stringify(
     {
       endpoint: process.env.SIP_SOAP_ENDPOINT,
-      systemId: process.env.SIP_SYSTEM_ID,
+      persona: personaSlug ?? null,
+      expected,
+      systemId: requiredPersonaEnv("SYSTEM_ID", "SIP_SYSTEM_ID"),
       orgaos: orgaos.length,
       perfis: perfis.length,
       recursos: recursos.length,

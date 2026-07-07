@@ -55,6 +55,7 @@ Notas de desenvolvimento, fixtures de contrato e próximos passos ficam em
 Documentação de uso e migração:
 
 - [Guia do sip-client](doc/sip-client.md)
+- [Contrato SIP WSDL](doc/sip-contrato-wsdl.md)
 - [Migração de consumidores](doc/migracao-consumidores.md)
 
 ## CI/CD e ferramental
@@ -64,10 +65,11 @@ O repositório segue o padrão das bibliotecas internas ANPD:
 - branch de integração: `dev`;
 - branch de homologação/release: `main`;
 - registry interno: `https://npm.anpd.gov.br`;
-- CI por catálogo em `.gitlab-ci.yml`: `ci-gitleaks`, `ci-node`,
+- CI por catálogo em `.gitlab-ci.yml`: `ci-gitleaks`, `ci-node`, `sonarqube`,
   `ci-changeset-monorepo` e `pages-typedoc`;
-- SonarQube via componente de catálogo `sonarqube`, herdado pelo `ci-node`, com
-  `SONAR_HOST_URL` e `SONAR_TOKEN` definidos como variáveis de CI;
+- SonarQube via componente de catálogo `sonarqube@v6.3.0`, com projeto definido
+  em `sonar-project.properties` e `SONAR_HOST_URL`/`SONAR_TOKEN` definidos como
+  variáveis de CI;
 - dependências base centralizadas no `catalog` do `pnpm-workspace.yaml`;
 - versionamento via Changesets em modo independente por pacote;
 - publicação manual por pacote com `pnpm publish:sip` e `pnpm publish:sei`.

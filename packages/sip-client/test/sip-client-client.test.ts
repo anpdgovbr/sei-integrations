@@ -100,8 +100,8 @@ const unidadesResponse = `<?xml version="1.0" encoding="UTF-8"?>
   <SOAP-ENV:Body>
     <ns1:carregarUnidadesResponse>
       <returnUnidades>
-        <item><item>110000075</item><item>CGTI</item><item>Coordenacao-Geral de Tecnologia</item><item>S</item></item>
-        <item><item>110000076</item><item>TESTE</item><item>Unidade de Teste</item><item>N</item></item>
+        <item><item>110000075</item><item>0</item><item>CGTI</item><item>Coordenacao-Geral de Tecnologia</item><item>S</item><item/><item/><item>cgti</item></item>
+        <item><item>110000076</item><item>0</item><item>TESTE</item><item>Unidade de Teste</item><item>N</item><item/><item/><item>teste</item></item>
       </returnUnidades>
     </ns1:carregarUnidadesResponse>
   </SOAP-ENV:Body>
@@ -199,9 +199,11 @@ describe("SipClient", () => {
     expect(result?.permissoes).toHaveLength(1)
     expect(fetchMock()).toHaveBeenCalledTimes(2)
     expect(requestBody(0)).toContain("<sip:carregarUsuarios")
+    expect(requestBody(0)).toContain('<IdSistema xsi:type="xsd:long">100000100</IdSistema>')
     expect(requestBody(0)).toContain("<SiglaUsuario")
     expect(requestBody(0)).toContain(">usuario.teste</SiglaUsuario>")
     expect(requestBody(1)).toContain("<sip:listarPermissao")
+    expect(requestBody(1)).toContain('<IdSistema xsi:type="xsd:string">100000100</IdSistema>')
     expect(requestBody(1)).toContain("<IdUsuario")
     expect(requestBody(1)).toContain(">100000103</IdUsuario>")
   })
@@ -262,15 +264,23 @@ describe("SipClient", () => {
     ).resolves.toEqual([
       {
         id: "110000075",
+        idOrgao: "0",
+        idOrigem: "cgti",
         sigla: "CGTI",
         descricao: "Coordenacao-Geral de Tecnologia",
         ativo: true,
+        subunidades: [],
+        unidadesSuperiores: [],
       },
       {
         id: "110000076",
+        idOrgao: "0",
+        idOrigem: "teste",
         sigla: "TESTE",
         descricao: "Unidade de Teste",
         ativo: false,
+        subunidades: [],
+        unidadesSuperiores: [],
       },
     ])
     await expect(
@@ -285,12 +295,18 @@ describe("SipClient", () => {
         nome: "Informatica",
         descricao: "Suporte SEI",
         ativo: true,
+        grupos: [],
+        recursos: [],
+        menus: [],
       },
       {
         id: "100000941",
         nome: "Consulta",
         descricao: "Consulta SEI",
         ativo: false,
+        grupos: [],
+        recursos: [],
+        menus: [],
       },
     ])
     await expect(
@@ -309,13 +325,17 @@ describe("SipClient", () => {
     ).resolves.toMatchObject({ sigla: "usuario.teste", nome: "Usuario Teste" })
 
     expect(requestBody(0)).toContain("<sip:carregarOrgaos")
+    expect(requestBody(0)).toContain('<IdSistema xsi:type="xsd:long">100000100</IdSistema>')
     expect(requestBody(0)).toContain("<SinTodos")
     expect(requestBody(0)).toContain(">N</SinTodos>")
     expect(requestBody(1)).toContain("<sip:carregarUnidades")
+    expect(requestBody(1)).toContain('<IdSistema xsi:type="xsd:long">100000100</IdSistema>')
     expect(requestBody(1)).toContain(">100000103</IdUsuario>")
     expect(requestBody(2)).toContain("<sip:carregarPerfis")
+    expect(requestBody(2)).toContain('<IdSistema xsi:type="xsd:long">100000100</IdSistema>')
     expect(requestBody(2)).toContain(">R</StaFiltroRecursosMenus>")
     expect(requestBody(3)).toContain("<sip:carregarUsuario")
+    expect(requestBody(3)).toContain('<IdSistema xsi:type="xsd:string">100000100</IdSistema>')
     expect(requestBody(3)).toContain(">AD</TipoServidorAutenticacao>")
     expect(requestBody(4)).toContain("<sip:pesquisarUsuario")
     expect(requestBody(4)).toContain(">0</IdOrgao>")
@@ -400,7 +420,7 @@ describe("SipClient", () => {
     expect(requestBody(1)).toContain("<sip:replicarPermissao")
     expect(requestBody(1)).toContain('Permissoes SOAP-ENC:arrayType="sip:Permissao[1]"')
     expect(requestBody(1)).toContain(">A</StaOperacao>")
-    expect(requestBody(1)).toContain(">100000100</IdSistema>")
+    expect(requestBody(1)).toContain('<IdSistema xsi:type="xsd:string">100000100</IdSistema>')
     expect(requestBody(1)).toContain(">N</SinSubunidades>")
     expect(requestBody(2)).toContain("<sip:validarReplicacao")
     expect(requestBody(2)).toContain(">rep-1</IdReplicacao>")
@@ -417,6 +437,19 @@ describe("SipClient", () => {
       operation: "listarPermissao",
       status: 403,
       fault: "Servico nao liberado.",
+    } satisfies Partial<SipSoapError>)
+  })
+
+  it("falha explicitamente em HTTP sem SOAP Fault", async () => {
+    fetchMock().mockResolvedValueOnce(response("<html>erro</html>", 500))
+
+    const sip = createSipClient(config)
+
+    await expect(sip.consultas.listarOrgaos()).rejects.toMatchObject({
+      name: "SipSoapError",
+      message: "Erro HTTP 500 chamando carregarOrgaos.",
+      operation: "carregarOrgaos",
+      status: 500,
     } satisfies Partial<SipSoapError>)
   })
 })

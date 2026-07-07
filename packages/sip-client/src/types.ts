@@ -72,11 +72,11 @@ export type SipOrgao = Readonly<{
 }>
 
 export type SipUnidade = Readonly<{
-  /**
-   * Algumas operações do SIP devolvem unidades apenas como
-   * [sigla, descrição, ativo]. Quando isso ocorrer, o id fica nulo.
-   */
-  id: string | null
+  id: string
+  idOrgao: string | null
+  idOrigem: string | null
+  subunidades: string[]
+  unidadesSuperiores: string[]
   sigla: string
   descricao: string
   ativo: boolean
@@ -105,11 +105,42 @@ export type SipUsuarioDiretorio = Readonly<{
   email: string | null
 }>
 
+export type SipGrupoPerfil = Readonly<{
+  id: string
+  nome: string
+  ativo: boolean
+}>
+
+export type SipRecurso = Readonly<{
+  id: string
+  nome: string
+  descricao: string | null
+  ativo: boolean
+}>
+
+export type SipItemMenu = Readonly<{
+  id: string
+  idRecurso: string | null
+  rotulo: string
+  ramificacao: string | null
+  ativo: boolean
+}>
+
+export type SipMenu = Readonly<{
+  id: string
+  nome: string
+  ativo: boolean
+  itens: SipItemMenu[]
+}>
+
 export type SipPerfil = Readonly<{
   id: string
   nome: string
   descricao: string | null
   ativo: boolean
+  grupos: SipGrupoPerfil[]
+  recursos: SipRecurso[]
+  menus: SipMenu[]
 }>
 
 export type SipPermissao = Readonly<{

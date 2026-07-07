@@ -152,6 +152,10 @@ const normalizeSoapValue = (value: unknown): SipRawValue => {
     return normalizeSoapValue(value["#text"])
   }
 
+  if ("arrayType" in value && !("item" in value)) {
+    return []
+  }
+
   if ("item" in value && Object.keys(value).length <= 3) {
     return normalizeSoapValue(value.item)
   }
@@ -210,7 +214,15 @@ export const callSipSoap = async (
     })
     const text = await response.text()
     try {
-      return parseSipSoapResponse(text, options.operation)
+      const payload = parseSipSoapResponse(text, options.operation)
+      if (!response.ok) {
+        throw new SipSoapError(
+          `Erro HTTP ${response.status} chamando ${options.operation}.`,
+          options.operation,
+          response.status,
+        )
+      }
+      return payload
     } catch (error) {
       if (error instanceof SipSoapError) {
         throw new SipSoapError(error.message, options.operation, response.status, error.fault)

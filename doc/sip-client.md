@@ -109,6 +109,47 @@ Replicação:
 Os métodos de consulta na raiz do cliente continuam disponíveis como atalhos de
 compatibilidade. Código novo deve preferir `consultas` e `replicacao`.
 
+O mapa detalhado entre API pública, WSDL e `SipWS.php` fica em
+[sip-contrato-wsdl.md](sip-contrato-wsdl.md).
+
+## DTOs retornados
+
+O pacote não entrega XML SOAP nem arrays posicionais do PHP para consumidores.
+Ele normaliza os retornos do SIP para DTOs TypeScript, preservando os campos do
+contrato `InfraSip::$WS_*`.
+
+`SipUnidade` inclui a hierarquia retornada por `carregarUnidades`:
+
+```ts
+type SipUnidade = {
+  id: string
+  idOrgao: string | null
+  sigla: string
+  descricao: string
+  ativo: boolean
+  subunidades: string[]
+  unidadesSuperiores: string[]
+  idOrigem: string | null
+}
+```
+
+`SipPerfil` inclui grupos, recursos e menus quando `carregarPerfis` retorna
+esses blocos, especialmente com `filtroRecursosMenus` igual a `R`, `M` ou `T`:
+
+```ts
+type SipPerfil = {
+  id: string
+  nome: string
+  descricao: string | null
+  ativo: boolean
+  grupos: SipGrupoPerfil[]
+  recursos: SipRecurso[]
+  menus: SipMenu[]
+}
+```
+
+Arrays opcionais ausentes no SOAP são normalizados como `[]`, não como `null`.
+
 ## Permissões por sigla
 
 `listarPermissao` não aceita filtro por sigla de usuário no WSDL. O fluxo em

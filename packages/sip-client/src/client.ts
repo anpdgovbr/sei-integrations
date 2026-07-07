@@ -36,7 +36,20 @@ type ClientOptions = Readonly<{
   config: SipConfig
 }>
 
-const createBaseParams = (config: SipConfig) => ({
+const systemIdAsLong = (config: SipConfig): number => {
+  const systemId = Number(config.systemId)
+  if (!Number.isSafeInteger(systemId)) {
+    throw new Error(`IdSistema invalido para o SIP: ${config.systemId}`)
+  }
+  return systemId
+}
+
+const createBaseLongParams = (config: SipConfig) => ({
+  ChaveAcesso: config.accessKey,
+  IdSistema: systemIdAsLong(config),
+})
+
+const createBaseStringParams = (config: SipConfig) => ({
   ChaveAcesso: config.accessKey,
   IdSistema: config.systemId,
 })
@@ -70,7 +83,7 @@ export class SipConsultasClient {
     const payload = await callSipSoap(this.config, {
       operation: "carregarOrgaos",
       params: {
-        ...createBaseParams(this.config),
+        ...createBaseLongParams(this.config),
         SinTodos: params.todos === false ? "N" : "S",
       },
     })
@@ -81,7 +94,7 @@ export class SipConsultasClient {
     const payload = await callSipSoap(this.config, {
       operation: "carregarUnidades",
       params: {
-        ...createBaseParams(this.config),
+        ...createBaseLongParams(this.config),
         IdUsuario: params.idUsuario,
         IdUnidade: params.idUnidade,
       },
@@ -93,7 +106,7 @@ export class SipConsultasClient {
     const payload = await callSipSoap(this.config, {
       operation: "carregarUsuarios",
       params: {
-        ...createBaseParams(this.config),
+        ...createBaseLongParams(this.config),
         IdUnidade: params.idUnidade,
         Recurso: params.recurso,
         Perfil: params.perfil,
@@ -117,7 +130,7 @@ export class SipConsultasClient {
     const payload = await callSipSoap(this.config, {
       operation: "carregarUsuariosSemPermissao",
       params: {
-        ...createBaseParams(this.config),
+        ...createBaseLongParams(this.config),
         IdOrgaoUsuario: params.idOrgaoUsuario,
         IdUsuario: params.idUsuario,
         IdOrigemUsuario: params.idOrigemUsuario,
@@ -159,7 +172,7 @@ export class SipConsultasClient {
     const payload = await callSipSoap(this.config, {
       operation: "carregarPerfis",
       params: {
-        ...createBaseParams(this.config),
+        ...createBaseLongParams(this.config),
         IdUsuario: params.idUsuario,
         IdUnidade: params.idUnidade,
         IdPerfil: null,
@@ -188,7 +201,7 @@ export class SipConsultasClient {
     const payload = await callSipSoap(this.config, {
       operation: "listarPermissao",
       params: {
-        ...createBaseParams(this.config),
+        ...createBaseStringParams(this.config),
         IdOrgaoUsuario: params.idOrgaoUsuario,
         IdUsuario: params.idUsuario,
         IdOrigemUsuario: params.idOrigemUsuario,

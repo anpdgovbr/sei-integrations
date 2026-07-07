@@ -12,7 +12,12 @@ include:
     inputs:
       project_type: "lib"
       cache_node_modules_path: "node_modules/"
+
+  - component: gitlab.anpd.gov.br/publico/ci-templates/sonarqube@v6.3.0
+    inputs:
       sonar_project_key: "anpd-sei-integrations"
+      integration_branch: "dev"
+      needs_job: "test"
 
   - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@v6.2.0
     inputs:
