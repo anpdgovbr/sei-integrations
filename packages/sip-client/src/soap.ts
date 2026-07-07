@@ -140,8 +140,10 @@ const normalizeSoapValue = (value: unknown): SipRawValue => {
     return value.map(normalizeSoapValue)
   }
 
+  // value aqui só pode ser function | symbol | bigint (objetos reais já
+  // foram tratados por isRecord), então String() nunca produz "[object Object]".
   if (!isRecord(value)) {
-    return String(value)
+    return typeof value === "function" ? value.toString() : String(value)
   }
 
   if (value.nil === "true") {
