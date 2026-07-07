@@ -33,6 +33,7 @@ variables:
   INTEGRATION_BRANCH: "dev"
   HOMOLOG_BRANCH: "main"
   NPM_CONFIG_OPTIONAL: "true"
+  SECRET_DETECTION_ENABLED: "true"
   BUILD_VALIDATION_SCRIPT: |
     FAILED=""
     for pkg in packages/*/; do
