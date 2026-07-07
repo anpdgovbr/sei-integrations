@@ -48,7 +48,19 @@ export type SipSoapCallOptions = Readonly<{
   params: Readonly<Record<string, SipSoapParamValue>>
 }>
 
-export type SipOperacaoReplicacao = "I" | "A" | "E"
+/**
+ * Operações aceitas pelo `replicarUsuario` do SIP 5.0.4.
+ *
+ * C: cadastrar, A: alterar, E: excluir, D: desativar, R: reativar.
+ */
+export type SipOperacaoReplicacaoUsuario = "C" | "A" | "E" | "D" | "R"
+
+/**
+ * Operações aceitas pelo `replicarPermissao` do SIP 5.0.4.
+ *
+ * A: cadastrar/alterar, E: excluir.
+ */
+export type SipOperacaoReplicacaoPermissao = "A" | "E"
 
 export type SipFiltroRecursosMenus = "N" | "R" | "M" | "T"
 
@@ -181,7 +193,7 @@ export type SipListarPermissoesParams = Readonly<{
 }>
 
 export type SipReplicarUsuario = Readonly<{
-  operacao: SipOperacaoReplicacao
+  operacao: SipOperacaoReplicacaoUsuario
   idOrigem: string
   idOrgao: string
   sigla: string
@@ -192,7 +204,7 @@ export type SipReplicarUsuario = Readonly<{
 }>
 
 export type SipReplicarPermissao = Readonly<{
-  operacao?: SipOperacaoReplicacao | null
+  operacao: SipOperacaoReplicacaoPermissao
   idSistema?: string | null
   idOrgaoUsuario?: string | null
   idUsuario?: string | null

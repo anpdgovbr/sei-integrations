@@ -21,6 +21,22 @@ O fluxo funcional coberto pelo pacote SIP é:
 aplicação consumidora -> SIP SOAP -> dados do sistema alvo cadastrado no SIP
 ```
 
+## Quando usar cada pacote
+
+Use `@anpdgovbr/sip-client` quando a aplicação precisa consultar ou replicar
+usuários, unidades, perfis, recursos e permissões do sistema cadastrado no SIP.
+Esse é o caminho esperado para autorização e sincronização vinculadas ao SIP.
+
+Use `@anpdgovbr/sei-client` somente para integrações diretas com operações do SEI
+que não são contrato do SIP. O escopo público desse pacote deve ser definido
+antes da implementação, usando o código-fonte do SEI 5.0.4 como referência:
+endpoints expostos, autenticação, operações permitidas, tipos de erro e
+diferenças explícitas em relação ao SIP.
+
+Use composição própria na aplicação quando a regra depende de produto, banco,
+cache, RBAC, auditoria, UI, filas ou orquestração entre múltiplas fontes. Essas
+decisões não devem entrar nos clientes base.
+
 ## Desenvolvimento
 
 ```bash
@@ -29,8 +45,17 @@ pnpm format:check
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:coverage
 pnpm build
 ```
+
+Notas de desenvolvimento, fixtures de contrato e próximos passos ficam em
+[doc/desenvolvimento.md](doc/desenvolvimento.md).
+
+Documentação de uso e migração:
+
+- [Guia do sip-client](doc/sip-client.md)
+- [Migração de consumidores](doc/migracao-consumidores.md)
 
 ## CI/CD e ferramental
 
@@ -41,15 +66,8 @@ O repositório segue o padrão das bibliotecas internas ANPD:
 - registry interno: `https://npm.anpd.gov.br`;
 - CI por catálogo em `.gitlab-ci.yml`: `ci-gitleaks`, `ci-node`,
   `ci-changeset-monorepo` e `pages-typedoc`;
+- SonarQube via componente de catálogo `sonarqube`, herdado pelo `ci-node`, com
+  `SONAR_HOST_URL` e `SONAR_TOKEN` definidos como variáveis de CI;
 - dependências base centralizadas no `catalog` do `pnpm-workspace.yaml`;
-- publicação e versionamento via Changesets.
-
-## Próximos passos
-
-1. Confirmar o pipeline inicial na branch `dev`.
-2. Definir se a primeira publicação será global do monorepo ou por pacote.
-3. Publicar versão inicial `0.1.0` de `@anpdgovbr/sip-client` no registry interno.
-4. Revisar nomenclatura pública antes da primeira versão estável.
-5. Adicionar testes de contrato com fixtures reais anonimizadas do WSDL SIP, incluindo falhas SOAP e respostas vazias.
-6. Definir o escopo do `@anpdgovbr/sei-client` antes de implementar: endpoints diretos do SEI, autenticação, operações permitidas e diferenças em relação ao SIP.
-7. Documentar claramente quando uma aplicação deve usar SIP, SEI direto ou uma composição própria da aplicação.
+- versionamento via Changesets em modo independente por pacote;
+- publicação manual por pacote com `pnpm publish:sip` e `pnpm publish:sei`.

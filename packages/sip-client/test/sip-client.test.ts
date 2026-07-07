@@ -51,6 +51,25 @@ const permissaoResponse = `<?xml version="1.0" encoding="UTF-8"?>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`
 
+const emptyUsuariosResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="sipns">
+  <SOAP-ENV:Body>
+    <ns1:carregarUsuariosResponse>
+      <returnUsuarios/>
+    </ns1:carregarUsuariosResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`
+
+const faultResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <SOAP-ENV:Fault>
+      <faultcode>SOAP-ENV:Server</faultcode>
+      <faultstring>Serviço não liberado.</faultstring>
+    </SOAP-ENV:Fault>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`
+
 describe("sei-sip SOAP", () => {
   it("monta envelope com nil e escape XML", () => {
     const envelope = buildSipSoapEnvelope({
@@ -74,7 +93,7 @@ describe("sei-sip SOAP", () => {
         ChaveAcesso: "abc",
         Usuarios: createSoapArray("ArrayOfUsuarios", "Usuario", [
           {
-            StaOperacao: "I",
+            StaOperacao: "C",
             IdOrigem: "ad:luciano.psilva",
             IdOrgao: "0",
             Sigla: "luciano.psilva",
@@ -92,6 +111,28 @@ describe("sei-sip SOAP", () => {
     expect(envelope).toContain('<item xsi:type="sip:Usuario">')
     expect(envelope).toContain("<StaOperacao")
     expect(envelope).toContain("<NomeSocial xsi:nil")
+  })
+
+  it("usa operações de replicação de usuário compatíveis com o SIP 5.0.4", () => {
+    const envelope = buildSipSoapEnvelope({
+      operation: "replicarUsuario",
+      params: {
+        ChaveAcesso: "abc",
+        Usuarios: createSoapArray("ArrayOfUsuarios", "Usuario", [
+          {
+            StaOperacao: "C",
+            IdOrigem: "ad:usuario.teste",
+            IdOrgao: "0",
+            Sigla: "usuario.teste",
+            Nome: "Usuario Teste",
+          },
+        ]),
+      },
+    })
+
+    expect(envelope).toContain("<StaOperacao")
+    expect(envelope).toContain(">C</StaOperacao>")
+    expect(envelope).not.toContain(">I</StaOperacao>")
   })
 
   it("parseia usuário retornado pelo Map SOAP do SIP", () => {
@@ -147,10 +188,28 @@ describe("sei-sip SOAP", () => {
     ])
   })
 
-  it("transforma SOAP fault em erro de domínio", () => {
-    const fault =
-      '<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><SOAP-ENV:Fault><faultstring>Serviço não liberado.</faultstring></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>'
+  it("normaliza respostas vazias como lista vazia nos mappers", () => {
+    const payload = parseSipSoapResponse(emptyUsuariosResponse, "carregarUsuarios")
 
-    expect(() => parseSipSoapResponse(fault, "listarPermissao")).toThrow(SipSoapError)
+    expect(payload).toBe("")
+    expect(mapUsuarios(payload)).toEqual([])
+    expect(mapPermissoes(null)).toEqual([])
+  })
+
+  it("transforma SOAP fault em erro de domínio", () => {
+    expect(() => parseSipSoapResponse(faultResponse, "listarPermissao")).toThrow(SipSoapError)
+
+    try {
+      parseSipSoapResponse(faultResponse, "listarPermissao")
+      expect.unreachable("parseSipSoapResponse deveria lançar SipSoapError")
+    } catch (error) {
+      expect(error).toBeInstanceOf(SipSoapError)
+      expect(error).toMatchObject({
+        message: "Serviço não liberado.",
+        operation: "listarPermissao",
+        status: 500,
+        fault: "Serviço não liberado.",
+      })
+    }
   })
 })

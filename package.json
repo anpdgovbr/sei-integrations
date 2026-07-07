@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Monorepo de clientes TypeScript para integrações SEI e SIP da ANPD.",
   "license": "MIT",
-  "packageManager": "pnpm@11.9.0",
+  "packageManager": "pnpm@11.10.0",
   "engines": {
     "node": ">=22.0.0",
     "pnpm": ">=10.0.0"
@@ -20,28 +20,36 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "test": "pnpm -r --if-present test",
+    "test:coverage": "pnpm build && pnpm exec vitest run --config vitest.workspace.config.ts --coverage",
     "typecheck": "pnpm -r --if-present typecheck",
     "docs": "typedoc --entryPointStrategy expand packages/*/src/index.ts --out docs",
+    "sonar": "set -a && [ -f .env ] && . ./.env; set +a; sonar-scanner -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.token=$SONAR_TOKEN -Dsonar.projectVersion=$(node -p \"require('./package.json').version\")",
+    "sonar:scan": "pnpm test:coverage && pnpm sonar",
+    "smoke:sip": "tsx scripts/smoke-sip.ts",
     "changeset": "changeset",
     "changeset:version": "changeset version",
-    "changeset:publish": "changeset publish"
+    "changeset:publish": "changeset publish",
+    "publish:sip": "pnpm --filter @anpdgovbr/sip-client publish --access public",
+    "publish:sei": "pnpm --filter @anpdgovbr/sei-client publish --access public"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
     "@eslint/js": "^9.39.4",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "^8.62.1",
-    "@typescript-eslint/parser": "^8.62.1",
+    "@typescript-eslint/eslint-plugin": "^8.63.0",
+    "@typescript-eslint/parser": "^8.63.0",
     "@vitest/coverage-v8": "catalog:",
     "eslint": "^9.39.4",
     "fast-xml-parser": "catalog:",
     "globals": "^17.7.0",
     "prettier": "^3.9.4",
     "rimraf": "catalog:",
+    "sonar-scanner": "catalog:",
     "tsup": "catalog:",
+    "tsx": "catalog:",
     "typedoc": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.62.1",
+    "typescript-eslint": "^8.63.0",
     "vitest": "catalog:"
   }
 }

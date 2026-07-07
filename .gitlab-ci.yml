@@ -12,11 +12,12 @@ include:
     inputs:
       project_type: "lib"
       cache_node_modules_path: "node_modules/"
+      sonar_project_key: "anpd-sei-integrations"
 
   - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@v6.2.0
     inputs:
       project_type: "lib"
-      release_mode: "global"
+      release_mode: "independent"
 
   - component: gitlab.anpd.gov.br/publico/ci-templates/pages-typedoc@v6.2.0
     inputs:
@@ -69,7 +70,33 @@ stages:
   - lint
   - build
   - test
+  - sonar
   - deploy
 
 secret_detection:
   stage: security
+
+# O template de lib executa o job de testes; neste monorepo exigimos cobertura
+# agregada no root para publicar junit/cobertura em um único diretório.
+test:
+  needs:
+    - job: install
+      optional: true
+    - job: build
+      artifacts: true
+  script:
+    - |
+      if needs_install; then
+        pnpm install --frozen-lockfile --prefer-offline
+      fi
+    - pnpm test:coverage
+  artifacts:
+    when: always
+    reports:
+      junit: coverage/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/
+    expire_in: 1 week

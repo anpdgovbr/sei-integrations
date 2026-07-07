@@ -5,3 +5,6 @@ docs/
 .turbo/
 .DS_Store
 *.log
+.scannerwork/
+.env
+!.env.example
