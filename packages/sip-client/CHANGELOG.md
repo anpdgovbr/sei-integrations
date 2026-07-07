@@ -1,5 +1,12 @@
 # @anpdgovbr/sip-client
 
+## 0.1.2
+
+### Patch Changes
+
+- 17dcc0e: Corrige a configuração de release por pacote no pipeline do monorepo.
+- 17dcc0e: Adiciona metadados de publicação e documentos distribuídos no pacote.
+
 ## 0.1.1
 
 ### Patch Changes
