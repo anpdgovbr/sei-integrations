@@ -1,6 +1,8 @@
-# Integrações SEI e SIP
+# @anpdgovbr/sei-integrations
 
-Monorepo de bibliotecas TypeScript internas para integrações com SIP e SEI.
+Monorepo interno de bibliotecas TypeScript para integrações com SIP e SEI.
+Os pacotes são desenhados para reuso entre aplicações, sem dependência de
+frameworks, bancos de dados, autorização, UI ou runtime específico.
 
 ## Pacotes
 
@@ -10,14 +12,30 @@ Monorepo de bibliotecas TypeScript internas para integrações com SIP e SEI.
 ## Fronteira de responsabilidade
 
 O pacote SIP é agnóstico de aplicação. Ele não lê `.env`, não conhece Next.js,
-Prisma, RBAC, UI, auditoria ou regras do SGI. A aplicação consumidora deve
+Prisma, RBAC, UI, auditoria ou regras de produto. A aplicação consumidora deve
 resolver configuração, cache, autorização, logging e persistência.
 
-Para o caso atual do SGI, o fluxo funcional continua sendo:
+O fluxo funcional coberto pelo pacote SIP é:
 
 ```text
-SGI -> SIP SOAP -> permissões do sistema SEI cadastrado no SIP
+aplicação consumidora -> SIP SOAP -> dados do sistema alvo cadastrado no SIP
 ```
+
+## Quando usar cada pacote
+
+Use `@anpdgovbr/sip-client` quando a aplicação precisa consultar ou replicar
+usuários, unidades, perfis, recursos e permissões do sistema cadastrado no SIP.
+Esse é o caminho esperado para autorização e sincronização vinculadas ao SIP.
+
+Use `@anpdgovbr/sei-client` somente para integrações diretas com operações do SEI
+que não são contrato do SIP. O escopo público desse pacote deve ser definido
+antes da implementação, usando o código-fonte do SEI 5.0.4 como referência:
+endpoints expostos, autenticação, operações permitidas, tipos de erro e
+diferenças explícitas em relação ao SIP.
+
+Use composição própria na aplicação quando a regra depende de produto, banco,
+cache, RBAC, auditoria, UI, filas ou orquestração entre múltiplas fontes. Essas
+decisões não devem entrar nos clientes base.
 
 ## Desenvolvimento
 
@@ -27,16 +45,31 @@ pnpm format:check
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:coverage
 pnpm build
 ```
 
-## LPA - próximos passos
+Notas de desenvolvimento, fixtures de contrato e próximos passos ficam em
+[doc/desenvolvimento.md](doc/desenvolvimento.md).
 
-1. Inicializar o repositório Git remoto em `ddss/libs/sei-integrations` ou nome equivalente aprovado.
-2. Rodar `pnpm install` no monorepo e commitar o `pnpm-lock.yaml`.
-3. Publicar versão inicial `0.1.0` de `@anpdgovbr/sip-client` no registry interno.
-4. Trocar o SGI de dependência `workspace:`/local para versão publicada quando o pacote estiver disponível no registry.
-5. Revisar nomenclatura pública antes da primeira versão estável: manter aliases `SeiSip*` apenas se forem úteis para compatibilidade.
-6. Adicionar testes de contrato com fixtures reais anonimizadas do WSDL SIP, incluindo falhas SOAP e respostas vazias.
-7. Definir o escopo do `@anpdgovbr/sei-client` antes de implementar: endpoints diretos do SEI, autenticação, operações permitidas e diferenças em relação ao SIP.
-8. Documentar claramente quando uma aplicação deve usar SIP, SEI direto ou uma composição própria da aplicação.
+Documentação de uso e migração:
+
+- [Guia do sip-client](doc/sip-client.md)
+- [Contrato SIP WSDL](doc/sip-contrato-wsdl.md)
+- [Migração de consumidores](doc/migracao-consumidores.md)
+
+## CI/CD e ferramental
+
+O repositório segue o padrão das bibliotecas internas ANPD:
+
+- branch de integração: `dev`;
+- branch de homologação/release: `main`;
+- registry interno: `https://npm.anpd.gov.br`;
+- CI por catálogo em `.gitlab-ci.yml`: `ci-gitleaks`, `ci-node`, `sonarqube`,
+  `ci-changeset-monorepo` e `pages-typedoc`;
+- SonarQube via componente de catálogo `sonarqube@v6.3.0`, com projeto definido
+  em `sonar-project.properties` e `SONAR_HOST_URL`/`SONAR_TOKEN` definidos como
+  variáveis de CI;
+- dependências base centralizadas no `catalog` do `pnpm-workspace.yaml`;
+- versionamento via Changesets em modo independente por pacote;
+- publicação manual por pacote com `pnpm publish:sip` e `pnpm publish:sei`.

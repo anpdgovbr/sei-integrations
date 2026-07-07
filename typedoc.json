@@ -1,0 +1,22 @@
+{
+  "entryPointStrategy": "expand",
+  "entryPoints": ["packages/*/src/index.ts"],
+  "out": "docs",
+  "name": "ANPD SEI Integrations",
+  "includeVersion": true,
+  "tsconfig": "tsconfig.base.json",
+  "exclude": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "packages/*/test/**"
+  ],
+  "readme": "README.md",
+  "theme": "default",
+  "hideGenerator": true,
+  "validation": {
+    "invalidLink": false,
+    "notExported": false
+  }
+}

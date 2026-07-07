@@ -1,9 +1,13 @@
 import type {
+  SipGrupoPerfil,
+  SipItemMenu,
+  SipMenu,
   SipOrgao,
   SipPerfil,
   SipPermissao,
   SipRawMap,
   SipRawValue,
+  SipRecurso,
   SipUnidade,
   SipUsuario,
   SipUsuarioDiretorio,
@@ -50,10 +54,31 @@ const nonNullStrings = (value: SipRawValue): string[] =>
     .flatMap((item) => (Array.isArray(item) ? nonNullStrings(item) : [stringValue(item)]))
     .filter((item): item is string => item !== null && item !== "")
 
-const mapNestedArray = (value: SipRawValue): string[][] =>
-  asArray(value)
-    .map((item) => asArray(item).map((child) => stringValue(child) ?? ""))
+const isScalarLike = (value: SipRawValue): boolean =>
+  value === null ||
+  typeof value === "string" ||
+  typeof value === "number" ||
+  typeof value === "boolean"
+
+const mapNestedArray = (value: SipRawValue): string[][] => {
+  const items = Array.isArray(value) && value.every(isScalarLike) ? [value] : asArray(value)
+  return items
+    .map((item) => {
+      const source = isMap(item) && "value" in item ? (item.value ?? null) : item
+      return asArray(source).map((child) => stringValue(child) ?? "")
+    })
     .filter((item) => item.length > 0)
+}
+
+const mapRecordArray = (value: SipRawValue): SipRawValue[][] => {
+  const items = Array.isArray(value) && value.every(isScalarLike) ? [value] : asArray(value)
+  return items
+    .map((item) => {
+      const source = isMap(item) && "value" in item ? (item.value ?? null) : item
+      return asArray(source)
+    })
+    .filter((item) => item.length > 0)
+}
 
 /**
  * Map SOAP PHP: cada item tem `key` e `value`.
@@ -80,21 +105,42 @@ export const mapOrgaos = (value: SipRawValue): SipOrgao[] =>
   }))
 
 export const mapUnidades = (value: SipRawValue): SipUnidade[] =>
-  mapNestedArray(value).map((item) => {
+  mapRecordArray(value).map((item) => {
+    if (item.length >= 5) {
+      return {
+        id: requiredString(item[0] ?? null, "Unidade.IdUnidade"),
+        idOrgao: stringValue(item[1] ?? null),
+        sigla: requiredString(item[2] ?? null, "Unidade.Sigla"),
+        descricao: stringValue(item[3] ?? null) ?? "",
+        ativo: boolFromSin(item[4] ?? null),
+        subunidades: nonNullStrings(item[5] ?? null),
+        unidadesSuperiores: nonNullStrings(item[6] ?? null),
+        idOrigem: stringValue(item[7] ?? null),
+      }
+    }
+
     if (item.length >= 4) {
       return {
-        id: item[0] ?? null,
-        sigla: item[1] ?? "",
-        descricao: item[2] ?? "",
-        ativo: item[3] === "S",
+        id: requiredString(item[0] ?? null, "Unidade.IdUnidade"),
+        idOrgao: null,
+        sigla: requiredString(item[1] ?? null, "Unidade.Sigla"),
+        descricao: stringValue(item[2] ?? null) ?? "",
+        ativo: boolFromSin(item[3] ?? null),
+        subunidades: [],
+        unidadesSuperiores: [],
+        idOrigem: null,
       }
     }
 
     return {
-      id: null,
-      sigla: item[0] ?? "",
-      descricao: item[1] ?? "",
-      ativo: item[2] === "S",
+      id: "",
+      idOrgao: null,
+      sigla: stringValue(item[0] ?? null) ?? "",
+      descricao: stringValue(item[1] ?? null) ?? "",
+      ativo: boolFromSin(item[2] ?? null),
+      subunidades: [],
+      unidadesSuperiores: [],
+      idOrigem: null,
     }
   })
 
@@ -140,23 +186,61 @@ export const mapUsuarioDiretorio = (value: SipRawValue): SipUsuarioDiretorio | n
   }
 }
 
+const mapGrupoPerfis = (value: SipRawValue): SipGrupoPerfil[] =>
+  mapRecordArray(value).map((item) => ({
+    id: requiredString(item[0] ?? null, "GrupoPerfil.IdGrupoPerfil"),
+    nome: requiredString(item[1] ?? null, "GrupoPerfil.Nome"),
+    ativo: boolFromSin(item[2] ?? null),
+  }))
+
+const mapRecursosPerfil = (value: SipRawValue): SipRecurso[] =>
+  mapRecordArray(value).map((item) => ({
+    id: requiredString(item[0] ?? null, "Recurso.IdRecurso"),
+    nome: requiredString(item[1] ?? null, "Recurso.Nome"),
+    descricao: stringValue(item[2] ?? null),
+    ativo: boolFromSin(item[3] ?? null),
+  }))
+
+const mapItensMenu = (value: SipRawValue): SipItemMenu[] =>
+  mapRecordArray(value).map((item) => ({
+    id: requiredString(item[0] ?? null, "ItemMenu.IdItemMenu"),
+    idRecurso: stringValue(item[1] ?? null),
+    rotulo: requiredString(item[2] ?? null, "ItemMenu.Rotulo"),
+    ramificacao: stringValue(item[3] ?? null),
+    ativo: boolFromSin(item[4] ?? null),
+  }))
+
+const mapMenus = (value: SipRawValue): SipMenu[] =>
+  mapRecordArray(value).map((item) => ({
+    id: requiredString(item[0] ?? null, "Menu.IdMenu"),
+    nome: requiredString(item[1] ?? null, "Menu.Nome"),
+    ativo: boolFromSin(item[2] ?? null),
+    itens: mapItensMenu(item[3] ?? null),
+  }))
+
 export const mapPerfis = (value: SipRawValue): SipPerfil[] =>
-  mapNestedArray(value)
+  mapRecordArray(value)
     .map((item) => {
       if (item.length >= 4) {
         return {
-          id: item[0] ?? "",
-          nome: item[1] ?? "",
-          descricao: item[2] || null,
-          ativo: item[3] === "S",
+          id: requiredString(item[0] ?? null, "Perfil.IdPerfil"),
+          nome: requiredString(item[1] ?? null, "Perfil.Nome"),
+          descricao: stringValue(item[2] ?? null),
+          ativo: boolFromSin(item[3] ?? null),
+          grupos: mapGrupoPerfis(item[4] ?? null),
+          recursos: mapRecursosPerfil(item[5] ?? null),
+          menus: mapMenus(item[6] ?? null),
         }
       }
 
       return {
         id: "",
-        nome: item[0] ?? "",
-        descricao: item[1] || null,
-        ativo: item[2] === "S",
+        nome: stringValue(item[0] ?? null) ?? "",
+        descricao: stringValue(item[1] ?? null),
+        ativo: boolFromSin(item[2] ?? null),
+        grupos: [],
+        recursos: [],
+        menus: [],
       }
     })
     .filter((item) => item.nome)
