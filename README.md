@@ -1,6 +1,8 @@
-# Integrações SEI e SIP
+# @anpdgovbr/sei-integrations
 
-Monorepo de bibliotecas TypeScript internas para integrações com SIP e SEI.
+Monorepo interno de bibliotecas TypeScript para integrações com SIP e SEI.
+Os pacotes são desenhados para reuso entre aplicações, sem dependência de
+frameworks, bancos de dados, autorização, UI ou runtime específico.
 
 ## Pacotes
 
@@ -10,13 +12,13 @@ Monorepo de bibliotecas TypeScript internas para integrações com SIP e SEI.
 ## Fronteira de responsabilidade
 
 O pacote SIP é agnóstico de aplicação. Ele não lê `.env`, não conhece Next.js,
-Prisma, RBAC, UI, auditoria ou regras do SGI. A aplicação consumidora deve
+Prisma, RBAC, UI, auditoria ou regras de produto. A aplicação consumidora deve
 resolver configuração, cache, autorização, logging e persistência.
 
-Para o caso atual do SGI, o fluxo funcional continua sendo:
+O fluxo funcional coberto pelo pacote SIP é:
 
 ```text
-SGI -> SIP SOAP -> permissões do sistema SEI cadastrado no SIP
+aplicação consumidora -> SIP SOAP -> dados do sistema alvo cadastrado no SIP
 ```
 
 ## Desenvolvimento
@@ -30,13 +32,24 @@ pnpm test
 pnpm build
 ```
 
-## LPA - próximos passos
+## CI/CD e ferramental
 
-1. Inicializar o repositório Git remoto em `ddss/libs/sei-integrations` ou nome equivalente aprovado.
-2. Rodar `pnpm install` no monorepo e commitar o `pnpm-lock.yaml`.
+O repositório segue o padrão das bibliotecas internas ANPD:
+
+- branch de integração: `dev`;
+- branch de homologação/release: `main`;
+- registry interno: `https://npm.anpd.gov.br`;
+- CI por catálogo em `.gitlab-ci.yml`: `ci-gitleaks`, `ci-node`,
+  `ci-changeset-monorepo` e `pages-typedoc`;
+- dependências base centralizadas no `catalog` do `pnpm-workspace.yaml`;
+- publicação e versionamento via Changesets.
+
+## Próximos passos
+
+1. Confirmar o pipeline inicial na branch `dev`.
+2. Definir se a primeira publicação será global do monorepo ou por pacote.
 3. Publicar versão inicial `0.1.0` de `@anpdgovbr/sip-client` no registry interno.
-4. Trocar o SGI de dependência `workspace:`/local para versão publicada quando o pacote estiver disponível no registry.
-5. Revisar nomenclatura pública antes da primeira versão estável: manter aliases `SeiSip*` apenas se forem úteis para compatibilidade.
-6. Adicionar testes de contrato com fixtures reais anonimizadas do WSDL SIP, incluindo falhas SOAP e respostas vazias.
-7. Definir o escopo do `@anpdgovbr/sei-client` antes de implementar: endpoints diretos do SEI, autenticação, operações permitidas e diferenças em relação ao SIP.
-8. Documentar claramente quando uma aplicação deve usar SIP, SEI direto ou uma composição própria da aplicação.
+4. Revisar nomenclatura pública antes da primeira versão estável.
+5. Adicionar testes de contrato com fixtures reais anonimizadas do WSDL SIP, incluindo falhas SOAP e respostas vazias.
+6. Definir o escopo do `@anpdgovbr/sei-client` antes de implementar: endpoints diretos do SEI, autenticação, operações permitidas e diferenças em relação ao SIP.
+7. Documentar claramente quando uma aplicação deve usar SIP, SEI direto ou uma composição própria da aplicação.

@@ -4,6 +4,33 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    "@types/node":
+      specifier: ^25.9.4
+      version: 25.9.4
+    "@vitest/coverage-v8":
+      specifier: ^4.1.9
+      version: 4.1.10
+    fast-xml-parser:
+      specifier: ^5.9.3
+      version: 5.9.3
+    rimraf:
+      specifier: ^6.1.3
+      version: 6.1.3
+    tsup:
+      specifier: ^8.5.1
+      version: 8.5.1
+    typedoc:
+      specifier: ^0.28.19
+      version: 0.28.20
+    typescript:
+      specifier: ^6.0.3
+      version: 6.0.3
+    vitest:
+      specifier: ^4.1.9
+      version: 4.1.10
+
 importers:
   .:
     devDependencies:
@@ -14,7 +41,7 @@ importers:
         specifier: ^9.39.4
         version: 9.39.4
       "@types/node":
-        specifier: ^25.9.4
+        specifier: "catalog:"
         version: 25.9.4
       "@typescript-eslint/eslint-plugin":
         specifier: ^8.62.1
@@ -23,13 +50,13 @@ importers:
         specifier: ^8.62.1
         version: 8.63.0(eslint@9.39.4)(typescript@6.0.3)
       "@vitest/coverage-v8":
-        specifier: ^4.1.9
+        specifier: "catalog:"
         version: 4.1.10(vitest@4.1.10)
       eslint:
         specifier: ^9.39.4
         version: 9.39.4
       fast-xml-parser:
-        specifier: ^5.9.3
+        specifier: "catalog:"
         version: 5.9.3
       globals:
         specifier: ^17.7.0
@@ -38,60 +65,63 @@ importers:
         specifier: ^3.9.4
         version: 3.9.4
       rimraf:
-        specifier: ^6.1.3
+        specifier: "catalog:"
         version: 6.1.3
       tsup:
-        specifier: ^8.5.1
-        version: 8.5.1(postcss@8.5.16)(typescript@6.0.3)
+        specifier: "catalog:"
+        version: 8.5.1(postcss@8.5.16)(typescript@6.0.3)(yaml@2.9.0)
+      typedoc:
+        specifier: "catalog:"
+        version: 0.28.20(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: "catalog:"
         version: 6.0.3
       typescript-eslint:
         specifier: ^8.62.1
         version: 8.63.0(eslint@9.39.4)(typescript@6.0.3)
       vitest:
-        specifier: ^4.1.9
-        version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7))
+        specifier: "catalog:"
+        version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0))
 
   packages/sei-client:
     devDependencies:
       rimraf:
-        specifier: ^6.1.3
+        specifier: "catalog:"
         version: 6.1.3
       tsup:
-        specifier: ^8.5.1
-        version: 8.5.1(postcss@8.5.16)(typescript@6.0.3)
+        specifier: "catalog:"
+        version: 8.5.1(postcss@8.5.16)(typescript@6.0.3)(yaml@2.9.0)
       typescript:
-        specifier: ^6.0.3
+        specifier: "catalog:"
         version: 6.0.3
       vitest:
-        specifier: ^4.1.9
-        version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7))
+        specifier: "catalog:"
+        version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0))
 
   packages/sip-client:
     dependencies:
       fast-xml-parser:
-        specifier: ^5.9.3
+        specifier: "catalog:"
         version: 5.9.3
     devDependencies:
       "@types/node":
-        specifier: ^25.9.4
+        specifier: "catalog:"
         version: 25.9.4
       "@vitest/coverage-v8":
-        specifier: ^4.1.9
+        specifier: "catalog:"
         version: 4.1.10(vitest@4.1.10)
       rimraf:
-        specifier: ^6.1.3
+        specifier: "catalog:"
         version: 6.1.3
       tsup:
-        specifier: ^8.5.1
-        version: 8.5.1(postcss@8.5.16)(typescript@6.0.3)
+        specifier: "catalog:"
+        version: 8.5.1(postcss@8.5.16)(typescript@6.0.3)(yaml@2.9.0)
       typescript:
-        specifier: ^6.0.3
+        specifier: "catalog:"
         version: 6.0.3
       vitest:
-        specifier: ^4.1.9
-        version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7))
+        specifier: "catalog:"
+        version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0))
 
 packages:
   "@babel/helper-string-parser@7.29.7":
@@ -562,6 +592,12 @@ packages:
         integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==,
       }
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
+
+  "@gerrit0/mini-shiki@3.23.0":
+    resolution:
+      {
+        integrity: sha512-bEMORlG0cqdjVyCEuU0cDQbORWX+kYCeo0kV1lbxF5bt4r7SID2l9bqsxJEM0zndaxpOUT7riCyIVEuqq/Ynxg==,
+      }
 
   "@humanfs/core@0.19.2":
     resolution:
@@ -1048,6 +1084,36 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  "@shikijs/engine-oniguruma@3.23.0":
+    resolution:
+      {
+        integrity: sha512-1nWINwKXxKKLqPibT5f4pAFLej9oZzQTsby8942OTlsJzOBZ0MWKiwzMsd+jhzu8YPCHAswGnnN1YtQfirL35g==,
+      }
+
+  "@shikijs/langs@3.23.0":
+    resolution:
+      {
+        integrity: sha512-2Ep4W3Re5aB1/62RSYQInK9mM3HsLeB91cHqznAJMuylqjzNVAVCMnNWRHFtcNHXsoNRayP9z1qj4Sq3nMqYXg==,
+      }
+
+  "@shikijs/themes@3.23.0":
+    resolution:
+      {
+        integrity: sha512-5qySYa1ZgAT18HR/ypENL9cUSGOeI2x+4IvYJu4JgVJdizn6kG4ia5Q1jDEOi7gTbN4RbuYtmHh0W3eccOrjMA==,
+      }
+
+  "@shikijs/types@3.23.0":
+    resolution:
+      {
+        integrity: sha512-3JZ5HXOZfYjsYSk0yPwBrkupyYSLpAE26Qc0HLghhZNGTZg/SKxXIIgoxOpmmeQP0RRSDJTk1/vPfw9tbw+jSQ==,
+      }
+
+  "@shikijs/vscode-textmate@10.0.2":
+    resolution:
+      {
+        integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==,
+      }
+
   "@standard-schema/spec@1.1.0":
     resolution:
       {
@@ -1078,6 +1144,12 @@ packages:
         integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==,
       }
 
+  "@types/hast@3.0.4":
+    resolution:
+      {
+        integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==,
+      }
+
   "@types/json-schema@7.0.15":
     resolution:
       {
@@ -1094,6 +1166,12 @@ packages:
     resolution:
       {
         integrity: sha512-dszCsrKb5U7ZsVZBWiHFklTloVl0mSEnWH/iZXfZUlI4rzCUnsvGmgqfuVRHL54ugE7/wRuxEIXRa2iMZ+BG6g==,
+      }
+
+  "@types/unist@3.0.3":
+    resolution:
+      {
+        integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==,
       }
 
   "@typescript-eslint/eslint-plugin@8.63.0":
@@ -1521,6 +1599,13 @@ packages:
         integrity: sha512-rRqJg/6gd538VHvR3PSrdRBb/1Vy2YfzHqzvbhGIQpDRKIa4FgV/54b5Q1xYSxOOwKvjXweS26E0Q+nAMwp2pQ==,
       }
     engines: { node: ">=8.6" }
+
+  entities@4.5.0:
+    resolution:
+      {
+        integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==,
+      }
+    engines: { node: ">=0.12" }
 
   es-module-lexer@2.3.0:
     resolution:
@@ -2129,6 +2214,12 @@ packages:
         integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==,
       }
 
+  linkify-it@5.0.2:
+    resolution:
+      {
+        integrity: sha512-ONTm2jCMAVZjgQa/Fy1kScXsuOoF5NPTsoFBdE1KVIZ2vAh/r9+Bqo+0jINCBYnavTPQZz38QzFTme79ENoN3Q==,
+      }
+
   load-tsconfig@0.2.5:
     resolution:
       {
@@ -2169,6 +2260,12 @@ packages:
       }
     engines: { node: 20 || >=22 }
 
+  lunr@2.3.9:
+    resolution:
+      {
+        integrity: sha512-zTU3DaZaF3Rt9rhN3uBMGQD3dD2/vFQqnvZCDv4dl5iOzq2IZQqTxu90r4E5J+nP70J3ilqVCrbho2eWaeW8Ow==,
+      }
+
   magic-string@0.30.21:
     resolution:
       {
@@ -2187,6 +2284,19 @@ packages:
         integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==,
       }
     engines: { node: ">=10" }
+
+  markdown-it@14.3.0:
+    resolution:
+      {
+        integrity: sha512-RCEsPjR+sr0x+AuYp601tKTkgFG4YEPLCzHST3cQ/fhlJkqAkz1L2/Qbp1j9qw5SBwQHFBoW8+hoN5xssOF0Tw==,
+      }
+    hasBin: true
+
+  mdurl@2.0.0:
+    resolution:
+      {
+        integrity: sha512-Lf+9+2r+Tdp5wXDXC4PcIBjTDtq4UKjCPMQhKIuzpJNW0b96kVqSwW0bT7FhRSfmAiFYgP+SCRvdrDozfh0U5w==,
+      }
 
   merge2@1.4.1:
     resolution:
@@ -2487,6 +2597,13 @@ packages:
       }
     engines: { node: ">=14" }
     hasBin: true
+
+  punycode.js@2.3.1:
+    resolution:
+      {
+        integrity: sha512-uxFIHU0YlHYhDQtV4R9J6a52SLx28BCjT+4ieh7IGbgwVJWO+km431c4yRlREUAsAmt/uMjQUyQHNEPf0M39CA==,
+      }
+    engines: { node: ">=6" }
 
   punycode@2.3.1:
     resolution:
@@ -2817,6 +2934,16 @@ packages:
       }
     engines: { node: ">= 0.8.0" }
 
+  typedoc@0.28.20:
+    resolution:
+      {
+        integrity: sha512-uSKqkh8Cr48vllnEy+jdaAgOeR6Y+QCBW7usgUsKj7gJEfR7stw9U/fE49LBnj2tPRKPY0c0EBJSWe9Appmplg==,
+      }
+    engines: { node: ">= 18", pnpm: ">= 10" }
+    hasBin: true
+    peerDependencies:
+      typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x || 6.0.x
+
   typescript-eslint@8.63.0:
     resolution:
       {
@@ -2834,6 +2961,12 @@ packages:
       }
     engines: { node: ">=14.17" }
     hasBin: true
+
+  uc.micro@2.1.0:
+    resolution:
+      {
+        integrity: sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==,
+      }
 
   ufo@1.6.4:
     resolution:
@@ -2979,6 +3112,14 @@ packages:
         integrity: sha512-k8KO9hrMyNk6tUWqUfkTEZbezRRpONVOzUTnc97VnCvyj6Tf9lyUR9EDAIeiVLv56jsMcoXEwjW8Kv5yPY52lw==,
       }
     engines: { node: ">=16.0.0" }
+
+  yaml@2.9.0:
+    resolution:
+      {
+        integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==,
+      }
+    engines: { node: ">= 14.6" }
+    hasBin: true
 
   yocto-queue@0.1.0:
     resolution:
@@ -3288,6 +3429,14 @@ snapshots:
       "@eslint/core": 0.17.0
       levn: 0.4.1
 
+  "@gerrit0/mini-shiki@3.23.0":
+    dependencies:
+      "@shikijs/engine-oniguruma": 3.23.0
+      "@shikijs/langs": 3.23.0
+      "@shikijs/themes": 3.23.0
+      "@shikijs/types": 3.23.0
+      "@shikijs/vscode-textmate": 10.0.2
+
   "@humanfs/core@0.19.2":
     dependencies:
       "@humanfs/types": 0.15.0
@@ -3490,6 +3639,26 @@ snapshots:
   "@rollup/rollup-win32-x64-msvc@4.62.2":
     optional: true
 
+  "@shikijs/engine-oniguruma@3.23.0":
+    dependencies:
+      "@shikijs/types": 3.23.0
+      "@shikijs/vscode-textmate": 10.0.2
+
+  "@shikijs/langs@3.23.0":
+    dependencies:
+      "@shikijs/types": 3.23.0
+
+  "@shikijs/themes@3.23.0":
+    dependencies:
+      "@shikijs/types": 3.23.0
+
+  "@shikijs/types@3.23.0":
+    dependencies:
+      "@shikijs/vscode-textmate": 10.0.2
+      "@types/hast": 3.0.4
+
+  "@shikijs/vscode-textmate@10.0.2": {}
+
   "@standard-schema/spec@1.1.0": {}
 
   "@tybys/wasm-util@0.10.3":
@@ -3506,6 +3675,10 @@ snapshots:
 
   "@types/estree@1.0.9": {}
 
+  "@types/hast@3.0.4":
+    dependencies:
+      "@types/unist": 3.0.3
+
   "@types/json-schema@7.0.15": {}
 
   "@types/node@12.20.55": {}
@@ -3513,6 +3686,8 @@ snapshots:
   "@types/node@25.9.4":
     dependencies:
       undici-types: 7.24.6
+
+  "@types/unist@3.0.3": {}
 
   "@typescript-eslint/eslint-plugin@8.63.0(@typescript-eslint/parser@8.63.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(typescript@6.0.3)":
     dependencies:
@@ -3617,7 +3792,7 @@ snapshots:
       obug: 2.1.3
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7))
+      vitest: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0))
 
   "@vitest/expect@4.1.10":
     dependencies:
@@ -3628,13 +3803,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  "@vitest/mocker@4.1.10(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7))":
+  "@vitest/mocker@4.1.10(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0))":
     dependencies:
       "@vitest/spy": 4.1.10
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.1.3(@types/node@25.9.4)(esbuild@0.27.7)
+      vite: 8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0)
 
   "@vitest/pretty-format@4.1.10":
     dependencies:
@@ -3784,6 +3959,8 @@ snapshots:
     dependencies:
       ansi-colors: 4.1.3
       strip-ansi: 6.0.1
+
+  entities@4.5.0: {}
 
   es-module-lexer@2.3.0: {}
 
@@ -4144,6 +4321,10 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
+  linkify-it@5.0.2:
+    dependencies:
+      uc.micro: 2.1.0
+
   load-tsconfig@0.2.5: {}
 
   locate-path@5.0.0:
@@ -4160,6 +4341,8 @@ snapshots:
 
   lru-cache@11.5.1: {}
 
+  lunr@2.3.9: {}
+
   magic-string@0.30.21:
     dependencies:
       "@jridgewell/sourcemap-codec": 1.5.5
@@ -4173,6 +4356,17 @@ snapshots:
   make-dir@4.0.0:
     dependencies:
       semver: 7.8.5
+
+  markdown-it@14.3.0:
+    dependencies:
+      argparse: 2.0.1
+      entities: 4.5.0
+      linkify-it: 5.0.2
+      mdurl: 2.0.0
+      punycode.js: 2.3.1
+      uc.micro: 2.1.0
+
+  mdurl@2.0.0: {}
 
   merge2@1.4.1: {}
 
@@ -4292,11 +4486,12 @@ snapshots:
       mlly: 1.8.2
       pathe: 2.0.3
 
-  postcss-load-config@6.0.1(postcss@8.5.16):
+  postcss-load-config@6.0.1(postcss@8.5.16)(yaml@2.9.0):
     dependencies:
       lilconfig: 3.1.3
     optionalDependencies:
       postcss: 8.5.16
+      yaml: 2.9.0
 
   postcss@8.5.16:
     dependencies:
@@ -4309,6 +4504,8 @@ snapshots:
   prettier@2.8.8: {}
 
   prettier@3.9.4: {}
+
+  punycode.js@2.3.1: {}
 
   punycode@2.3.1: {}
 
@@ -4487,7 +4684,7 @@ snapshots:
   tslib@2.8.1:
     optional: true
 
-  tsup@8.5.1(postcss@8.5.16)(typescript@6.0.3):
+  tsup@8.5.1(postcss@8.5.16)(typescript@6.0.3)(yaml@2.9.0):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.27.7)
       cac: 6.7.14
@@ -4498,7 +4695,7 @@ snapshots:
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
       picocolors: 1.1.1
-      postcss-load-config: 6.0.1(postcss@8.5.16)
+      postcss-load-config: 6.0.1(postcss@8.5.16)(yaml@2.9.0)
       resolve-from: 5.0.0
       rollup: 4.62.2
       source-map: 0.7.6
@@ -4519,6 +4716,15 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
 
+  typedoc@0.28.20(typescript@6.0.3):
+    dependencies:
+      "@gerrit0/mini-shiki": 3.23.0
+      lunr: 2.3.9
+      markdown-it: 14.3.0
+      minimatch: 10.2.5
+      typescript: 6.0.3
+      yaml: 2.9.0
+
   typescript-eslint@8.63.0(eslint@9.39.4)(typescript@6.0.3):
     dependencies:
       "@typescript-eslint/eslint-plugin": 8.63.0(@typescript-eslint/parser@8.63.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(typescript@6.0.3)
@@ -4532,6 +4738,8 @@ snapshots:
 
   typescript@6.0.3: {}
 
+  uc.micro@2.1.0: {}
+
   ufo@1.6.4: {}
 
   undici-types@7.24.6: {}
@@ -4542,7 +4750,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7):
+  vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.5
@@ -4553,11 +4761,12 @@ snapshots:
       "@types/node": 25.9.4
       esbuild: 0.27.7
       fsevents: 2.3.3
+      yaml: 2.9.0
 
-  vitest@4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)):
+  vitest@4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0)):
     dependencies:
       "@vitest/expect": 4.1.10
-      "@vitest/mocker": 4.1.10(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7))
+      "@vitest/mocker": 4.1.10(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0))
       "@vitest/pretty-format": 4.1.10
       "@vitest/runner": 4.1.10
       "@vitest/snapshot": 4.1.10
@@ -4574,7 +4783,7 @@ snapshots:
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.0
-      vite: 8.1.3(@types/node@25.9.4)(esbuild@0.27.7)
+      vite: 8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       "@types/node": 25.9.4
@@ -4594,5 +4803,7 @@ snapshots:
   word-wrap@1.2.5: {}
 
   xml-naming@0.1.0: {}
+
+  yaml@2.9.0: {}
 
   yocto-queue@0.1.0: {}

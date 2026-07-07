@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+docs/
 .turbo/
 .DS_Store
 *.log

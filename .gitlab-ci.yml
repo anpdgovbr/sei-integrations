@@ -1,0 +1,74 @@
+# =====================================================================
+# GitLab CI/CD Pipeline - @anpdgovbr/sei-integrations (Monorepo)
+# =====================================================================
+
+# ==========================================
+# COMPONENTES DO CATÁLOGO
+# ==========================================
+include:
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-gitleaks@v6.2.0
+
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-node@v6.2.0
+    inputs:
+      project_type: "lib"
+      cache_node_modules_path: "node_modules/"
+
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@v6.2.0
+    inputs:
+      project_type: "lib"
+      release_mode: "global"
+
+  - component: gitlab.anpd.gov.br/publico/ci-templates/pages-typedoc@v6.2.0
+    inputs:
+      project_type: "lib"
+
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/SAST-IaC.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+# ==========================================
+# VARIÁVEIS DO PROJETO
+# ==========================================
+variables:
+  INTEGRATION_BRANCH: "dev"
+  HOMOLOG_BRANCH: "main"
+  NPM_CONFIG_OPTIONAL: "true"
+  BUILD_VALIDATION_SCRIPT: |
+    FAILED=""
+    for pkg in packages/*/; do
+      if [ -f "$pkg/package.json" ]; then
+        PKG=$(node -p "require('./$pkg/package.json').name")
+        if [ ! -d "$pkg/dist" ]; then
+          echo "dist ausente: $PKG"
+          FAILED="$FAILED $PKG"
+        else
+          echo "OK: $PKG"
+        fi
+      fi
+    done
+    [ -z "$FAILED" ] || { echo "Falha:$FAILED"; exit 1; }
+
+# ==========================================
+# WORKFLOW RULES
+# ==========================================
+workflow:
+  rules:
+    - if: "$CI_COMMIT_TAG"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $INTEGRATION_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == $HOMOLOG_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+    - when: never
+
+# ==========================================
+# STAGES
+# ==========================================
+stages:
+  - security
+  - install
+  - lint
+  - build
+  - test
+  - deploy
+
+secret_detection:
+  stage: security
