@@ -1,5 +1,11 @@
 # @anpdgovbr/sip-client
 
+## 0.1.3
+
+### Patch Changes
+
+- d9fee8d: Corrige a configuração de release por pacote no pipeline do monorepo.
+
 ## 0.1.2
 
 ### Patch Changes
