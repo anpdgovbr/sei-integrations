@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Variáveis de exemplo vazias para personas SIP"
+paths = [
+  '''^doc/desenvolvimento\.md$''',
+  '''^\.env\.example$''',
+]
+regexes = [
+  '''(?m)^SIP_PERSONA_[A-Z_]+_ACCESS_KEY=$''',
+]

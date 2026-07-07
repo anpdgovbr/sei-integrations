@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <SOAP-ENV:Fault>
+      <faultcode>SOAP-ENV:Client</faultcode>
+      <faultstring>Serviço "Pesquisa de Usuários" não foi liberado para o sistema Sistema Teste/ANPD.</faultstring>
+      <detail>
+        <item>
+          <key>infra_tipo_excecao</key>
+          <value>INFRA_ERRO</value>
+        </item>
+      </detail>
+    </SOAP-ENV:Fault>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
