@@ -426,6 +426,79 @@ describe("SipClient", () => {
     expect(requestBody(2)).toContain(">rep-1</IdReplicacao>")
   })
 
+  it("rejeita IdSistema que não é um inteiro seguro", async () => {
+    const sip = createSipClient({ ...config, systemId: "abc" })
+
+    await expect(sip.consultas.listarOrgaos()).rejects.toThrow(/IdSistema invalido para o SIP: abc/)
+    expect(fetchMock()).not.toHaveBeenCalled()
+  })
+
+  it("converte SinSubunidades true para 'S' na replicação de permissão", async () => {
+    fetchMock().mockResolvedValueOnce(
+      response(trueResponse("replicarPermissao", "returnReplicarPermissao")),
+    )
+
+    const sip = createSipClient(config)
+    await sip.replicacao.replicarPermissoes([
+      {
+        operacao: "A",
+        idUsuario: "100000103",
+        idUnidade: "110000075",
+        idPerfil: "100000940",
+        dataInicial: "08/04/2026",
+        sinSubunidades: true,
+      },
+    ])
+
+    expect(requestBody(0)).toContain(">S</SinSubunidades>")
+  })
+
+  it("interpreta '1' como resultado booleano verdadeiro do SIP", async () => {
+    fetchMock().mockResolvedValueOnce(
+      response(
+        trueResponse("validarReplicacao", "returnValidarReplicacao").replace(">true<", ">1<"),
+      ),
+    )
+
+    const sip = createSipClient(config)
+
+    await expect(sip.replicacao.validarReplicacao("rep-1")).resolves.toBe(true)
+  })
+
+  it("propaga erros de rede sem envolver em SipSoapError", async () => {
+    const networkError = new Error("network down")
+    fetchMock().mockRejectedValueOnce(networkError)
+
+    const sip = createSipClient(config)
+
+    await expect(sip.consultas.listarOrgaos()).rejects.toBe(networkError)
+  })
+
+  it("converte timeout de requisição em SipSoapError 408", async () => {
+    vi.useFakeTimers()
+    fetchMock().mockImplementation(
+      (_url: RequestInfo | URL, init?: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            const abortError = new Error("The operation was aborted.")
+            abortError.name = "AbortError"
+            reject(abortError)
+          })
+        }),
+    )
+
+    const sip = createSipClient({ ...config, requestTimeoutMs: 10 })
+    const assertion = expect(sip.consultas.listarOrgaos()).rejects.toMatchObject({
+      name: "SipSoapError",
+      operation: "carregarOrgaos",
+      status: 408,
+    } satisfies Partial<SipSoapError>)
+
+    await vi.advanceTimersByTimeAsync(10)
+    await assertion
+    vi.useRealTimers()
+  })
+
   it("preserva status HTTP em SOAP Faults", async () => {
     fetchMock().mockResolvedValueOnce(response(faultResponse, 403))
 

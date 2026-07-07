@@ -22,7 +22,6 @@ include:
   - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@v6.2.0
     inputs:
       project_type: "lib"
-      registry_url: "https://npm.anpd.gov.br"
       npm_scope: "@anpdgovbr"
       release_mode: "global"
       global_tag_prefix: "v"

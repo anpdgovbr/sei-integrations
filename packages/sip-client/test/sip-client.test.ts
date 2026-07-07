@@ -2,7 +2,14 @@ import { readFileSync } from "node:fs"
 
 import { describe, expect, it } from "vitest"
 
-import { mapOrgaos, mapPerfis, mapPermissoes, mapUnidades, mapUsuarios } from "../src/mappers"
+import {
+  mapOrgaos,
+  mapPerfis,
+  mapPermissoes,
+  mapUnidades,
+  mapUsuarioDiretorio,
+  mapUsuarios,
+} from "../src/mappers"
 import { buildSipSoapEnvelope, createSoapArray, parseSipSoapResponse, SipSoapError } from "../src"
 
 const readFixture = (name: string): string =>
@@ -73,6 +80,24 @@ describe("sei-sip SOAP", () => {
     expect(envelope).toContain('<item xsi:type="sip:Usuario">')
     expect(envelope).toContain("<StaOperacao")
     expect(envelope).toContain("<NomeSocial xsi:nil")
+  })
+
+  it("monta parâmetro struct aninhado fora de um array SOAP", () => {
+    const envelope = buildSipSoapEnvelope({
+      operation: "carregarUsuario",
+      params: {
+        ChaveAcesso: "abc",
+        Filtro: {
+          Sigla: "usuario.teste",
+          Ativo: "S",
+        },
+      },
+    })
+
+    expect(envelope).toContain("<Filtro>")
+    expect(envelope).toContain('<Sigla xsi:type="xsd:string">usuario.teste</Sigla>')
+    expect(envelope).toContain('<Ativo xsi:type="xsd:string">S</Ativo>')
+    expect(envelope).toContain("</Filtro>")
   })
 
   it("usa operações de replicação de usuário compatíveis com o SIP 5.0.4", () => {
@@ -299,6 +324,237 @@ describe("sei-sip SOAP", () => {
 
     expect(payload).toEqual([])
     expect(mapUsuarios(payload)).toEqual([])
+  })
+
+  it("mapeia unidades com registros de 4 e de 3 campos", () => {
+    expect(mapUnidades([["110000029", "CGTI", "Coordenação de TI", "S"]])).toEqual([
+      {
+        id: "110000029",
+        idOrgao: null,
+        sigla: "CGTI",
+        descricao: "Coordenação de TI",
+        ativo: true,
+        subunidades: [],
+        unidadesSuperiores: [],
+        idOrigem: null,
+      },
+    ])
+
+    expect(mapUnidades([["CGTI", "Coordenação de TI", "N"]])).toEqual([
+      {
+        id: "",
+        idOrgao: null,
+        sigla: "CGTI",
+        descricao: "Coordenação de TI",
+        ativo: false,
+        subunidades: [],
+        unidadesSuperiores: [],
+        idOrigem: null,
+      },
+    ])
+  })
+
+  it("normaliza idOrgao/idOrigem quando o SIP retorna número ou booleano", () => {
+    expect(mapUnidades([["110000029", 0, "CGTI", "Coordenação de TI", "S", [], [], true]])).toEqual(
+      [
+        {
+          id: "110000029",
+          idOrgao: "0",
+          idOrigem: "true",
+          sigla: "CGTI",
+          descricao: "Coordenação de TI",
+          ativo: true,
+          subunidades: [],
+          unidadesSuperiores: [],
+        },
+      ],
+    )
+
+    expect(
+      mapUnidades([
+        ["110000029", "0", "CGTI", "Coordenação de TI", "S", [], [], ["formato", "inesperado"]],
+      ]),
+    ).toEqual([
+      {
+        id: "110000029",
+        idOrgao: "0",
+        idOrigem: null,
+        sigla: "CGTI",
+        descricao: "Coordenação de TI",
+        ativo: true,
+        subunidades: [],
+        unidadesSuperiores: [],
+      },
+    ])
+  })
+
+  it("lança erro de domínio quando um campo obrigatório está ausente", () => {
+    expect(() => mapUnidades([[null, "0", "CGTI", "Coordenação de TI", "S"]])).toThrow(
+      /Unidade\.IdUnidade/,
+    )
+  })
+
+  it("mapeia múltiplos usuários retornados como lista de Maps PHP", () => {
+    const usuarios = mapUsuarios([
+      {
+        key: "1",
+        value: [
+          { key: "0", value: "100000103" },
+          { key: "1", value: null },
+          { key: "2", value: null },
+          { key: "3", value: "usuario.um" },
+          { key: "4", value: "Usuario Um" },
+          { key: "5", value: "S" },
+        ],
+      },
+      {
+        key: "2",
+        value: [
+          { key: "0", value: "100000104" },
+          { key: "1", value: null },
+          { key: "2", value: null },
+          { key: "3", value: "usuario.dois" },
+          { key: "4", value: "Usuario Dois" },
+          { key: "5", value: "N" },
+        ],
+      },
+    ])
+
+    expect(usuarios.map((usuario) => usuario.sigla)).toEqual(["usuario.um", "usuario.dois"])
+    expect(usuarios[1]).toMatchObject({ id: "100000104", nome: "Usuario Dois", ativo: false })
+  })
+
+  it("mapeia usuários quando o item do Map não segue o formato key/value", () => {
+    const usuarios = mapUsuarios([
+      {
+        "0": [
+          { key: "0", value: "100000105" },
+          { key: "1", value: null },
+          { key: "2", value: null },
+          { key: "3", value: "usuario.tres" },
+          { key: "4", value: "Usuario Tres" },
+          { key: "5", value: "S" },
+        ],
+      },
+    ])
+
+    expect(usuarios).toEqual([expect.objectContaining({ id: "100000105", sigla: "usuario.tres" })])
+  })
+
+  it("retorna null ao mapear diretório de usuário sem estrutura de Map", () => {
+    expect(mapUsuarioDiretorio(null)).toBeNull()
+    expect(mapUsuarioDiretorio("usuario.teste")).toBeNull()
+  })
+
+  it("mapeia permissão sem campos opcionais informados", () => {
+    const permissoes = mapPermissoes([
+      {
+        IdSistema: "100000100",
+        IdUsuario: "100000103",
+        IdUnidade: "110000068",
+        IdPerfil: "100000938",
+        DataInicial: "08/08/2024",
+      },
+    ])
+
+    expect(permissoes).toEqual([
+      {
+        idSistema: "100000100",
+        idOrgaoUsuario: null,
+        idUsuario: "100000103",
+        idOrigemUsuario: null,
+        idOrgaoUnidade: null,
+        idUnidade: "110000068",
+        idOrigemUnidade: null,
+        idPerfil: "100000938",
+        dataInicial: "08/08/2024",
+        dataFinal: null,
+        sinSubunidades: false,
+      },
+    ])
+  })
+
+  it.each([
+    ["IdSistema", "Permissao.IdSistema"],
+    ["IdUsuario", "Permissao.IdUsuario"],
+    ["IdUnidade", "Permissao.IdUnidade"],
+    ["IdPerfil", "Permissao.IdPerfil"],
+    ["DataInicial", "Permissao.DataInicial"],
+  ])("lança erro de domínio quando %s está ausente na permissão", (field, campoEsperado) => {
+    const base: Record<string, string> = {
+      IdSistema: "100000100",
+      IdUsuario: "100000103",
+      IdUnidade: "110000068",
+      IdPerfil: "100000938",
+      DataInicial: "08/08/2024",
+    }
+    delete base[field]
+
+    expect(() => mapPermissoes([base])).toThrow(campoEsperado)
+  })
+
+  it("mapeia grupo, recurso, item de menu e menu sem campos opcionais", () => {
+    const perfis = mapPerfis([
+      [
+        "100000949",
+        "Acervo de Sigilosos da Unidade",
+        null,
+        "S",
+        [["10", "Grupo Teste"]],
+        [["100015455", "procedimento_acervo_sigilosos_unidade"]],
+        [["20", "Menu Teste", "S", [["30", "100015455", "Acervo"]]]],
+      ],
+    ])
+
+    expect(perfis).toEqual([
+      {
+        id: "100000949",
+        nome: "Acervo de Sigilosos da Unidade",
+        descricao: null,
+        ativo: true,
+        grupos: [{ id: "10", nome: "Grupo Teste", ativo: false }],
+        recursos: [
+          {
+            id: "100015455",
+            nome: "procedimento_acervo_sigilosos_unidade",
+            descricao: null,
+            ativo: false,
+          },
+        ],
+        menus: [
+          {
+            id: "20",
+            nome: "Menu Teste",
+            ativo: true,
+            itens: [
+              {
+                id: "30",
+                idRecurso: "100015455",
+                rotulo: "Acervo",
+                ramificacao: null,
+                ativo: false,
+              },
+            ],
+          },
+        ],
+      },
+    ])
+  })
+
+  it("mapeia perfil em formato curto sem id/grupos/recursos/menus", () => {
+    const perfis = mapPerfis([["Consulta", "Consulta SEI", "S"]])
+
+    expect(perfis).toEqual([
+      {
+        id: "",
+        nome: "Consulta",
+        descricao: "Consulta SEI",
+        ativo: true,
+        grupos: [],
+        recursos: [],
+        menus: [],
+      },
+    ])
   })
 
   it("transforma SOAP fault em erro de domínio", () => {
