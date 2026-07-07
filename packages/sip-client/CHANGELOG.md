@@ -1,5 +1,11 @@
 # @anpdgovbr/sip-client
 
+## 0.1.1
+
+### Patch Changes
+
+- 8b2cc1e: Adiciona metadados de publicação e documentos distribuídos no pacote.
+
 ## 0.1.0
 
 ### Initial release
