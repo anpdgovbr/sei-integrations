@@ -83,6 +83,30 @@ stages:
   - sonar
   - deploy
 
+pages:
+  rules:
+    # Não publica se há changesets pendentes (aguarda bump)
+    - if: '$PROJECT_TYPE == "lib" && $CI_COMMIT_BRANCH == $HOMOLOG_BRANCH'
+      exists:
+        - .changeset/*.md
+      when: never
+    - if: '$PROJECT_TYPE != "lib" && $CI_COMMIT_BRANCH == $PRODUCTION_BRANCH'
+      exists:
+        - .changeset/*.md
+      when: never
+    # Libs publicam na homologacao (main)
+    - if: '$PROJECT_TYPE == "lib" && $CI_COMMIT_BRANCH == $HOMOLOG_BRANCH'
+      when: on_success
+    # Apps/APIs publicam na producao (stable)
+    - if: '$PROJECT_TYPE != "lib" && $CI_COMMIT_BRANCH == $PRODUCTION_BRANCH'
+      when: on_success
+    # Permite override manual
+    - if: '$PAGES_FORCE_DEPLOY == "true"'
+      when: on_success
+    - if: "$CI_COMMIT_BRANCH"
+      when: manual
+      allow_failure: true
+
 secret_detection:
   stage: security
 
