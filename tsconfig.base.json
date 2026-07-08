@@ -4,6 +4,10 @@
     "lib": ["ESNext", "DOM"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@anpdgovbr/soap-base": ["packages/soap-base/src/index.ts"]
+    },
     "strict": true,
     "declaration": true,
     "declarationMap": true,
