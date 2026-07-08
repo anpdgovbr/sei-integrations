@@ -25,7 +25,8 @@ aplicação consumidora -> SIP SOAP -> permissões do sistema SEI no SIP
 ```
 
 Isso não é integração direta com o SEI. Integrações diretas com operações do SEI
-pertencem ao futuro `@anpdgovbr/sei-client`.
+(geração de processos, inclusão de documentos, envio e outras operações) pertencem
+ao `@anpdgovbr/sei-client`. Veja [sei-client.md](sei-client.md).
 
 ## Cadastro e permissões no SIP
 

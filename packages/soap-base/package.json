@@ -1,0 +1,54 @@
+{
+  "name": "@anpdgovbr/soap-base",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Infraestrutura SOAP interna compartilhada entre sip-client e sei-client.",
+  "license": "MIT",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rimraf dist coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fast-xml-parser": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "rimraf": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "sideEffects": false,
+  "typedocOptions": {
+    "entryPoints": [
+      "src/index.ts"
+    ],
+    "entryPointStrategy": "resolve",
+    "readme": "none",
+    "categoryOrder": [
+      "Error Handling",
+      "SOAP Transport",
+      "SOAP Primitives",
+      "Configuration",
+      "Mapper Helpers",
+      "*"
+    ]
+  }
+}

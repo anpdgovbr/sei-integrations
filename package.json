@@ -35,7 +35,7 @@
     "test": "pnpm -r --if-present test",
     "test:coverage": "pnpm build && pnpm exec vitest run --config vitest.workspace.config.ts --coverage",
     "typecheck": "pnpm -r --if-present typecheck",
-    "docs": "typedoc --entryPointStrategy expand packages/*/src/index.ts --out docs",
+    "docs": "typedoc",
     "sonar": "set -a && [ -f .env ] && . ./.env; set +a; sonar-scanner -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.token=$SONAR_TOKEN -Dsonar.projectVersion=$(node -p \"require('./packages/sip-client/package.json').version\")",
     "sonar:scan": "pnpm test:coverage && pnpm sonar",
     "smoke:sip": "tsx scripts/smoke-sip.ts",
@@ -75,6 +75,7 @@
     "tsup": "catalog:",
     "tsx": "catalog:",
     "typedoc": "catalog:",
+    "typedoc-plugin-mdn-links": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "^8.63.0",
     "vitest": "catalog:"

@@ -17,10 +17,11 @@
  * | {@link mapRecursos}       | `carregarRecursos`                   | `string[]`                  |
  * | {@link mapPermissoes}     | `listarPermissao`                    | {@link SipPermissao}`[]`    |
  *
- * As funções auxiliares internas (`asArray`, `isMap`, `stringValue`, etc.) são
- * marcadas como `@internal` e não fazem parte da API pública.
+ * As funções auxiliares internas (marcadas individualmente como `@internal`)
+ * não fazem parte da API pública.
  *
- * @internal
+ * @categoryDescription Mappers
+ * Funções que convertem respostas SOAP brutas em entidades de domínio tipadas.
  */
 import type {
   SipGrupoPerfil,
@@ -29,7 +30,6 @@ import type {
   SipOrgao,
   SipPerfil,
   SipPermissao,
-  SipRawMap,
   SipRawValue,
   SipRecurso,
   SipUnidade,
@@ -37,46 +37,7 @@ import type {
   SipUsuarioDiretorio,
 } from "./types"
 
-/** @internal */
-const asArray = (value: SipRawValue): SipRawValue[] => {
-  if (Array.isArray(value)) {
-    return value
-  }
-  if (value === null || value === undefined) {
-    return []
-  }
-  return [value]
-}
-
-/** @internal */
-const isMap = (value: SipRawValue): value is SipRawMap =>
-  typeof value === "object" && value !== null && !Array.isArray(value)
-
-/** @internal */
-const stringValue = (value: SipRawValue): string | null => {
-  if (value === null || value === undefined) {
-    return null
-  }
-  if (typeof value === "string") {
-    return value
-  }
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value)
-  }
-  return null
-}
-
-/** @internal */
-const requiredString = (value: SipRawValue, field: string): string => {
-  const normalized = stringValue(value)
-  if (!normalized) {
-    throw new Error(`Campo obrigatório ausente na resposta SIP: ${field}.`)
-  }
-  return normalized
-}
-
-/** @internal */
-const boolFromSin = (value: SipRawValue): boolean => stringValue(value) === "S"
+import { asArray, boolFromSin, isMap, requiredString, stringValue } from "@anpdgovbr/soap-base"
 
 /** @internal */
 const nonNullStrings = (value: SipRawValue): string[] =>
@@ -144,6 +105,7 @@ const mapPhpMapEntries = (value: SipRawValue): SipRawValue[] => {
  * @returns Lista de órgãos, possivelmente vazia.
  *
  * @see {@link SipConsultasClient.listarOrgaos}
+ * @category Mappers
  */
 export const mapOrgaos = (value: SipRawValue): SipOrgao[] =>
   mapNestedArray(value).map((item) => ({
@@ -169,6 +131,7 @@ export const mapOrgaos = (value: SipRawValue): SipOrgao[] =>
  * @returns Lista de unidades, possivelmente vazia.
  *
  * @see {@link SipConsultasClient.listarUnidades}
+ * @category Mappers
  */
 export const mapUnidades = (value: SipRawValue): SipUnidade[] =>
   mapRecordArray(value).map((item) => {
@@ -226,6 +189,7 @@ export const mapUnidades = (value: SipRawValue): SipUnidade[] =>
  *
  * @see {@link SipConsultasClient.buscarUsuarios}
  * @see {@link SipConsultasClient.buscarUsuariosSemPermissao}
+ * @category Mappers
  */
 export const mapUsuarios = (value: SipRawValue): SipUsuario[] => {
   const userMaps =
@@ -270,6 +234,7 @@ export const mapUsuarios = (value: SipRawValue): SipUsuario[] => {
  *
  * @see {@link SipConsultasClient.carregarUsuario}
  * @see {@link SipConsultasClient.pesquisarUsuario}
+ * @category Mappers
  */
 export const mapUsuarioDiretorio = (value: SipRawValue): SipUsuarioDiretorio | null => {
   if (!isMap(value)) {
@@ -341,6 +306,7 @@ const mapMenus = (value: SipRawValue): SipMenu[] =>
  *
  * @see {@link SipConsultasClient.listarPerfis}
  * @see {@link SipFiltroRecursosMenus}
+ * @category Mappers
  */
 export const mapPerfis = (value: SipRawValue): SipPerfil[] =>
   mapRecordArray(value)
@@ -379,6 +345,7 @@ export const mapPerfis = (value: SipRawValue): SipPerfil[] =>
  *   possivelmente vazia.
  *
  * @see {@link SipConsultasClient.listarRecursos}
+ * @category Mappers
  */
 export const mapRecursos = (value: SipRawValue): string[] => nonNullStrings(value)
 
@@ -398,6 +365,7 @@ export const mapRecursos = (value: SipRawValue): string[] => nonNullStrings(valu
  *   `IdUnidade`, `IdPerfil`, `DataInicial`) estiverem ausentes.
  *
  * @see {@link SipConsultasClient.listarPermissoes}
+ * @category Mappers
  */
 export const mapPermissoes = (value: SipRawValue): SipPermissao[] =>
   asArray(value)

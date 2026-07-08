@@ -6,9 +6,8 @@ export default tseslint.config(
   {
     ignores: ["**/dist/**", "**/coverage/**", "**/docs/**", "node_modules/**"],
   },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
   {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     languageOptions: {
       ecmaVersion: "latest",
       globals: {

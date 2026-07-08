@@ -1,22 +1,35 @@
 {
-  "entryPointStrategy": "expand",
-  "entryPoints": ["packages/*/src/index.ts"],
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "packages",
+  "entryPoints": ["packages/soap-base", "packages/sip-client", "packages/sei-client"],
   "out": "docs",
   "name": "ANPD SEI Integrations",
   "includeVersion": true,
-  "tsconfig": "tsconfig.base.json",
+  "readme": "README.md",
+  "hideGenerator": true,
+  "searchInComments": true,
+  "plugin": ["typedoc-plugin-mdn-links"],
+  "sourceLinkTemplate": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/blob/{gitRevision}/{path}#L{line}",
+  "navigationLinks": {
+    "GitLab": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations"
+  },
+  "groupOrder": ["Classes", "Functions", "Type Aliases", "Interfaces", "Variables", "*"],
+  "validation": {
+    "invalidLink": false,
+    "notExported": false,
+    "notDocumented": false
+  },
+  "visibilityFilters": {
+    "protected": true,
+    "private": false,
+    "inherited": true,
+    "external": false
+  },
   "exclude": [
     "**/node_modules/**",
     "**/dist/**",
     "**/*.spec.ts",
     "**/*.test.ts",
     "packages/*/test/**"
-  ],
-  "readme": "README.md",
-  "theme": "default",
-  "hideGenerator": true,
-  "validation": {
-    "invalidLink": false,
-    "notExported": false
-  }
+  ]
 }

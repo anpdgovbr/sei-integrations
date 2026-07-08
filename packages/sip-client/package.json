@@ -53,7 +53,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "fast-xml-parser": "catalog:"
+    "@anpdgovbr/soap-base": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",
@@ -85,5 +85,25 @@
     "type": "git",
     "url": "git+https://gitlab.anpd.gov.br/publico/libs/sei-integrations.git",
     "directory": "packages/sip-client"
+  },
+  "typedocOptions": {
+    "entryPoints": [
+      "src/index.ts",
+      "src/mappers.ts"
+    ],
+    "entryPointStrategy": "resolve",
+    "categoryOrder": [
+      "Configuration",
+      "Client",
+      "Error Handling",
+      "SOAP Transport",
+      "Domain Entities",
+      "Operation Parameters",
+      "Replication",
+      "Enumerations",
+      "SOAP Primitives",
+      "Mappers",
+      "*"
+    ]
   }
 }

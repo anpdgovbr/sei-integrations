@@ -70,10 +70,6 @@ import type {
   SipUsuarioDiretorio,
 } from "./types"
 
-/** @internal */
-type ClientOptions = Readonly<{
-  config: SipConfig
-}>
 
 /**
  * Converte `systemId` para `number`, lançando `TypeError` se o valor não for
@@ -154,6 +150,7 @@ const booleanReturn = (value: unknown): boolean =>
  *
  * @see {@link SipClient}
  * @see {@link createSipClient}
+ * @category Client
  */
 export class SipConsultasClient {
   /** @param config - Configuração de conexão com o SIP. */
@@ -162,9 +159,7 @@ export class SipConsultasClient {
   /**
    * Lista os órgãos cadastrados no SIP.
    *
-   * @param params - Filtros opcionais.
-   * @param params.todos - Quando `true` (padrão), inclui órgãos inativos.
-   *   Passe `false` para retornar apenas órgãos ativos.
+   * @param params - Filtros opcionais. Passe `{ todos: false }` para retornar apenas órgãos ativos.
    * @returns Lista de órgãos.
    * @throws {@link SipSoapError} em caso de falha de comunicação ou SOAP Fault.
    *
@@ -187,9 +182,7 @@ export class SipConsultasClient {
   /**
    * Lista as unidades organizacionais visíveis pelo sistema configurado.
    *
-   * @param params - Filtros opcionais.
-   * @param params.idUsuario - Restringe às unidades associadas a este usuário.
-   * @param params.idUnidade - Retorna apenas a unidade com este ID.
+   * @param params - Filtros opcionais. Aceita `idUsuario` para filtrar por usuário ou `idUnidade` para uma unidade específica.
    * @returns Lista de unidades.
    * @throws {@link SipSoapError} em caso de falha de comunicação ou SOAP Fault.
    *
@@ -343,9 +336,7 @@ export class SipConsultasClient {
   /**
    * Lista os perfis cadastrados no SIP para o sistema configurado.
    *
-   * @param params - Filtros e controle de profundidade da resposta.
-   * @param params.filtroRecursosMenus - Controla se recursos e/ou menus são
-   *   incluídos. Padrão: `"N"` (somente dados do perfil).
+   * @param params - Filtros e controle de profundidade da resposta. Use `filtroRecursosMenus: "T"` para incluir recursos e menus.
    * @returns Lista de perfis.
    * @throws {@link SipSoapError} em caso de falha de comunicação ou SOAP Fault.
    *
@@ -496,6 +487,7 @@ export class SipConsultasClient {
  *
  * @see {@link SipClient}
  * @see {@link createSipClient}
+ * @category Client
  */
 export class SipReplicacaoClient {
   /** @param config - Configuração de conexão com o SIP. */
@@ -656,6 +648,7 @@ export class SipReplicacaoClient {
  * @see {@link createSipClient}
  * @see {@link SipConsultasClient}
  * @see {@link SipReplicacaoClient}
+ * @category Client
  */
 export class SipClient {
   /** Subclient para operações somente leitura. */
@@ -663,10 +656,10 @@ export class SipClient {
   /** Subclient para operações de escrita (replicação). */
   readonly replicacao: SipReplicacaoClient
 
-  /** @param options - Objeto contendo a configuração de conexão. */
-  constructor(options: ClientOptions) {
-    this.consultas = new SipConsultasClient(options.config)
-    this.replicacao = new SipReplicacaoClient(options.config)
+  /** @param config - Configuração de conexão com o SIP. */
+  constructor(config: SipConfig) {
+    this.consultas = new SipConsultasClient(config)
+    this.replicacao = new SipReplicacaoClient(config)
   }
 
   /** @deprecated Use `sip.consultas.listarOrgaos()` diretamente. */
@@ -741,5 +734,6 @@ export class SipClient {
  *
  * const orgaos = await sip.consultas.listarOrgaos()
  * ```
+ * @category Client
  */
-export const createSipClient = (config: SipConfig): SipClient => new SipClient({ config })
+export const createSipClient = (config: SipConfig): SipClient => new SipClient(config)

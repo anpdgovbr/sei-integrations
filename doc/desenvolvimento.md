@@ -5,19 +5,36 @@ O README raiz deve permanecer como visão geral para consumo e operação.
 
 ## Estado atual
 
-- `@anpdgovbr/sip-client` já possui base funcional validada para envelopes SOAP,
+### sip-client
+
+- `@anpdgovbr/sip-client` possui base funcional validada para envelopes SOAP,
   parsing de respostas e mapeamento de entidades centrais do SIP.
-- A revisão de nomenclatura pública do SIP foi alinhada ao WSDL/fonte local do
-  SEI 5.0.4 em `/home/luciano/anpdgovbr/sei/src/sip/web/ws/sip.wsdl` e
+- A nomenclatura pública foi alinhada ao WSDL/fonte local do SEI 5.0.4 em
+  `/home/luciano/anpdgovbr/sei/src/sip/web/ws/sip.wsdl` e
   `/home/luciano/anpdgovbr/sei/src/sip/web/ws/SipWS.php`.
 - Os aliases públicos `SeiSip*` foram removidos para não confundir o cliente SIP
   com integração direta ao SEI.
 - As operações de replicação foram separadas por contrato:
   `SipOperacaoReplicacaoUsuario` (`C`, `A`, `E`, `D`, `R`) e
   `SipOperacaoReplicacaoPermissao` (`A`, `E`).
-- `@anpdgovbr/sei-client` ainda é um pacote reservado. O contrato público deve
-  ser definido antes da implementação, usando o código-fonte do SEI 5.0.4 como
-  referência.
+
+### sei-client
+
+- `@anpdgovbr/sei-client` implementado com 57 operações mapeadas do WSDL do
+  SEI 5.0.4 (`/sei/ws/SeiWS.php`), organizadas em dois subclientes:
+  - `SeiConsultasClient` — 20 operações de leitura (unidades, procedimentos,
+    documentos, blocos, usuários, contatos, tipos de processo, andamentos,
+    marcadores, publicações, feriados e tabelas de referência).
+  - `SeiOperacoesClient` — 37 operações de escrita (geração de procedimento,
+    inclusão de documento, envio de processo, blocos, andamentos, marcadores,
+    controle de prazo, publicações, e-mail, ouvidoria e outros).
+- Infraestrutura SOAP compartilhada em `@anpdgovbr/soap-base` (privado),
+  reutilizada por ambos os clientes.
+- Toda a superfície pública documentada com TypeDoc: categorias, exemplos e
+  links de fonte para o GitLab. Geração roda `pnpm docs` sem erros ou avisos.
+
+### Infraestrutura
+
 - O pipeline local e de CI já roda build, lint, typecheck, testes e cobertura.
 - O SonarQube usa `coverage/lcov.info` gerado por `pnpm test:coverage`.
 
@@ -166,28 +183,25 @@ equipe SEI/SIP estão em
 
 ## Próximos passos
 
+### sip-client
+
 1. Capturar fixtures reais anonimizadas restantes do SIP, priorizando órgãos,
    unidades, perfis com recursos e listas vazias.
 2. Complementar as fixtures sintéticas restantes por fixtures reais onde isso
    reduzir risco de divergência com o SIP HML.
-3. Revisar novamente a nomenclatura pública do `@anpdgovbr/sip-client` antes da
-   primeira versão estável, especialmente se novas fixtures indicarem campos
-   ainda não mapeados.
-4. Definir o escopo inicial do `@anpdgovbr/sei-client`.
-5. Mapear no SEI 5.0.4 os pontos de integração direta permitidos:
-   autenticação, endpoints, operações, tipos de erro e diferenças em relação ao
-   SIP.
-6. Implementar o primeiro contrato mínimo do `@anpdgovbr/sei-client` somente
-   depois de documentar esse escopo.
-7. Publicar manualmente os pacotes necessários no registry interno.
+3. Revisar a nomenclatura pública do `@anpdgovbr/sip-client` antes da primeira
+   versão estável, especialmente se novas fixtures indicarem campos não mapeados.
 
-## Critérios para iniciar o sei-client
+### sei-client
 
-Antes de implementar código no `@anpdgovbr/sei-client`, precisamos fechar:
+4. Criar `scripts/smoke-sei.ts` análogo ao `smoke-sip.ts` para homologação do
+   `@anpdgovbr/sei-client` contra o ambiente HML do SEI.
+5. Definir variáveis de ambiente e personas para o smoke do SEI (endpoint, sigla
+   do sistema, chave de identificação, unidade de teste).
+6. Capturar fixtures SOAP reais anonimizadas do SEI, priorizando consultas de
+   procedimento, documento e unidade.
 
-- quais operações diretas do SEI serão expostas;
-- qual mecanismo de autenticação será usado;
-- quais endpoints são estáveis e permitidos para uso por biblioteca;
-- como erros do SEI serão normalizados;
-- quais responsabilidades ficam fora da lib e pertencem à aplicação consumidora;
-- como a integração direta se diferencia de consultar dados via SIP.
+### Publicação
+
+7. Publicar manualmente `@anpdgovbr/sip-client` e `@anpdgovbr/sei-client` no
+   registry interno quando os pacotes estiverem prontos para consumo.

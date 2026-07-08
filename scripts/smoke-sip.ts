@@ -47,7 +47,7 @@ const requiredPersonaEnv = (name: string, fallbackName: string): string => {
   const value = personaEnv(name, fallbackName)
   if (!value) {
     throw new Error(
-      `Variavel obrigatoria ausente: ${personaPrefix ? `${personaPrefix}${name}` : fallbackName}`,
+      `Variavel obrigatoria ausente: ${personaPrefix !== null ? personaPrefix + name : fallbackName}`,
     )
   }
   return value
@@ -69,7 +69,7 @@ const maskSoapXml = (xml: string): string => {
 }
 
 const getSoapOperation = (xml: string): string | null => {
-  const match = xml.match(/<sip:([A-Za-z0-9_]+)/)
+  const match = /<sip:(\w+)/.exec(xml)
   return match?.[1] ?? null
 }
 

@@ -8,6 +8,6 @@
     "rootDir": "src",
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
-  "exclude": ["dist", "coverage"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist"]
 }

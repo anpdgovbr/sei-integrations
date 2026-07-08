@@ -30,6 +30,9 @@ catalogs:
     typedoc:
       specifier: ^0.28.19
       version: 0.28.20
+    typedoc-plugin-mdn-links:
+      specifier: ^3.0.0
+      version: 3.3.8
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
@@ -89,6 +92,9 @@ importers:
       typedoc:
         specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)
+      typedoc-plugin-mdn-links:
+        specifier: 'catalog:'
+        version: 3.3.8(typedoc@0.28.20(typescript@6.0.3))
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -100,28 +106,10 @@ importers:
         version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.27.7)(tsx@4.23.0)(yaml@2.9.0))
 
   packages/sei-client:
-    devDependencies:
-      '@vitest/coverage-v8':
-        specifier: 'catalog:'
-        version: 4.1.10(vitest@4.1.10)
-      rimraf:
-        specifier: 'catalog:'
-        version: 6.1.3
-      tsup:
-        specifier: 'catalog:'
-        version: 8.5.1(postcss@8.5.16)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0)
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.3
-      vitest:
-        specifier: 'catalog:'
-        version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0))
-
-  packages/sip-client:
     dependencies:
-      fast-xml-parser:
-        specifier: 'catalog:'
-        version: 5.9.3
+      '@anpdgovbr/soap-base':
+        specifier: workspace:*
+        version: link:../soap-base
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -141,6 +129,50 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0))
+
+  packages/sip-client:
+    dependencies:
+      '@anpdgovbr/soap-base':
+        specifier: workspace:*
+        version: link:../soap-base
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.4
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.10(vitest@4.1.10)
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      tsup:
+        specifier: 'catalog:'
+        version: 8.5.1(postcss@8.5.16)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.10(@types/node@25.9.4)(@vitest/coverage-v8@4.1.10)(vite@8.1.3(@types/node@25.9.4)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0))
+
+  packages/soap-base:
+    dependencies:
+      fast-xml-parser:
+        specifier: 'catalog:'
+        version: 5.9.3
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.4
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      tsup:
+        specifier: 'catalog:'
+        version: 8.5.1(postcss@8.5.16)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
 packages:
 
@@ -1982,6 +2014,11 @@ packages:
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
+
+  typedoc-plugin-mdn-links@3.3.8:
+    resolution: {integrity: sha512-Aewg+SW7hBdffRpT6WnpRwWthoaF9irlzXDKRyvcDVekPZSFujOlh690SV6eCgqrtP7GBJmN0TVeJUq6+6rb1w==}
+    peerDependencies:
+      typedoc: '>= 0.23.14 || 0.24.x || 0.25.x || 0.26.x'
 
   typedoc@0.28.20:
     resolution: {integrity: sha512-uSKqkh8Cr48vllnEy+jdaAgOeR6Y+QCBW7usgUsKj7gJEfR7stw9U/fE49LBnj2tPRKPY0c0EBJSWe9Appmplg==}
@@ -3843,6 +3880,10 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
+
+  typedoc-plugin-mdn-links@3.3.8(typedoc@0.28.20(typescript@6.0.3)):
+    dependencies:
+      typedoc: 0.28.20(typescript@6.0.3)
 
   typedoc@0.28.20(typescript@6.0.3):
     dependencies:
