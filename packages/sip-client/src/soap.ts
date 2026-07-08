@@ -131,7 +131,7 @@ export const buildSipSoapEnvelope = (options: SipSoapCallOptions): string =>
  * @category SOAP Transport
  */
 export const parseSipSoapResponse = (xml: string, operation: string): SipRawValue =>
-  parseSoapResponse(xml, operation, makeSipError) as SipRawValue
+  parseSoapResponse(xml, operation, makeSipError)
 
 /**
  * Executa uma chamada SOAP ao SIP com suporte a timeout e tratamento de erros.
@@ -147,4 +147,4 @@ export const parseSipSoapResponse = (xml: string, operation: string): SipRawValu
  * @category SOAP Transport
  */
 export const callSipSoap = (config: SipConfig, options: SipSoapCallOptions): Promise<SipRawValue> =>
-  callSoap(config, options, SIP_NS, makeSipError) as Promise<SipRawValue>
+  callSoap(config, options, SIP_NS, makeSipError)

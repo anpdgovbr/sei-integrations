@@ -130,7 +130,7 @@ export const buildSeiSoapEnvelope = (options: SeiSoapCallOptions): string =>
  * @category SOAP Transport
  */
 export const parseSeiSoapResponse = (xml: string, operation: string): SeiRawValue =>
-  parseSoapResponse(xml, operation, makeSeiError) as SeiRawValue
+  parseSoapResponse(xml, operation, makeSeiError)
 
 /**
  * Executa uma chamada SOAP ao SEI com suporte a timeout e tratamento de erros.
@@ -146,4 +146,4 @@ export const parseSeiSoapResponse = (xml: string, operation: string): SeiRawValu
  * @category SOAP Transport
  */
 export const callSeiSoap = (config: SeiConfig, options: SeiSoapCallOptions): Promise<SeiRawValue> =>
-  callSoap(config, options, SEI_NS, makeSeiError) as Promise<SeiRawValue>
+  callSoap(config, options, SEI_NS, makeSeiError)
