@@ -137,7 +137,7 @@ const mapInteressadoFromMap = (item: SeiRawMap): SeiInteressado => ({
 const mapAtributoAndamentoFromMap = (item: SeiRawMap): SeiAtributoAndamento => ({
   nome: requiredString(item.Nome ?? null, "AtributoAndamento.Nome"),
   valor: stringValue(item.Valor ?? null) ?? "",
-  idOrigem: requiredString(item.IdOrigem ?? null, "AtributoAndamento.IdOrigem"),
+  idOrigem: stringValue(item.IdOrigem ?? null) ?? "",
 })
 
 /** @internal */

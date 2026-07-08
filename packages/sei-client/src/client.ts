@@ -283,11 +283,12 @@ export class SeiConsultasClient {
   /** @param config - Configuração de conexão com o SEI. */
   constructor(private readonly config: SeiConfig) {}
 
-  async listarUnidades(params: SeiListarUnidadesParams): Promise<SeiUnidade[]> {
+  async listarUnidades(params: SeiListarUnidadesParams = {}): Promise<SeiUnidade[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarUnidades",
       params: {
-        ...createBaseParams(this.config, params.idUnidade),
+        SiglaSistema: this.config.siglaSistema,
+        IdentificacaoServico: this.config.identificacaoServico,
         IdTipoProcedimento: params.idTipoProcedimento ?? null,
         IdSerie: params.idSerie ?? null,
       },

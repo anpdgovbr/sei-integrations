@@ -653,6 +653,7 @@ export type SeiCampoInput = Readonly<{
  */
 export type SeiSecaoDocumentoInput = Readonly<{
   nome: string
+  /** Conteúdo da seção em Base64, normalmente Latin-1 no SEI legado. */
   conteudo: string
 }>
 
@@ -679,8 +680,10 @@ export type SeiProcedimentoInput = Readonly<{
  *
  * @remarks
  * `tipo` deve ser `"G"` (gerado) ou `"R"` (recebido).
- * Para conteúdo, use `conteudo` (HTML/base64 inline), `idArquivo` (arquivo
- * já carregado via `adicionarArquivo`) ou `conteudoSecoes` (formulários).
+ * Para conteúdo, use `conteudo` (Base64), `idArquivo` (arquivo já carregado
+ * via `adicionarArquivo`) ou `conteudoSecoes` (conteúdo por seção em Base64).
+ * Use {@link encodeSeiLatin1Base64} para codificar HTML/texto de documentos
+ * gerados em instalações SEI legadas.
  * @category Input Types
  */
 export type SeiDocumentoInput = Readonly<{
@@ -703,7 +706,7 @@ export type SeiDocumentoInput = Readonly<{
   nomeArquivo?: string | null
   nivelAcesso?: string | null
   idHipoteseLegal?: string | null
-  /** HTML ou conteúdo base64. Exclusivo com `idArquivo`. */
+  /** Conteúdo em Base64. Exclusivo com `idArquivo` e `conteudoSecoes`. */
   conteudo?: string | null
   conteudoSecoes?: readonly SeiSecaoDocumentoInput[]
   /** ID do arquivo pré-carregado via `adicionarArquivo`. */
@@ -841,7 +844,6 @@ export type SeiAnexoInput = Readonly<{
 
 /** Parâmetros para {@link SeiConsultasClient.listarUnidades}. @category Operation Parameters */
 export type SeiListarUnidadesParams = Readonly<{
-  idUnidade: string
   idTipoProcedimento?: string | null
   idSerie?: string | null
 }>

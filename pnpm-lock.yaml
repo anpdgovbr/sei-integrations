@@ -44,9 +44,6 @@ importers:
 
   .:
     devDependencies:
-      '@anpdgovbr/shared-scripts':
-        specifier: ^1.5.2
-        version: 1.5.2
       '@changesets/cli':
         specifier: ^2.31.0
         version: 2.31.0(@types/node@25.9.4)
@@ -175,11 +172,6 @@ importers:
         version: 6.0.3
 
 packages:
-
-  '@anpdgovbr/shared-scripts@1.5.2':
-    resolution: {integrity: sha512-gX5FhwPRGn5W1sbOfDsnuHe5zs9aZSsHyzNCnHCZihT+GVwmmfX+eQvLJr3Ptz6aCF2PKoNvfbcRTmo4lUG0NA==}
-    engines: {node: '>=24.0.0'}
-    hasBin: true
 
   '@babel/helper-string-parser@7.29.7':
     resolution: {integrity: sha512-Pb5ijPrZ89GDH8223L4UP8i6QApWxs04RbPQJTeWDV0/keR2E36MeKnyr6LYmUUvqRRI+Iv87SuF1W6ErINzYw==}
@@ -2167,8 +2159,6 @@ packages:
     engines: {node: '>=10'}
 
 snapshots:
-
-  '@anpdgovbr/shared-scripts@1.5.2': {}
 
   '@babel/helper-string-parser@7.29.7': {}
 

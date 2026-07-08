@@ -70,7 +70,6 @@ import type {
   SipUsuarioDiretorio,
 } from "./types"
 
-
 /**
  * Converte `systemId` para `number`, lançando `TypeError` se o valor não for
  * um inteiro seguro.

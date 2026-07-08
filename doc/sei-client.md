@@ -35,8 +35,8 @@ Não libere operações de escrita para integrações somente leitura.
 import { createSeiClient, type SeiConfig } from "@anpdgovbr/sei-client"
 
 const config: SeiConfig = {
-  endpointUrl: process.env.SEI_SOAP_ENDPOINT!,     // .../sei/ws/SeiWS.php
-  siglaSistema: process.env.SEI_SIGLA_SISTEMA!,    // ex.: "SGI"
+  endpointUrl: process.env.SEI_SOAP_ENDPOINT!, // .../sei/ws/SeiWS.php
+  siglaSistema: process.env.SEI_SIGLA_SISTEMA!, // ex.: "SGI"
   identificacaoServico: process.env.SEI_IDENTIFICACAO_SERVICO!,
   requestTimeoutMs: Number(process.env.SEI_REQUEST_TIMEOUT_MS ?? 30_000),
 }
@@ -66,7 +66,7 @@ const sei = createSeiClient({
 })
 
 // Consultas
-const unidades = await sei.consultas.listarUnidades({ idUnidade: "110000001" })
+const unidades = await sei.consultas.listarUnidades()
 const proc = await sei.consultas.consultarProcedimento({
   idUnidade: "110000001",
   protocoloProcedimento: "00000.000001/2026-01",
@@ -90,33 +90,33 @@ const { idProcedimento, procedimentoFormatado } = await sei.operacoes.gerarProce
 
 Subclient `sei.consultas` (`SeiConsultasClient`):
 
-| Método | Descrição |
-|--------|-----------|
-| `listarUnidades(params)` | Unidades ativas visíveis pelo sistema |
-| `listarTiposProcedimento(params)` | Tipos de procedimento (assuntos) |
-| `listarTiposPrioridade(params)` | Prioridades disponíveis |
-| `listarSeries(params)` | Séries documentais |
-| `listarContatos(params)` | Contatos cadastrados |
-| `consultarProcedimento(params)` | Dados completos de um processo |
-| `consultarProcedimentoIndividual(params)` | Dados resumidos de um processo |
-| `consultarDocumento(params)` | Dados de um documento |
-| `consultarBloco(params)` | Dados de um bloco |
-| `listarExtensoesPermitidas(params)` | Extensões de arquivo aceitas pelo SEI |
-| `listarUsuarios(params)` | Usuários da unidade |
-| `listarHipotesesLegais(params)` | Hipóteses legais para restrição |
-| `listarTiposConferencia(params)` | Tipos de conferência de documentos |
-| `listarPaises(params)` | Países cadastrados |
-| `listarEstados(params)` | Estados do Brasil |
-| `listarCidades(params)` | Cidades por estado |
-| `listarTiposProcedimentoOuvidoria()` | Tipos de procedimento para ouvidoria |
-| `listarCargos(params)` | Cargos cadastrados |
-| `listarAndamentos(params)` | Histórico de andamentos de um processo |
-| `listarMarcadoresUnidade(params)` | Marcadores da unidade |
-| `listarAndamentosMarcadores(params)` | Andamentos com marcadores |
-| `consultarPublicacao(params)` | Dados de uma publicação |
-| `listarFeriados(params)` | Feriados cadastrados |
-| `adicionarArquivo(params)` | Inicia upload de arquivo em partes (retorna token) |
-| `adicionarConteudoArquivo(params)` | Envia parte de arquivo para o SEI |
+| Método                                    | Descrição                                          |
+| ----------------------------------------- | -------------------------------------------------- |
+| `listarUnidades(params)`                  | Unidades ativas visíveis pelo sistema              |
+| `listarTiposProcedimento(params)`         | Tipos de procedimento (assuntos)                   |
+| `listarTiposPrioridade(params)`           | Prioridades disponíveis                            |
+| `listarSeries(params)`                    | Séries documentais                                 |
+| `listarContatos(params)`                  | Contatos cadastrados                               |
+| `consultarProcedimento(params)`           | Dados completos de um processo                     |
+| `consultarProcedimentoIndividual(params)` | Dados resumidos de um processo                     |
+| `consultarDocumento(params)`              | Dados de um documento                              |
+| `consultarBloco(params)`                  | Dados de um bloco                                  |
+| `listarExtensoesPermitidas(params)`       | Extensões de arquivo aceitas pelo SEI              |
+| `listarUsuarios(params)`                  | Usuários da unidade                                |
+| `listarHipotesesLegais(params)`           | Hipóteses legais para restrição                    |
+| `listarTiposConferencia(params)`          | Tipos de conferência de documentos                 |
+| `listarPaises(params)`                    | Países cadastrados                                 |
+| `listarEstados(params)`                   | Estados do Brasil                                  |
+| `listarCidades(params)`                   | Cidades por estado                                 |
+| `listarTiposProcedimentoOuvidoria()`      | Tipos de procedimento para ouvidoria               |
+| `listarCargos(params)`                    | Cargos cadastrados                                 |
+| `listarAndamentos(params)`                | Histórico de andamentos de um processo             |
+| `listarMarcadoresUnidade(params)`         | Marcadores da unidade                              |
+| `listarAndamentosMarcadores(params)`      | Andamentos com marcadores                          |
+| `consultarPublicacao(params)`             | Dados de uma publicação                            |
+| `listarFeriados(params)`                  | Feriados cadastrados                               |
+| `adicionarArquivo(params)`                | Inicia upload de arquivo em partes (retorna token) |
+| `adicionarConteudoArquivo(params)`        | Envia parte de arquivo para o SEI                  |
 
 ## Operações de escrita
 
@@ -124,75 +124,75 @@ Subclient `sei.operacoes` (`SeiOperacoesClient`):
 
 **Processos:**
 
-| Método | Descrição |
-|--------|-----------|
-| `gerarProcedimento(params)` | Cria um novo processo |
-| `excluirProcesso(params)` | Exclui um processo rascunho |
-| `enviarProcesso(params)` | Envia o processo para outras unidades |
-| `atribuirProcesso(params)` | Atribui o processo a um usuário |
-| `reabrirProcesso(params)` | Reabre um processo concluído |
-| `concluirProcesso(params)` | Conclui o processo na unidade |
-| `bloquearProcesso(params)` | Bloqueia o processo |
-| `desbloquearProcesso(params)` | Desbloqueia o processo |
-| `relacionarProcesso(params)` | Cria relacionamento entre processos |
-| `removerRelacionamentoProcesso(params)` | Remove relacionamento |
-| `anexarProcesso(params)` | Anexa um processo a outro |
-| `desanexarProcesso(params)` | Desanexa um processo |
-| `sobrestarProcesso(params)` | Sobrestamento processual |
-| `removerSobrestamentoProcesso(params)` | Remove sobrestamento |
+| Método                                  | Descrição                             |
+| --------------------------------------- | ------------------------------------- |
+| `gerarProcedimento(params)`             | Cria um novo processo                 |
+| `excluirProcesso(params)`               | Exclui um processo rascunho           |
+| `enviarProcesso(params)`                | Envia o processo para outras unidades |
+| `atribuirProcesso(params)`              | Atribui o processo a um usuário       |
+| `reabrirProcesso(params)`               | Reabre um processo concluído          |
+| `concluirProcesso(params)`              | Conclui o processo na unidade         |
+| `bloquearProcesso(params)`              | Bloqueia o processo                   |
+| `desbloquearProcesso(params)`           | Desbloqueia o processo                |
+| `relacionarProcesso(params)`            | Cria relacionamento entre processos   |
+| `removerRelacionamentoProcesso(params)` | Remove relacionamento                 |
+| `anexarProcesso(params)`                | Anexa um processo a outro             |
+| `desanexarProcesso(params)`             | Desanexa um processo                  |
+| `sobrestarProcesso(params)`             | Sobrestamento processual              |
+| `removerSobrestamentoProcesso(params)`  | Remove sobrestamento                  |
 
 **Documentos:**
 
-| Método | Descrição |
-|--------|-----------|
-| `incluirDocumento(params)` | Inclui documento em um processo |
-| `cancelarDocumento(params)` | Cancela um documento |
-| `bloquearDocumento(params)` | Bloqueia um documento |
+| Método                      | Descrição                       |
+| --------------------------- | ------------------------------- |
+| `incluirDocumento(params)`  | Inclui documento em um processo |
+| `cancelarDocumento(params)` | Cancela um documento            |
+| `bloquearDocumento(params)` | Bloqueia um documento           |
 
 **Blocos:**
 
-| Método | Descrição |
-|--------|-----------|
-| `gerarBloco(params)` | Cria um novo bloco |
-| `alterarBloco(params)` | Altera dados de um bloco |
-| `excluirBloco(params)` | Exclui um bloco |
-| `disponibilizarBloco(params)` | Disponibiliza bloco para assinatura/acesso |
-| `cancelarDisponibilizacaoBloco(params)` | Cancela disponibilização |
-| `concluirBloco(params)` | Conclui um bloco |
-| `reabrirBloco(params)` | Reabre um bloco concluído |
-| `devolverBloco(params)` | Devolve um bloco |
-| `incluirDocumentoBloco(params)` | Inclui documento em bloco |
-| `retirarDocumentoBloco(params)` | Retira documento de bloco |
-| `incluirProcessoBloco(params)` | Inclui processo em bloco |
-| `retirarProcessoBloco(params)` | Retira processo de bloco |
+| Método                                  | Descrição                                  |
+| --------------------------------------- | ------------------------------------------ |
+| `gerarBloco(params)`                    | Cria um novo bloco                         |
+| `alterarBloco(params)`                  | Altera dados de um bloco                   |
+| `excluirBloco(params)`                  | Exclui um bloco                            |
+| `disponibilizarBloco(params)`           | Disponibiliza bloco para assinatura/acesso |
+| `cancelarDisponibilizacaoBloco(params)` | Cancela disponibilização                   |
+| `concluirBloco(params)`                 | Conclui um bloco                           |
+| `reabrirBloco(params)`                  | Reabre um bloco concluído                  |
+| `devolverBloco(params)`                 | Devolve um bloco                           |
+| `incluirDocumentoBloco(params)`         | Inclui documento em bloco                  |
+| `retirarDocumentoBloco(params)`         | Retira documento de bloco                  |
+| `incluirProcessoBloco(params)`          | Inclui processo em bloco                   |
+| `retirarProcessoBloco(params)`          | Retira processo de bloco                   |
 
 **Andamentos e marcadores:**
 
-| Método | Descrição |
-|--------|-----------|
-| `lancarAndamento(params)` | Lança andamento em um processo |
-| `definirMarcador(params)` | Define marcador em processo ou documento |
-| `definirControlePrazo(params)` | Define controle de prazo |
-| `concluirControlePrazo(params)` | Conclui controle de prazo |
-| `removerControlePrazo(params)` | Remove controle de prazo |
-| `registrarAnotacao(params)` | Registra anotação em processo |
+| Método                          | Descrição                                |
+| ------------------------------- | ---------------------------------------- |
+| `lancarAndamento(params)`       | Lança andamento em um processo           |
+| `definirMarcador(params)`       | Define marcador em processo ou documento |
+| `definirControlePrazo(params)`  | Define controle de prazo                 |
+| `concluirControlePrazo(params)` | Conclui controle de prazo                |
+| `removerControlePrazo(params)`  | Remove controle de prazo                 |
+| `registrarAnotacao(params)`     | Registra anotação em processo            |
 
 **Publicações:**
 
-| Método | Descrição |
-|--------|-----------|
-| `agendarPublicacao(params)` | Agenda publicação na imprensa |
-| `alterarPublicacao(params)` | Altera publicação agendada |
-| `cancelarAgendamentoPublicacao(params)` | Cancela agendamento |
-| `confirmarDisponibilizacaoPublicacao(params)` | Confirma disponibilização |
+| Método                                        | Descrição                     |
+| --------------------------------------------- | ----------------------------- |
+| `agendarPublicacao(params)`                   | Agenda publicação na imprensa |
+| `alterarPublicacao(params)`                   | Altera publicação agendada    |
+| `cancelarAgendamentoPublicacao(params)`       | Cancela agendamento           |
+| `confirmarDisponibilizacaoPublicacao(params)` | Confirma disponibilização     |
 
 **Contatos e outros:**
 
-| Método | Descrição |
-|--------|-----------|
-| `atualizarContatos(params)` | Atualiza contatos vinculados |
-| `enviarEmail(params)` | Envia e-mail institucional via SEI |
-| `registrarOuvidoria(params)` | Registra dados de ouvidoria |
+| Método                       | Descrição                          |
+| ---------------------------- | ---------------------------------- |
+| `atualizarContatos(params)`  | Atualiza contatos vinculados       |
+| `enviarEmail(params)`        | Envia e-mail institucional via SEI |
+| `registrarOuvidoria(params)` | Registra dados de ouvidoria        |
 
 ## DTOs principais
 
@@ -200,10 +200,10 @@ Subclient `sei.operacoes` (`SeiOperacoesClient`):
 
 ```ts
 type SeiConfig = {
-  endpointUrl: string           // https://.../sei/ws/SeiWS.php
-  siglaSistema: string          // sigla do sistema integrador cadastrado no SEI
-  identificacaoServico: string  // chave gerada no cadastro do sistema
-  requestTimeoutMs: number      // timeout por chamada SOAP em ms
+  endpointUrl: string // https://.../sei/ws/SeiWS.php
+  siglaSistema: string // sigla do sistema integrador cadastrado no SEI
+  identificacaoServico: string // chave gerada no cadastro do sistema
+  requestTimeoutMs: number // timeout por chamada SOAP em ms
 }
 ```
 

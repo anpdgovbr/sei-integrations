@@ -20,18 +20,180 @@ O README raiz deve permanecer como visão geral para consumo e operação.
 
 ### sei-client
 
-- `@anpdgovbr/sei-client` implementado com 57 operações mapeadas do WSDL do
-  SEI 5.0.4 (`/sei/ws/SeiWS.php`), organizadas em dois subclientes:
-  - `SeiConsultasClient` — 20 operações de leitura (unidades, procedimentos,
-    documentos, blocos, usuários, contatos, tipos de processo, andamentos,
-    marcadores, publicações, feriados e tabelas de referência).
-  - `SeiOperacoesClient` — 37 operações de escrita (geração de procedimento,
-    inclusão de documento, envio de processo, blocos, andamentos, marcadores,
-    controle de prazo, publicações, e-mail, ouvidoria e outros).
+- `@anpdgovbr/sei-client` tem uma primeira implementação ampla, mas ainda deve
+  ser tratado como API em validação operacional até passar por smoke tests em
+  HML serviço a serviço.
+- O levantamento no código base local do SEI
+  `/home/luciano/anpdgovbr/sei/src/sei/web/ws/SeiWS.php` identificou 68
+  operações SOAP expostas pelo `SeiWS`. Todas já possuem método público
+  correspondente no `sei-client`.
+- A API está organizada em dois subclientes:
+  - `SeiConsultasClient` — 25 operações de leitura, referência, consulta e
+    upload em partes.
+  - `SeiOperacoesClient` — 43 operações que alteram estado ou produzem efeitos
+    no SEI.
 - Infraestrutura SOAP compartilhada em `@anpdgovbr/soap-base` (privado),
   reutilizada por ambos os clientes.
-- Toda a superfície pública documentada com TypeDoc: categorias, exemplos e
-  links de fonte para o GitLab. Geração roda `pnpm docs` sem erros ou avisos.
+- Testes automatizados iniciais cobrem envelope SOAP, parsing, mappers, SOAP
+  Fault e chamadas básicas da fachada do `sei-client`; falta validação com SOAP
+  real de HML para cada operação.
+
+## Inventário SEI
+
+Fonte de verdade do levantamento: métodos `*Monitorado` em
+`/home/luciano/anpdgovbr/sei/src/sei/web/ws/SeiWS.php`. A coluna "ciclo"
+indica a ordem recomendada para liberar e validar no `sei-client`, não uma
+ordem imposta pelo SEI.
+
+### Ciclos de disponibilização do sei-client
+
+| Ciclo | Objetivo                                              | Critério de saída                                                                                       |
+| ----- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 0     | Infraestrutura de smoke e fixtures                    | `scripts/smoke-sei.ts`, variáveis `.env`, mascaramento de segredo e execução seletiva por ciclo         |
+| 1     | Consultas básicas e tabelas de referência             | Autenticação, envelope, parser, arrays e mappers validados com operações somente leitura                |
+| 2     | Consulta de processo, documento e histórico           | Fluxo de leitura de protocolo real validado com fixtures HML anonimizadas                               |
+| 3     | Escrita mínima controlada                             | Geração de processo e inclusão de documento em unidade de teste, com limpeza/identificação operacional  |
+| 4     | Tramitação e ciclo de vida de processo/documento      | Envio, atribuição, conclusão/reabertura, bloqueios e exclusões validados em massa pequena               |
+| 5     | Blocos                                                | Criação, consulta e operações de bloco validadas com documentos/processos de teste                      |
+| 6     | Marcadores, anotações, andamentos e controle de prazo | Operações auxiliares de gestão processual validadas contra processos de teste                           |
+| 7     | Cadastros, arquivos, e-mail e ouvidoria               | Operações com payloads maiores, anexos ou efeitos externos validadas com isolamento explícito           |
+| 8     | Publicações                                           | Operações de publicação validadas por último por dependência de veículo, agenda e regras institucionais |
+
+### Operações por ciclo
+
+#### Ciclo 1 - Consultas básicas e tabelas de referência
+
+Primeiro bloco de HML. Serve para confirmar conectividade, autenticação,
+permissões do sistema integrador, serialização de parâmetros simples e
+normalização de listas.
+
+| Operação SOAP                      | Método público                                   | Observação                                         |
+| ---------------------------------- | ------------------------------------------------ | -------------------------------------------------- |
+| `listarUnidades`                   | `sei.consultas.listarUnidades`                   | Base para descobrir unidades permitidas ao sistema |
+| `listarTiposProcedimento`          | `sei.consultas.listarTiposProcedimento`          | Necessária antes de gerar procedimento             |
+| `listarSeries`                     | `sei.consultas.listarSeries`                     | Necessária antes de incluir documento              |
+| `listarTiposPrioridade`            | `sei.consultas.listarTiposPrioridade`            | Complementa criação/classificação de processo      |
+| `listarHipotesesLegais`            | `sei.consultas.listarHipotesesLegais`            | Necessária para níveis de acesso restritos         |
+| `listarTiposConferencia`           | `sei.consultas.listarTiposConferencia`           | Necessária para documentos externos                |
+| `listarUsuarios`                   | `sei.consultas.listarUsuarios`                   | Necessária para atribuição e validação de unidade  |
+| `listarPaises`                     | `sei.consultas.listarPaises`                     | Tabela de referência de contatos/ouvidoria         |
+| `listarEstados`                    | `sei.consultas.listarEstados`                    | Tabela de referência de contatos/ouvidoria         |
+| `listarCidades`                    | `sei.consultas.listarCidades`                    | Tabela de referência de contatos/ouvidoria         |
+| `listarCargos`                     | `sei.consultas.listarCargos`                     | Tabela de referência de contatos                   |
+| `listarFeriados`                   | `sei.consultas.listarFeriados`                   | Útil para controle de prazo e retorno programado   |
+| `listarExtensoesPermitidas`        | `sei.consultas.listarExtensoesPermitidas`        | Pré-requisito para upload/anexos                   |
+| `listarTiposProcedimentoOuvidoria` | `sei.consultas.listarTiposProcedimentoOuvidoria` | Pré-requisito para `registrarOuvidoria`            |
+
+#### Ciclo 2 - Consulta de processo, documento, bloco e histórico
+
+Segundo bloco. Usa protocolos já existentes em HML e deve gerar fixtures reais
+anonimizadas, porque os retornos são compostos e mais propensos a divergência.
+
+| Operação SOAP                     | Método público                                  | Observação                                   |
+| --------------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| `consultarProcedimento`           | `sei.consultas.consultarProcedimento`           | Consulta central de processo                 |
+| `consultarProcedimentoIndividual` | `sei.consultas.consultarProcedimentoIndividual` | Consulta resumida por órgão/tipo/usuário     |
+| `consultarDocumento`              | `sei.consultas.consultarDocumento`              | Consulta central de documento                |
+| `listarAndamentos`                | `sei.consultas.listarAndamentos`                | Histórico de processo                        |
+| `consultarBloco`                  | `sei.consultas.consultarBloco`                  | Leitura antes das operações de bloco         |
+| `listarMarcadoresUnidade`         | `sei.consultas.listarMarcadoresUnidade`         | Pré-requisito para marcador                  |
+| `listarAndamentosMarcadores`      | `sei.consultas.listarAndamentosMarcadores`      | Validação de marcador/histórico              |
+| `consultarPublicacao`             | `sei.consultas.consultarPublicacao`             | Leitura antes do ciclo de publicações        |
+| `listarContatos`                  | `sei.consultas.listarContatos`                  | Consulta pesada; validar paginação e filtros |
+
+#### Ciclo 3 - Escrita mínima controlada
+
+Primeiro bloco com alteração de estado. Deve rodar apenas em unidade de teste,
+com tipo de procedimento, série, usuário e dados definidos no `.env` do smoke.
+
+| Operação SOAP       | Método público                    | Observação                                             |
+| ------------------- | --------------------------------- | ------------------------------------------------------ |
+| `gerarProcedimento` | `sei.operacoes.gerarProcedimento` | Primeira escrita a validar; base para ciclos seguintes |
+| `incluirDocumento`  | `sei.operacoes.incluirDocumento`  | Validar documento interno simples e externo mínimo     |
+| `lancarAndamento`   | `sei.operacoes.lancarAndamento`   | Escrita leve em processo de teste                      |
+| `registrarAnotacao` | `sei.operacoes.registrarAnotacao` | Escrita auxiliar reversível/baixa criticidade          |
+
+#### Ciclo 4 - Tramitação e ciclo de vida de processo/documento
+
+Operações de negócio comuns, mas com maior efeito operacional. Devem usar
+processos criados pelo ciclo 3.
+
+| Operação SOAP                   | Método público                                | Observação                                       |
+| ------------------------------- | --------------------------------------------- | ------------------------------------------------ |
+| `enviarProcesso`                | `sei.operacoes.enviarProcesso`                | Exige unidade destino conhecida                  |
+| `atribuirProcesso`              | `sei.operacoes.atribuirProcesso`              | Exige usuário válido na unidade                  |
+| `concluirProcesso`              | `sei.operacoes.concluirProcesso`              | Altera estado do processo na unidade             |
+| `reabrirProcesso`               | `sei.operacoes.reabrirProcesso`               | Par da conclusão                                 |
+| `bloquearProcesso`              | `sei.operacoes.bloquearProcesso`              | Validar somente em processo de teste             |
+| `desbloquearProcesso`           | `sei.operacoes.desbloquearProcesso`           | Par do bloqueio                                  |
+| `bloquearDocumento`             | `sei.operacoes.bloquearDocumento`             | Validar com documento criado no ciclo 3          |
+| `cancelarDocumento`             | `sei.operacoes.cancelarDocumento`             | Operação sensível; deixar após inclusão validada |
+| `excluirDocumento`              | `sei.operacoes.excluirDocumento`              | Rascunhos/documentos de teste apenas             |
+| `excluirProcesso`               | `sei.operacoes.excluirProcesso`               | Rascunhos/processos de teste apenas              |
+| `relacionarProcesso`            | `sei.operacoes.relacionarProcesso`            | Exige dois processos de teste                    |
+| `removerRelacionamentoProcesso` | `sei.operacoes.removerRelacionamentoProcesso` | Par do relacionamento                            |
+| `anexarProcesso`                | `sei.operacoes.anexarProcesso`                | Exige dois processos compatíveis                 |
+| `desanexarProcesso`             | `sei.operacoes.desanexarProcesso`             | Par da anexação                                  |
+| `sobrestarProcesso`             | `sei.operacoes.sobrestarProcesso`             | Depende de motivo e estado processual            |
+| `removerSobrestamentoProcesso`  | `sei.operacoes.removerSobrestamentoProcesso`  | Par do sobrestamento                             |
+
+#### Ciclo 5 - Blocos
+
+Blocos dependem de documentos/processos criados previamente e de unidades para
+disponibilização. Validar criação e consulta antes das demais transições.
+
+| Operação SOAP                   | Método público                                | Observação                        |
+| ------------------------------- | --------------------------------------------- | --------------------------------- |
+| `gerarBloco`                    | `sei.operacoes.gerarBloco`                    | Primeira operação de bloco        |
+| `alterarBloco`                  | `sei.operacoes.alterarBloco`                  | Alteração de descrição/unidades   |
+| `disponibilizarBloco`           | `sei.operacoes.disponibilizarBloco`           | Exige unidade de disponibilização |
+| `cancelarDisponibilizacaoBloco` | `sei.operacoes.cancelarDisponibilizacaoBloco` | Par da disponibilização           |
+| `incluirDocumentoBloco`         | `sei.operacoes.incluirDocumentoBloco`         | Exige documento de teste          |
+| `retirarDocumentoBloco`         | `sei.operacoes.retirarDocumentoBloco`         | Par da inclusão de documento      |
+| `incluirProcessoBloco`          | `sei.operacoes.incluirProcessoBloco`          | Exige processo de teste           |
+| `retirarProcessoBloco`          | `sei.operacoes.retirarProcessoBloco`          | Par da inclusão de processo       |
+| `concluirBloco`                 | `sei.operacoes.concluirBloco`                 | Transição de estado               |
+| `reabrirBloco`                  | `sei.operacoes.reabrirBloco`                  | Par da conclusão                  |
+| `devolverBloco`                 | `sei.operacoes.devolverBloco`                 | Depende do tipo/estado do bloco   |
+| `excluirBloco`                  | `sei.operacoes.excluirBloco`                  | Última operação do ciclo          |
+
+#### Ciclo 6 - Marcadores, controle de prazo e gestão auxiliar
+
+Operações úteis para fluxos administrativos. Validar depois que processo,
+andamento e usuário/unidade estiverem estáveis.
+
+| Operação SOAP           | Método público                        | Observação                           |
+| ----------------------- | ------------------------------------- | ------------------------------------ |
+| `definirMarcador`       | `sei.operacoes.definirMarcador`       | Depende de `listarMarcadoresUnidade` |
+| `definirControlePrazo`  | `sei.operacoes.definirControlePrazo`  | Depende de datas e calendário        |
+| `concluirControlePrazo` | `sei.operacoes.concluirControlePrazo` | Par de `definirControlePrazo`        |
+| `removerControlePrazo`  | `sei.operacoes.removerControlePrazo`  | Limpeza de prazo                     |
+
+#### Ciclo 7 - Cadastros, arquivos, e-mail e ouvidoria
+
+Operações com payload mais volumoso ou efeitos externos. Devem ter massa de
+teste e critérios de isolamento antes de entrar no smoke padrão.
+
+| Operação SOAP              | Método público                           | Observação                                                         |
+| -------------------------- | ---------------------------------------- | ------------------------------------------------------------------ |
+| `atualizarContatos`        | `sei.operacoes.atualizarContatos`        | Cadastro sensível; usar contatos de teste                          |
+| `adicionarArquivo`         | `sei.consultas.adicionarArquivo`         | Inicia upload em partes, apesar de estar no subclient de consultas |
+| `adicionarConteudoArquivo` | `sei.consultas.adicionarConteudoArquivo` | Depende do token de `adicionarArquivo`                             |
+| `enviarEmail`              | `sei.operacoes.enviarEmail`              | Produz efeito externo; usar destinatário controlado                |
+| `registrarOuvidoria`       | `sei.operacoes.registrarOuvidoria`       | Payload composto, anexos e regras próprias                         |
+
+#### Ciclo 8 - Publicações
+
+Último bloco recomendado. Publicação tem dependência de veículo, agenda,
+documento e regras institucionais; deve ficar fora do smoke padrão até haver
+massa HML e procedimento operacional claro.
+
+| Operação SOAP                         | Método público                                      | Observação                           |
+| ------------------------------------- | --------------------------------------------------- | ------------------------------------ |
+| `agendarPublicacao`                   | `sei.operacoes.agendarPublicacao`                   | Cria agendamento                     |
+| `alterarPublicacao`                   | `sei.operacoes.alterarPublicacao`                   | Altera agendamento existente         |
+| `cancelarAgendamentoPublicacao`       | `sei.operacoes.cancelarAgendamentoPublicacao`       | Cancela agendamento                  |
+| `confirmarDisponibilizacaoPublicacao` | `sei.operacoes.confirmarDisponibilizacaoPublicacao` | Confirma disponibilização/publicação |
 
 ### Infraestrutura
 
@@ -181,6 +343,186 @@ As inconsistências e pontos de atenção levantados para eventual encaminhament
 equipe SEI/SIP estão em
 [sei-sip-inconsistencias-para-dev-sei.md](sei-sip-inconsistencias-para-dev-sei.md).
 
+## Achados HML SEI
+
+Em 2026-07-08, o ciclo 1 do `sei-client` foi validado contra
+`https://hmlsei.anpd.gov.br/sei/ws/SeiWS.php` com sucesso em 14/14 operações de
+leitura.
+
+Configuração HML usada para a validação:
+
+- Sistema SEI integrador: `SEI-INTEGRATIONS-HML`.
+- Serviço SEI integrador: `SEI-INTEGRATIONS-HML-CICLO1`.
+- Unidade usada nas operações configuráveis: `110000001` (`TESTE`).
+- Órgão disponível no HML: `0` (`ANPD`).
+- País usado para `listarEstados`: `76` (`Brasil`).
+- Período usado para `listarFeriados`: `01/01/2025` a `31/12/2025`.
+
+Observações operacionais:
+
+- O HML está defasado em relação à realidade atual; para smoke de feriados, o
+  ano de 2025 é a massa estável conhecida. Com 2026 a operação é válida, mas
+  retornou lista vazia.
+- As operações `listarUnidades`, `listarTiposProcedimento` e `listarSeries` não
+  aparecem na interface de cadastro de operações do serviço porque são
+  operações não configuráveis no SEI (`TS_LISTAR_UNIDADES`,
+  `TS_LISTAR_TIPOS_PROCEDIMENTO`, `TS_LISTAR_SERIES`).
+- `SEI_IDENTIFICACAO_SERVICO` deve receber a chave de acesso gerada do serviço
+  quando a autenticação estiver por chave, não apenas a identificação textual do
+  serviço.
+- `listarExtensoesPermitidas` precisou ser adicionada ao serviço SEI; depois da
+  configuração com todas as unidades, passou no smoke e retornou 38 registros.
+
+Resultado do ciclo 1 em HML:
+
+| Operação                           | Resultado |
+| ---------------------------------- | --------- |
+| `listarUnidades`                   | 66        |
+| `listarTiposProcedimento`          | 373       |
+| `listarSeries`                     | 340       |
+| `listarTiposPrioridade`            | 0         |
+| `listarHipotesesLegais`            | 30        |
+| `listarTiposConferencia`           | 4         |
+| `listarUsuarios`                   | 5         |
+| `listarPaises`                     | 204       |
+| `listarEstados`                    | 27        |
+| `listarCidades`                    | 5564      |
+| `listarCargos`                     | 83        |
+| `listarFeriados`                   | 17        |
+| `listarExtensoesPermitidas`        | 38        |
+| `listarTiposProcedimentoOuvidoria` | 6         |
+
+Para o ciclo 2, a unidade `TESTE` não deve ser usada como massa principal,
+porque tem pouco uso histórico no HML. As unidades com melhor chance de massa
+real são:
+
+| Unidade | ID        | Evidência inicial                                |
+| ------- | --------- | ------------------------------------------------ |
+| `CGA`   | 110000018 | Unidade real com chance de massa histórica       |
+| `CGTI`  | 110000029 | Unidade real adicionada ao serviço do ciclo 2    |
+| `FIS`   | 110000036 | Massa usada no ciclo 2; marcadores retornaram 16 |
+| `GABPR` | 110000005 | `listarMarcadoresUnidade` retornou 11 marcadores |
+
+`FIS` foi adotada como unidade padrão local do ciclo 2 com o processo
+`00261.001688/2022-98`, documento `0176343` e tipo de processo `100000429`
+(`ANPD: Procedimento de Fiscalização`). Nesse contexto:
+
+- `SEI_SMOKE_PROTOCOLO_DOCUMENTO` é o protocolo/número do documento SEI, por
+  exemplo `0176343`; não é o ID da série/tipo documental.
+- O tipo documental `Despacho` (`idSerie=5`) é relevante para inclusão de
+  documentos em ciclos de escrita, não para consulta do documento existente.
+- `listarAndamentos` exige ao menos um critério (`Andamentos`, `Tarefas` ou
+  `TarefasModulos`); para essa massa, `SEI_SMOKE_TAREFAS=1` valida a geração do
+  processo.
+- `consultarProcedimentoIndividual` exige tipo de processo individual; o tipo
+  `100000429` não é individual e, por isso, a operação usa a variável separada
+  `SEI_SMOKE_ID_TIPO_PROCEDIMENTO_INDIVIDUAL`.
+- Nas unidades candidatas testadas (`CGA`, `CGTI`, `FIS` e `GABPR`),
+  `listarTiposProcedimento` com `SinIndividual=S` retornou 0 tipos disponíveis.
+  Para validar `consultarProcedimentoIndividual` será necessário localizar ou
+  configurar um tipo de processo com `SinIndividual=S` e massa associada ao
+  usuário do smoke.
+- `consultarPublicacao` está autorizada no serviço e passou usando o protocolo
+  do documento, mas o HML pode não ter massa de publicação facilmente
+  localizável; se necessário, ela deve ficar como validação separada contra
+  produção ou contra uma massa HML dirigida.
+- `consultarBloco` foi validada com blocos `1410` e `1379` na FIS. O bloco
+  interno `308` também passou na CGTI (`110000029`).
+
+Regra observada no fonte local do SEI para `consultarProcedimentoIndividual`:
+
+- O tipo de processo precisa estar marcado como individual.
+- O serviço precisa ter a operação `Consultar Processo Individual` autorizada
+  para a unidade/tipo.
+- O usuário informado por `SEI_SMOKE_SIGLA_USUARIO` precisa existir no órgão
+  `SEI_SMOKE_ID_ORGAO_USUARIO`.
+- O processo precisa ter esse usuário como interessado, considerando o contato
+  do usuário ou contatos com o mesmo `IdOrigem`.
+- A operação retorna o processo individual mais recente do tipo/órgão/usuário,
+  desde que a unidade do serviço tenha acesso ao processo e ele não seja
+  sigiloso no contexto de serviço.
+
+Resultado do ciclo 2 em HML com FIS:
+
+| Operação                          | Resultado                                |
+| --------------------------------- | ---------------------------------------- |
+| `consultarProcedimento`           | OK                                       |
+| `consultarDocumento`              | OK                                       |
+| `listarAndamentos`                | OK, 1 registro com `SEI_SMOKE_TAREFAS=1` |
+| `consultarBloco`                  | OK                                       |
+| `listarMarcadoresUnidade`         | OK, 16 registros                         |
+| `listarAndamentosMarcadores`      | OK, 1 registro                           |
+| `consultarPublicacao`             | OK, retorno sem resumo no smoke          |
+| `listarContatos`                  | OK, 10 registros com paginação padrão    |
+| `consultarProcedimentoIndividual` | OK                                       |
+
+O ciclo 3 está automatizado no runner, mas protegido por
+`SEI_SMOKE_ALLOW_WRITE=1`. Sem essa variável, todas as operações de escrita são
+puladas. O fluxo padrão do ciclo 3 é encadeado: `gerarProcedimento` cria um
+processo de teste e o runner usa o protocolo retornado para `incluirDocumento`,
+`lancarAndamento` e `registrarAnotacao`.
+
+Variáveis específicas do ciclo 3:
+
+- `SEI_SMOKE_WRITE_ID_TIPO_PROCEDIMENTO`: tipo de processo usado para criar o
+  processo de teste.
+- `SEI_SMOKE_WRITE_CODIGO_ASSUNTO`: código estruturado de assunto válido para o
+  processo.
+- `SEI_SMOKE_WRITE_INTERESSADO_NOME`: interessado textual do processo de teste.
+- `SEI_SMOKE_WRITE_ID_SERIE`: tipo documental usado para incluir documento.
+- `SEI_SMOKE_WRITE_NIVEL_ACESSO`: nível de acesso; padrão `0` (público).
+- `SEI_SMOKE_WRITE_ID_TAREFA_ANDAMENTO`: tarefa usada em `lancarAndamento`;
+  padrão `65` (`Atualização de Andamento`), porque o SEI rejeita tarefas
+  reservadas menores que `1000`, exceto a `65`.
+- `SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO`: opcional para rodar operações do
+  ciclo 3 isoladamente em um processo de teste já existente. No ciclo completo,
+  o valor é preenchido em memória a partir de `gerarProcedimento`.
+
+Para o Serviço SEI, o ciclo 3 exige liberar as operações `Gerar Processo`,
+`Incluir Documento`, `Lançar Andamento` e `Registrar Anotação` na unidade de
+teste escolhida e nos tipos usados pela massa do smoke.
+
+Massa inicial sugerida para HML/FIS:
+
+- Unidade: `110000036` (`FIS`).
+- Tipo de processo: `100000429` (`ANPD: Procedimento de Fiscalização`).
+- Assunto: `100` (`Atividade Finalística`).
+- Tipo documental/série: `5` (`Despacho`).
+- Interessado textual: `SEI Client Smoke`.
+
+Em 2026-07-08, após liberação do serviço no SEI, o ciclo 3 foi executado com
+`SEI_SMOKE_ALLOW_WRITE=1` e passou em 4/4 operações:
+
+| Operação            | Resultado |
+| ------------------- | --------- |
+| `gerarProcedimento` | OK        |
+| `incluirDocumento`  | OK        |
+| `lancarAndamento`   | OK        |
+| `registrarAnotacao` | OK        |
+
+Achado sobre conteúdo de documento:
+
+- O SEI legado trabalha com conteúdo textual em ISO-8859-1/Latin-1 e o Web
+  Service exige `Conteudo` e `ConteudoSecoes[].Conteudo` em Base64.
+- Enviar HTML cru em UTF-8 no campo `Conteudo` gera documento corrompido no
+  editor SEI.
+- O `sei-client` expõe `encodeSeiLatin1Base64` para consumidores codificarem
+  HTML/texto antes de chamar `incluirDocumento` ou `gerarProcedimento` com
+  documentos embutidos.
+- Para documentos gerados com modelo, a estratégia mais previsível é enviar
+  `conteudoSecoes` apontando para a seção principal pelo nome configurado no
+  modelo, por exemplo `Corpo do Texto`, mantendo cabeçalho/rodapé no próprio
+  modelo.
+- A lib não deve tentar resolver regra negocial de assinatura. Ela expõe os
+  parâmetros do SEI; cabe à integração escolher série/modelo compatível. Para
+  automações sem assinatura humana, o caminho mais estável é usar tipo de
+  documento/modelo próprio de sistema, sem seção de assinatura obrigatória,
+  como fazem módulos internos.
+- No HML, a inclusão de documento com `conteudoSecoes` em Base64 Latin-1 foi
+  validada no processo `00261.001688/2022-98` para `Despacho` (`idSerie=5`,
+  documento `0178397`) e `Recibo Eletrônico de Protocolo` (`idSerie=283`,
+  documento `0178398`).
+
 ## Próximos passos
 
 ### sip-client
@@ -194,14 +536,28 @@ equipe SEI/SIP estão em
 
 ### sei-client
 
-4. Criar `scripts/smoke-sei.ts` análogo ao `smoke-sip.ts` para homologação do
-   `@anpdgovbr/sei-client` contra o ambiente HML do SEI.
-5. Definir variáveis de ambiente e personas para o smoke do SEI (endpoint, sigla
-   do sistema, chave de identificação, unidade de teste).
-6. Capturar fixtures SOAP reais anonimizadas do SEI, priorizando consultas de
-   procedimento, documento e unidade.
+4. Capturar fixtures SOAP reais anonimizadas do ciclo 1 do SEI para travar
+   mappers de listas e tabelas de referência.
+5. Preparar massa do ciclo 2 com protocolos reais HML de processo, documento,
+   bloco, publicação e contatos, evitando dados sensíveis.
+6. Rodar `pnpm smoke:sei -- --cycle 2` de forma incremental por operação,
+   começando por `consultarProcedimento`, `consultarDocumento` e
+   `listarAndamentos`.
+7. Ajustar mappers/tipos do `sei-client` conforme divergências reais do ciclo 2
+   antes de avançar para operações de escrita.
+
+O ciclo 0 do SEI já está preparado em `scripts/smoke-sei.ts` e registrado como
+`pnpm smoke:sei`. O runner carrega `.env`, mascara `IdentificacaoServico` no
+debug SOAP, permite `--plan`, `--cycle` e `--operation`, e reaproveita
+configuração compartilhável do SIP quando possível:
+
+- `SEI_SOAP_ENDPOINT` pode ficar vazio se `SIP_SOAP_ENDPOINT` terminar em
+  `/sip/ws/SipWS.php`; nesse caso o smoke deriva `/sei/ws/SeiWS.php` no mesmo
+  host.
+- `SEI_SMOKE_SIGLA_USUARIO` pode ficar vazia se `SIP_SMOKE_SIGLA_USUARIO` ou a
+  sigla da persona SIP ativa estiver preenchida.
 
 ### Publicação
 
-7. Publicar manualmente `@anpdgovbr/sip-client` e `@anpdgovbr/sei-client` no
+8. Publicar manualmente `@anpdgovbr/sip-client` e `@anpdgovbr/sei-client` no
    registry interno quando os pacotes estiverem prontos para consumo.

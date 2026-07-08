@@ -30,6 +30,11 @@
       "import": "./dist/soap.js",
       "require": "./dist/soap.cjs"
     },
+    "./encoding": {
+      "types": "./dist/encoding.d.ts",
+      "import": "./dist/encoding.js",
+      "require": "./dist/encoding.cjs"
+    },
     "./types": {
       "types": "./dist/types.d.ts",
       "import": "./dist/types.js",
