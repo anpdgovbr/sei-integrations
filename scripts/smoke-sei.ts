@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs"
 
-import { createSeiClient, encodeSeiLatin1Base64, SeiSoapError } from "../packages/sei-client/src"
+import { createSeiClient, encodeSeiBase64, SeiSoapError } from "../packages/sei-client/src"
 
 type SmokeCycle = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 type SmokeEffect = "read" | "write" | "external"
@@ -615,7 +615,9 @@ const operations: SmokeOperation[] = [
           idHipoteseLegal: optionalEnv("SEI_SMOKE_WRITE_ID_HIPOTESE_LEGAL"),
           conteudo:
             optionalEnv("SEI_SMOKE_WRITE_DOCUMENTO_CONTEUDO") ??
-            encodeSeiLatin1Base64(generatedDocumentHtml(label)),
+            encodeSeiBase64(generatedDocumentHtml(label)),
+          sinBloqueado: "S",
+          sinAssinado: "N",
         },
       })
     },

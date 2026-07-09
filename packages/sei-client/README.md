@@ -12,10 +12,10 @@ O guia operacional fica em [`../../doc/sei-client.md`](../../doc/sei-client.md).
 ## Conteúdo de documentos
 
 O SEI espera `Documento.Conteudo` e `Documento.ConteudoSecoes[].Conteudo` em
-Base64. Em instalações legadas, o conteúdo textual do editor é Latin-1.
+Base64.
 
 ```ts
-import { encodeSeiLatin1Base64 } from "@anpdgovbr/sei-client"
+import { encodeSeiBase64 } from "@anpdgovbr/sei-client"
 
 await sei.operacoes.incluirDocumento({
   idUnidade: "110000036",
@@ -27,7 +27,7 @@ await sei.operacoes.incluirDocumento({
     conteudoSecoes: [
       {
         nome: "Corpo do Texto",
-        conteudo: encodeSeiLatin1Base64("<p>Conteúdo do documento</p>"),
+        conteudo: encodeSeiBase64("<p>Conteúdo do documento</p>"),
       },
     ],
   },

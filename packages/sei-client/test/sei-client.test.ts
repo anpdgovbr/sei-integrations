@@ -4,7 +4,7 @@ import {
   buildSeiSoapEnvelope,
   createSeiClient,
   createSeiSoapArray,
-  encodeSeiLatin1Base64,
+  encodeSeiBase64,
   parseSeiSoapResponse,
   SeiSoapError,
 } from "../src"
@@ -94,8 +94,8 @@ const requestBody = (callIndex: number): string => {
 }
 
 describe("Sei SOAP", () => {
-  it("codifica conteúdo textual do editor SEI em Base64 Latin-1", () => {
-    expect(encodeSeiLatin1Base64("Ação")).toBe("Qefjbw==")
+  it("codifica conteúdo em Base64 UTF-8", () => {
+    expect(encodeSeiBase64("Ação")).toBe("QcOnw6Nv")
   })
 
   it("monta envelope RPC/encoded com namespace, nil e arrays tipados", () => {

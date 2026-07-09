@@ -25,7 +25,7 @@
  * @module
  */
 export { SeiClient, SeiConsultasClient, SeiOperacoesClient, createSeiClient } from "./client"
-export { encodeSeiLatin1Base64 } from "./encoding"
+export { encodeSeiBase64 } from "./encoding"
 export {
   SeiSoapError,
   buildSeiSoapEnvelope,

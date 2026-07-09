@@ -502,26 +502,17 @@ Em 2026-07-08, após liberação do serviço no SEI, o ciclo 3 foi executado com
 
 Achado sobre conteúdo de documento:
 
-- O SEI legado trabalha com conteúdo textual em ISO-8859-1/Latin-1 e o Web
-  Service exige `Conteudo` e `ConteudoSecoes[].Conteudo` em Base64.
-- Enviar HTML cru em UTF-8 no campo `Conteudo` gera documento corrompido no
-  editor SEI.
-- O `sei-client` expõe `encodeSeiLatin1Base64` para consumidores codificarem
-  HTML/texto antes de chamar `incluirDocumento` ou `gerarProcedimento` com
-  documentos embutidos.
-- Para documentos gerados com modelo, a estratégia mais previsível é enviar
-  `conteudoSecoes` apontando para a seção principal pelo nome configurado no
-  modelo, por exemplo `Corpo do Texto`, mantendo cabeçalho/rodapé no próprio
-  modelo.
-- A lib não deve tentar resolver regra negocial de assinatura. Ela expõe os
-  parâmetros do SEI; cabe à integração escolher série/modelo compatível. Para
-  automações sem assinatura humana, o caminho mais estável é usar tipo de
-  documento/modelo próprio de sistema, sem seção de assinatura obrigatória,
-  como fazem módulos internos.
-- No HML, a inclusão de documento com `conteudoSecoes` em Base64 Latin-1 foi
-  validada no processo `00261.001688/2022-98` para `Despacho` (`idSerie=5`,
-  documento `0178397`) e `Recibo Eletrônico de Protocolo` (`idSerie=283`,
-  documento `0178398`).
+- O Web Service do SEI exige `Conteudo` e `ConteudoSecoes[].Conteudo` em Base64 UTF-8. O helper foi corrigido e renomeado para `encodeSeiBase64`.
+- A acentuação em português (ex: "Eletrônico", "áéíóúçãõâêô") funciona perfeitamente ao codificar com UTF-8 em Base64, resolvendo problemas anteriores de caracteres inválidos (ex: "Eletr?nico") originados por encoding incorreto.
+- No HML, a inclusão de documento com acentos em Base64 UTF-8 foi validada no processo do ciclo 3 (`00261.000004/2026-64`) para `Recibo Eletrônico de Protocolo` (`idSerie=283`, documento `0178401`, id `196903`) e anteriormente no processo de referência para `Despacho` (`idSerie=5`, documento `0178397`).
+- Comportamento de `SinBloqueado='S'` e `SinAssinado='N'` via SOAP:
+  - **Edição**: Fica bloqueada na interface do SEI (o botão de editar conteúdo desaparece), pois a barra de ações verifica se `$strSinDocBloqueado === 'N'`.
+  - **Assinatura**: O botão de assinar continua disponível na interface do SEI. A verificação do botão de assinar em `ProtocoloINT.php` valida apenas se a série permite assinatura e se o tipo de documento é `TD_EDITOR_INTERNO` ('G') ou `TD_FORMULARIO_GERADO` ('F'), não checando `SinBloqueado`.
+  - Como o Web Service do SEI não aceita o parâmetro `SubTipo` ou `StaDocumento` (e força a criação como `TD_EDITOR_INTERNO` ou `TD_FORMULARIO_GERADO`), é impossível via SOAP puro criar um documento interno comum que não seja editável mas que impeça a assinatura na interface do usuário (o que exigiria o tipo `TD_FORMULARIO_AUTOMATICO` ou `TD_EXTERNO`).
+- Criação de Documento com Série de Aplicabilidade Formulário ('F'):
+  - Executamos com sucesso um teste utilizando a série documental `Teste_Form_CONT` (`idSerie=320`), que possui aplicabilidade `F` (Formulário).
+  - A API do SEI criou o documento `0178402` (ID `196904`) no processo do ciclo 3 (`00261.000004/2026-64`).
+  - Internamente, o SEI mapeou este documento com status `TD_FORMULARIO_GERADO` ('F') ao invés do padrão `TD_EDITOR_INTERNO` ('I'). Isso demonstra que a API respeita a aplicabilidade da série configurada para o tipo de documento, mas em ambos os casos (`TD_FORMULARIO_GERADO` e `TD_EDITOR_INTERNO`) a interface web do SEI mantém o documento como assinável, confirmando a impossibilidade de torná-lo não assinável sem recorrer ao status `TD_FORMULARIO_AUTOMATICO` (o que requer update direto de banco).
 
 ## Próximos passos
 

@@ -261,6 +261,7 @@ const serializedDocumento = (d: SeiIncluirDocumentoParams["documento"]) => ({
     (d.campos ?? []).map((c) => ({ Nome: c.nome, Valor: c.valor })),
   ),
   SinBloqueado: d.sinBloqueado ?? null,
+  SinAssinado: d.sinAssinado ?? null,
   IdItemEtapa: d.idItemEtapa ?? null,
 })
 

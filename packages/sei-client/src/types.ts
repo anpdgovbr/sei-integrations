@@ -682,8 +682,7 @@ export type SeiProcedimentoInput = Readonly<{
  * `tipo` deve ser `"G"` (gerado) ou `"R"` (recebido).
  * Para conteúdo, use `conteudo` (Base64), `idArquivo` (arquivo já carregado
  * via `adicionarArquivo`) ou `conteudoSecoes` (conteúdo por seção em Base64).
- * Use {@link encodeSeiLatin1Base64} para codificar HTML/texto de documentos
- * gerados em instalações SEI legadas.
+ * Use {@link encodeSeiBase64} para codificar HTML/texto de documentos.
  * @category Input Types
  */
 export type SeiDocumentoInput = Readonly<{
@@ -712,7 +711,8 @@ export type SeiDocumentoInput = Readonly<{
   /** ID do arquivo pré-carregado via `adicionarArquivo`. */
   idArquivo?: string | null
   campos?: readonly SeiCampoInput[]
-  sinBloqueado?: string | null
+  sinBloqueado?: "S" | "N" | null
+  sinAssinado?: "S" | "N" | null
   idItemEtapa?: string | null
 }>
 
