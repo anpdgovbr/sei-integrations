@@ -86,6 +86,15 @@ const faultResponse = `<?xml version="1.0" encoding="UTF-8"?>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`
 
+const stringResponse = (operation: string): string => `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="Sei">
+  <SOAP-ENV:Body>
+    <ns1:${operation}Response>
+      <return>OK</return>
+    </ns1:${operation}Response>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`
+
 const fetchMock = () => vi.mocked(fetch)
 
 const requestBody = (callIndex: number): string => {
@@ -206,5 +215,135 @@ describe("SeiClient", () => {
     expect(requestBody(0)).toContain("<ProtocoloProcedimento")
     expect(requestBody(0)).toContain("<SinRetornarAssuntos")
     expect(requestBody(0)).toContain(">S</SinRetornarAssuntos>")
+  })
+
+  it("executa operações reversíveis do ciclo 4 com protocolos esperados", async () => {
+    fetchMock()
+      .mockResolvedValueOnce(response(stringResponse("concluirProcesso")))
+      .mockResolvedValueOnce(response(stringResponse("reabrirProcesso")))
+      .mockResolvedValueOnce(response(stringResponse("relacionarProcesso")))
+      .mockResolvedValueOnce(response(stringResponse("desanexarProcesso")))
+      .mockResolvedValueOnce(response(stringResponse("sobrestarProcesso")))
+
+    const sei = createSeiClient(config)
+
+    await expect(
+      sei.operacoes.concluirProcesso({
+        idUnidade: "110000036",
+        protocoloProcedimento: "00261.000004/2026-64",
+      }),
+    ).resolves.toBe("OK")
+    await expect(
+      sei.operacoes.reabrirProcesso({
+        idUnidade: "110000036",
+        protocoloProcedimento: "00261.000004/2026-64",
+      }),
+    ).resolves.toBe("OK")
+    await expect(
+      sei.operacoes.relacionarProcesso({
+        idUnidade: "110000036",
+        protocoloProcedimento1: "00261.000004/2026-64",
+        protocoloProcedimento2: "00261.000005/2026-17",
+      }),
+    ).resolves.toBe("OK")
+    await expect(
+      sei.operacoes.desanexarProcesso({
+        idUnidade: "110000036",
+        protocoloProcedimentoPrincipal: "00261.000005/2026-17",
+        protocoloProcedimentoAnexado: "00261.000004/2026-64",
+        motivo: "Smoke ciclo 4",
+      }),
+    ).resolves.toBe("OK")
+    await expect(
+      sei.operacoes.sobrestarProcesso({
+        idUnidade: "110000036",
+        protocoloProcedimento: "00261.000004/2026-64",
+        protocoloProcedimentoVinculado: "00261.000005/2026-17",
+        motivo: "Smoke ciclo 4",
+      }),
+    ).resolves.toBe("OK")
+
+    expect(requestBody(0)).toContain("<sei:concluirProcesso")
+    expect(requestBody(0)).toContain("<ProtocoloProcedimento")
+    expect(requestBody(0)).toContain(">00261.000004/2026-64</ProtocoloProcedimento>")
+    expect(requestBody(2)).toContain("<sei:relacionarProcesso")
+    expect(requestBody(2)).toContain("<ProtocoloProcedimento2")
+    expect(requestBody(2)).toContain(">00261.000005/2026-17</ProtocoloProcedimento2>")
+    expect(requestBody(3)).toContain("<sei:desanexarProcesso")
+    expect(requestBody(3)).toContain("<Motivo")
+    expect(requestBody(3)).toContain(">Smoke ciclo 4</Motivo>")
+    expect(requestBody(4)).toContain("<sei:sobrestarProcesso")
+    expect(requestBody(4)).toContain("<ProtocoloProcedimentoVinculado")
+    expect(requestBody(4)).toContain(">00261.000005/2026-17</ProtocoloProcedimentoVinculado>")
+  })
+
+  it("executa operações de bloco do ciclo 5 com id e protocolos esperados", async () => {
+    fetchMock()
+      .mockResolvedValueOnce(response(stringResponse("gerarBloco").replace(">OK<", ">1500<")))
+      .mockResolvedValueOnce(response(stringResponse("alterarBloco")))
+      .mockResolvedValueOnce(response(stringResponse("incluirDocumentoBloco")))
+      .mockResolvedValueOnce(response(stringResponse("retirarProcessoBloco")))
+      .mockResolvedValueOnce(response(stringResponse("excluirBloco")))
+      .mockResolvedValueOnce(response(stringResponse("devolverBloco")))
+
+    const sei = createSeiClient(config)
+
+    await expect(
+      sei.operacoes.gerarBloco({
+        idUnidade: "110000036",
+        tipo: "A",
+        descricao: "Smoke bloco",
+        unidadesDisponibilizacao: ["110000029"],
+      }),
+    ).resolves.toBe("1500")
+    await expect(
+      sei.operacoes.alterarBloco({
+        idUnidade: "110000036",
+        idBloco: "1500",
+        descricao: "Smoke bloco alterado",
+      }),
+    ).resolves.toBe("OK")
+    await expect(
+      sei.operacoes.incluirDocumentoBloco({
+        idUnidade: "110000036",
+        idBloco: "1500",
+        protocoloDocumento: "0178401",
+        anotacao: "Smoke",
+      }),
+    ).resolves.toBe("OK")
+    await expect(
+      sei.operacoes.retirarProcessoBloco({
+        idUnidade: "110000036",
+        idBloco: "1500",
+        protocoloProcedimento: "00261.000004/2026-64",
+      }),
+    ).resolves.toBe("OK")
+    await expect(
+      sei.operacoes.excluirBloco({
+        idUnidade: "110000036",
+        idBloco: "1500",
+      }),
+    ).resolves.toBe("OK")
+    await expect(
+      sei.operacoes.devolverBloco({
+        idUnidade: "110000036",
+        idBloco: "865",
+      }),
+    ).resolves.toBe("OK")
+
+    expect(requestBody(0)).toContain("<sei:gerarBloco")
+    expect(requestBody(0)).toContain("<Tipo")
+    expect(requestBody(0)).toContain(">A</Tipo>")
+    expect(requestBody(0)).toContain("<UnidadesDisponibilizacao")
+    expect(requestBody(1)).toContain("<sei:alterarBloco")
+    expect(requestBody(1)).toContain(">1500</IdBloco>")
+    expect(requestBody(2)).toContain("<sei:incluirDocumentoBloco")
+    expect(requestBody(2)).toContain(">0178401</ProtocoloDocumento>")
+    expect(requestBody(3)).toContain("<sei:retirarProcessoBloco")
+    expect(requestBody(3)).toContain(">00261.000004/2026-64</ProtocoloProcedimento>")
+    expect(requestBody(4)).toContain("<sei:excluirBloco")
+    expect(requestBody(4)).toContain(">1500</IdBloco>")
+    expect(requestBody(5)).toContain("<sei:devolverBloco")
+    expect(requestBody(5)).toContain(">865</IdBloco>")
   })
 })

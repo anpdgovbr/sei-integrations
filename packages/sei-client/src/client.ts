@@ -750,6 +750,14 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Cria um bloco no SEI.
+   *
+   * @remarks
+   * O tipo do bloco determina quais protocolos podem ser adicionados. Em HML,
+   * documentos foram validados em bloco de assinatura (`Tipo=A`), mas processos
+   * exigiram bloco interno ou outro tipo compatível.
+   */
   async gerarBloco(params: SeiGerarBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "gerarBloco",
@@ -872,6 +880,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Inclui um documento em bloco.
+   *
+   * @remarks
+   * Validado em HML com bloco de assinatura (`Tipo=A`). Essa compatibilidade não
+   * se aplica automaticamente a processos.
+   */
   async incluirDocumentoBloco(params: SeiIncluirDocumentoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "incluirDocumentoBloco",
@@ -885,6 +900,12 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Retira um documento de bloco.
+   *
+   * @remarks
+   * Validado em HML com bloco de assinatura (`Tipo=A`).
+   */
   async retirarDocumentoBloco(params: SeiRetirarDocumentoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "retirarDocumentoBloco",
@@ -897,6 +918,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Inclui um processo em bloco.
+   *
+   * @remarks
+   * Não use bloco de assinatura (`Tipo=A`) para processo: o SEI rejeita essa
+   * combinação. Em HML, o fluxo foi validado com bloco interno.
+   */
   async incluirProcessoBloco(params: SeiIncluirProcessoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "incluirProcessoBloco",
@@ -910,6 +938,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Retira um processo de bloco.
+   *
+   * @remarks
+   * Deve ser usado com bloco compatível com processos. Em HML, o par
+   * incluir/retirar processo foi validado com bloco interno.
+   */
   async retirarProcessoBloco(params: SeiRetirarProcessoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "retirarProcessoBloco",

@@ -718,6 +718,11 @@ export type SeiDocumentoInput = Readonly<{
 
 /**
  * Dados de contato para criação/atualização via `atualizarContatos`.
+ *
+ * O campo `staOperacao` controla o efeito no SEI: `A` cria/altera, `E` exclui,
+ * `D` desativa e `R` reativa. Para alteração (`A`), envie o cadastro completo
+ * do contato; o SEI repassa o DTO inteiro para a regra de alteração.
+ *
  * @category Input Types
  */
 export type SeiContatoInput = Readonly<{
@@ -774,6 +779,10 @@ export type SeiAtributoAndamentoInput = Readonly<{
 
 /**
  * Definição de marcador para `definirMarcador`.
+ *
+ * O Web Service do SEI registra um andamento de marcador para o processo, sem expor uma
+ * operação par de remoção/cancelamento desse marcador.
+ *
  * @category Input Types
  */
 export type SeiDefinicaoMarcadorInput = Readonly<{
@@ -784,6 +793,11 @@ export type SeiDefinicaoMarcadorInput = Readonly<{
 
 /**
  * Definição de controle de prazo para `definirControlePrazo`.
+ *
+ * O SEI repassa `DataPrazo`, `Dias` e `SinDiasUteis` para a regra de controle de prazo.
+ * Para prazo relativo, informe `dias` e `sinDiasUteis` e envie `dataPrazo` como string vazia.
+ * Para prazo absoluto, informe `dataPrazo` no formato aceito pelo SEI da instalação.
+ *
  * @category Input Types
  */
 export type SeiDefinicaoControlePrazoInput = Readonly<{
@@ -969,7 +983,17 @@ export type SeiListarCargosParams = Readonly<{
   idCargo?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.adicionarArquivo}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiConsultasClient.adicionarArquivo}.
+ *
+ * `tamanho` deve representar o tamanho total do arquivo em bytes, `hash` deve ser
+ * o MD5 hexadecimal do arquivo completo, e `conteudo` deve ser a primeira parte
+ * do arquivo em Base64. Se a primeira parte não completar o tamanho total, o SEI
+ * mantém o anexo temporário inativo até receber as partes restantes por
+ * `adicionarConteudoArquivo`.
+ *
+ * @category Operation Parameters
+ */
 export type SeiAdicionarArquivoParams = Readonly<{
   idUnidade: string
   nome: string
@@ -978,7 +1002,15 @@ export type SeiAdicionarArquivoParams = Readonly<{
   conteudo: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.adicionarConteudoArquivo}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiConsultasClient.adicionarConteudoArquivo}.
+ *
+ * Envia uma parte adicional em Base64 para um arquivo temporário iniciado por
+ * `adicionarArquivo`. Quando o conteúdo acumulado atinge `tamanho`, o SEI valida
+ * o MD5 informado na criação do arquivo.
+ *
+ * @category Operation Parameters
+ */
 export type SeiAdicionarConteudoArquivoParams = Readonly<{
   idUnidade: string
   idArquivo: string
@@ -1069,9 +1101,19 @@ export type SeiBloquearDocumentoParams = Readonly<{
   protocoloDocumento: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.gerarBloco}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.gerarBloco}.
+ *
+ * @remarks
+ * O tipo do bloco controla quais protocolos podem ser vinculados. Em HML,
+ * documentos foram validados em bloco de assinatura (`Tipo=A`), enquanto
+ * processos exigiram bloco interno ou outro tipo compatível.
+ *
+ * @category Operation Parameters
+ */
 export type SeiGerarBlocoParams = Readonly<{
   idUnidade: string
+  /** Tipo do bloco no SEI, por exemplo `A` para bloco de assinatura. */
   tipo: string
   descricao: string
   unidadesDisponibilizacao?: readonly string[]
@@ -1111,7 +1153,15 @@ export type SeiOperacaoBlocoParams = Readonly<{
   idBloco: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.incluirDocumentoBloco}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.incluirDocumentoBloco}.
+ *
+ * @remarks
+ * Validado em HML com bloco de assinatura (`Tipo=A`). Essa regra é diferente de
+ * inclusão de processo em bloco.
+ *
+ * @category Operation Parameters
+ */
 export type SeiIncluirDocumentoBlocoParams = Readonly<{
   idUnidade: string
   idBloco: string
@@ -1119,14 +1169,29 @@ export type SeiIncluirDocumentoBlocoParams = Readonly<{
   anotacao?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.retirarDocumentoBloco}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.retirarDocumentoBloco}.
+ *
+ * @remarks
+ * Validado em HML com bloco de assinatura (`Tipo=A`).
+ *
+ * @category Operation Parameters
+ */
 export type SeiRetirarDocumentoBlocoParams = Readonly<{
   idUnidade: string
   idBloco: string
   protocoloDocumento: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.incluirProcessoBloco}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.incluirProcessoBloco}.
+ *
+ * @remarks
+ * O SEI rejeita inclusão de processo em bloco de assinatura (`Tipo=A`). Em HML,
+ * este fluxo foi validado com bloco interno.
+ *
+ * @category Operation Parameters
+ */
 export type SeiIncluirProcessoBlocoParams = Readonly<{
   idUnidade: string
   idBloco: string
@@ -1134,7 +1199,15 @@ export type SeiIncluirProcessoBlocoParams = Readonly<{
   anotacao?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.retirarProcessoBloco}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.retirarProcessoBloco}.
+ *
+ * @remarks
+ * Use com bloco compatível com processos. Em HML, o par incluir/retirar processo
+ * foi validado com bloco interno.
+ *
+ * @category Operation Parameters
+ */
 export type SeiRetirarProcessoBlocoParams = Readonly<{
   idUnidade: string
   idBloco: string
@@ -1274,7 +1347,14 @@ export type SeiConfirmarDisponibilizacaoPublicacaoParams = Readonly<{
   idDocumentos: readonly string[]
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.enviarEmail}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.enviarEmail}.
+ *
+ * Esta operação envia e-mail real pelo SEI e gera documento de e-mail no
+ * processo informado. Use apenas com destinatários controlados em smoke/HML.
+ *
+ * @category Operation Parameters
+ */
 export type SeiEnviarEmailParams = Readonly<{
   idUnidade: string
   protocoloProcedimento: string

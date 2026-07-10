@@ -514,6 +514,152 @@ Achado sobre conteúdo de documento:
   - A API do SEI criou o documento `0178402` (ID `196904`) no processo do ciclo 3 (`00261.000004/2026-64`).
   - Internamente, o SEI mapeou este documento com status `TD_FORMULARIO_GERADO` ('F') ao invés do padrão `TD_EDITOR_INTERNO` ('I'). Isso demonstra que a API respeita a aplicabilidade da série configurada para o tipo de documento, mas em ambos os casos (`TD_FORMULARIO_GERADO` e `TD_EDITOR_INTERNO`) a interface web do SEI mantém o documento como assinável, confirmando a impossibilidade de torná-lo não assinável sem recorrer ao status `TD_FORMULARIO_AUTOMATICO` (o que requer update direto de banco).
 
+Em 2026-07-10, o ciclo 4 foi preparado no runner com pares reversíveis e testado
+em HML usando o processo principal `00261.000004/2026-64` e o processo
+relacionado `00261.001688/2022-98`. A execução com `SEI_SMOKE_ALLOW_WRITE=1`
+chegou ao SEI. Na primeira tentativa, as 10 operações automatizadas falharam
+porque ainda não estavam configuradas no serviço ativo
+(`SEI-INTEGRATIONS-HML-CICLO1`) para o tipo `ANPD: Procedimento de Fiscalização`
+na unidade `FIS`. Após liberação do serviço, as 10 operações automatizadas
+passaram.
+
+Resultado do ciclo 4 em HML após liberação do serviço:
+
+| Operação                        | Resultado |
+| ------------------------------- | --------- |
+| `concluirProcesso`              | OK        |
+| `reabrirProcesso`               | OK        |
+| `bloquearProcesso`              | OK        |
+| `desbloquearProcesso`           | OK        |
+| `relacionarProcesso`            | OK        |
+| `removerRelacionamentoProcesso` | OK        |
+| `anexarProcesso`                | OK        |
+| `desanexarProcesso`             | OK        |
+| `sobrestarProcesso`             | OK        |
+| `removerSobrestamentoProcesso`  | OK        |
+
+As operações `enviarProcesso`, `atribuirProcesso`, `bloquearDocumento`,
+`cancelarDocumento`, `excluirDocumento` e `excluirProcesso` continuam
+catalogadas como `planned` no runner até haver roteiro de massa/limpeza HML
+específico.
+
+Em 2026-07-10, o ciclo 5 foi preparado no runner para operações de bloco usando
+bloco de assinatura (`SEI_SMOKE_BLOCO_TIPO=A`), unidade `FIS`, destino `CGTI`
+(`110000029`), processo `00261.000004/2026-64`, documento `0176343` e bloco
+disponibilizado `1417` para `devolverBloco`. A primeira execução após a
+liberação mostrou que `gerarBloco` exige `SinDisponibilizar` válido; o runner foi
+ajustado para enviar `N` por padrão.
+
+Após o ajuste, `gerarBloco` isolado passou e criou o bloco `1414`, removido em
+seguida por `excluirBloco` para limpeza. Com a ordem do runner ajustada para
+manter o documento no bloco até a disponibilização/cancelamento, a execução
+completa criou o bloco `1419` e validou 9/12 operações automatizadas.
+
+Resultado do ciclo 5 em HML após liberação parcial:
+
+| Operação                        | Resultado                                                                       |
+| ------------------------------- | ------------------------------------------------------------------------------- |
+| `gerarBloco`                    | OK, criou bloco `1419` no ciclo completo                                        |
+| `alterarBloco`                  | OK                                                                              |
+| `incluirDocumentoBloco`         | OK com documento `0176343`                                                      |
+| `incluirProcessoBloco`          | OK isolado com bloco interno `1420`; falha no fluxo completo com bloco `A`      |
+| `retirarProcessoBloco`          | OK isolado com bloco interno `1420`; retirada limpou a massa após a inclusão    |
+| `disponibilizarBloco`           | OK com destino `CGTI`                                                           |
+| `cancelarDisponibilizacaoBloco` | OK                                                                              |
+| `retirarDocumentoBloco`         | OK                                                                              |
+| `concluirBloco`                 | OK                                                                              |
+| `reabrirBloco`                  | OK                                                                              |
+| `excluirBloco`                  | OK para o bloco gerado `1419`                                                   |
+| `devolverBloco`                 | OK isolado com bloco `1417`; falha no ciclo completo se usar bloco `865` da FIS |
+
+Também foi testada a exclusão isolada do bloco `1410`, autorizada para limpeza,
+mas o SEI recusou porque o bloco possui documentos.
+
+O par `incluirProcessoBloco`/`retirarProcessoBloco` foi validado isoladamente
+com o bloco interno `1420`, usando o processo `00261.000004/2026-64`. Para
+repetir `devolverBloco`, informar um bloco disponibilizado por outra unidade
+para a `FIS`, como foi feito com o bloco `1417`.
+
+Em 2026-07-10, o ciclo 6 foi automatizado no runner para marcador e controle de
+prazo. O smoke usa um processo de teste (`SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO`),
+um marcador ativo da unidade (`SEI_SMOKE_ID_MARCADOR`) e prazo relativo por
+padrão (`SEI_SMOKE_CYCLE6_CONTROLE_PRAZO_DIAS=1`,
+`SEI_SMOKE_CYCLE6_CONTROLE_PRAZO_SIN_DIAS_UTEIS=S`). A primeira tentativa em
+HML usou o marcador `140` (`Em Análise`) e chegou ao SEI, mas as quatro
+operações foram barradas por configuração de serviço na unidade `FIS`.
+
+Resultado do ciclo 6 em HML antes da liberação do serviço:
+
+| Operação                | Resultado                                                                                          |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| `definirMarcador`       | Falha: operação não configurada no serviço `SEI-INTEGRATIONS-HML-CICLO1` para a unidade `FIS`      |
+| `definirControlePrazo`  | Falha: operação não configurada no serviço `SEI-INTEGRATIONS-HML-CICLO1` para a unidade `FIS`      |
+| `concluirControlePrazo` | Falha: operação não configurada no serviço `SEI-INTEGRATIONS-HML-CICLO1` para a unidade `FIS`      |
+| `removerControlePrazo`  | Falha: o SEI retornou bloqueio de configuração para `definirControlePrazo` ao remover prazo em FIS |
+
+Após liberação das permissões no serviço, a execução
+`SEI_SMOKE_ALLOW_WRITE=1 SEI_SMOKE_ID_MARCADOR=140 pnpm smoke:sei -- --cycle 6`
+passou integralmente em HML.
+
+Resultado do ciclo 6 em HML após liberação do serviço:
+
+| Operação                | Resultado |
+| ----------------------- | --------- |
+| `definirMarcador`       | OK        |
+| `definirControlePrazo`  | OK        |
+| `concluirControlePrazo` | OK        |
+| `removerControlePrazo`  | OK        |
+
+Observação sobre marcadores: `definirMarcador` registra um andamento de marcador
+no processo, mas o Web Service do SEI não expõe operação par de remoção. Esse
+comportamento foi documentado no TypeDoc e no guia do `sei-client` para evitar
+interpretação como falha da lib.
+
+Em 2026-07-10, o ciclo 7 começou pelo par de upload em partes, que é o trecho
+mais isolado do ciclo porque grava anexo temporário e não altera processo nem
+envia e-mail. O runner foi preparado para `adicionarArquivo` e
+`adicionarConteudoArquivo`, usando conteúdo pequeno em Base64, tamanho total em
+bytes e hash MD5 hexadecimal do arquivo completo, conforme validação nativa do
+SEI (`AnexoRN`).
+
+Resultado inicial do ciclo 7 em HML antes da liberação de upload:
+
+| Operação                   | Resultado                                                                                     |
+| -------------------------- | --------------------------------------------------------------------------------------------- |
+| `adicionarArquivo`         | Falha: operação não configurada no serviço `SEI-INTEGRATIONS-HML-CICLO1` para a unidade `FIS` |
+| `adicionarConteudoArquivo` | Não chegou ao SEI; depende do `IdArquivo` retornado por `adicionarArquivo`                    |
+| `atualizarContatos`        | `planned`; requer massa de contato de teste                                                   |
+| `enviarEmail`              | `planned`; requer destinatário controlado por produzir efeito externo                         |
+| `registrarOuvidoria`       | `planned`; requer massa específica de ouvidoria                                               |
+
+Após liberação das permissões do ciclo 7, o runner foi expandido para contato,
+e-mail e ouvidoria. A massa validada usou `SEI_SMOKE_CONTATO_ID=100000196`,
+destinatário `lucianoedipo@gmail.com` e remetente institucional
+`sei@anpd.gov.br`. Para contato, o smoke usa `StaOperacao=R` por padrão para
+exercitar a operação sem sobrescrever o cadastro completo.
+
+Resultado do ciclo 7 em HML após liberação:
+
+| Operação                   | Resultado                                                                                  |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| `adicionarArquivo`         | OK, retornou `IdArquivo=140563` no ciclo completo                                          |
+| `adicionarConteudoArquivo` | OK, completou o upload em partes                                                           |
+| `atualizarContatos`        | OK com `idContato=100000196` e `StaOperacao=R`                                             |
+| `enviarEmail`              | OK com remetente `sei@anpd.gov.br`; gerou documento `0178406` (`idDocumento=196908`)       |
+| `registrarOuvidoria`       | Bloqueado por configuração: `Tipo do Contato não informado.` ao criar contato de ouvidoria |
+
+Observações do ciclo 7:
+
+- O SMTP recusou `lucianoedipo@gmail.com` como remetente, mas aceitou
+  `sei@anpd.gov.br` como remetente e `lucianoedipo@gmail.com` como
+  destinatário.
+- Todos os tipos retornados por `listarTiposProcedimentoOuvidoria` em HML estão
+  com `sinOuvidoriaAnonimo=false`; portanto, o smoke de ouvidoria deve ser
+  não-anônimo.
+- A falha restante de `registrarOuvidoria` indica configuração faltante no SEI,
+  provavelmente o parâmetro `ID_TIPO_CONTATO_OUVIDORIA`, e não falha de
+  serialização do `sei-client`.
+
 ## Próximos passos
 
 ### sip-client
@@ -527,15 +673,18 @@ Achado sobre conteúdo de documento:
 
 ### sei-client
 
-4. Capturar fixtures SOAP reais anonimizadas do ciclo 1 do SEI para travar
-   mappers de listas e tabelas de referência.
-5. Preparar massa do ciclo 2 com protocolos reais HML de processo, documento,
-   bloco, publicação e contatos, evitando dados sensíveis.
-6. Rodar `pnpm smoke:sei -- --cycle 2` de forma incremental por operação,
-   começando por `consultarProcedimento`, `consultarDocumento` e
-   `listarAndamentos`.
-7. Ajustar mappers/tipos do `sei-client` conforme divergências reais do ciclo 2
-   antes de avançar para operações de escrita.
+4. Capturar fixtures SOAP reais anonimizadas dos ciclos 1, 2 e 3 do SEI para
+   travar mappers de listas, consultas compostas e escritas mínimas já validadas
+   em HML.
+5. Configurar no SEI HML o tipo de contato de ouvidoria usado por
+   `registrarOuvidoria` (parâmetro `ID_TIPO_CONTATO_OUVIDORIA`) ou confirmar
+   outro ajuste equivalente para permitir cadastro/reuso de contato de
+   ouvidoria.
+6. Reexecutar `SEI_SMOKE_ALLOW_WRITE=1 SEI_SMOKE_CONTATO_ID=100000196 SEI_SMOKE_EMAIL_DESTINATARIO=lucianoedipo@gmail.com pnpm smoke:sei -- --cycle 7`
+   após o ajuste de ouvidoria.
+7. Manter `enviarProcesso`, `atribuirProcesso`, operações de documento e
+   exclusões do ciclo 4 como `planned` até haver roteiro de massa/limpeza HML
+   específico.
 
 O ciclo 0 do SEI já está preparado em `scripts/smoke-sei.ts` e registrado como
 `pnpm smoke:sei`. O runner carrega `.env`, mascara `IdentificacaoServico` no
@@ -550,5 +699,5 @@ configuração compartilhável do SIP quando possível:
 
 ### Publicação
 
-8. Publicar manualmente `@anpdgovbr/sip-client` e `@anpdgovbr/sei-client` no
+9. Publicar manualmente `@anpdgovbr/sip-client` e `@anpdgovbr/sei-client` no
    registry interno quando os pacotes estiverem prontos para consumo.

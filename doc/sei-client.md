@@ -118,6 +118,11 @@ Subclient `sei.consultas` (`SeiConsultasClient`):
 | `adicionarArquivo(params)`                | Inicia upload de arquivo em partes (retorna token) |
 | `adicionarConteudoArquivo(params)`        | Envia parte de arquivo para o SEI                  |
 
+> Observação operacional: `adicionarArquivo` e `adicionarConteudoArquivo`
+> aparecem no subclient de consultas para seguir a divisão histórica do WSDL,
+> mas gravam anexo temporário no SEI. O hash aceito pelo SEI é MD5 hexadecimal
+> do arquivo completo, não SHA-256.
+
 ## Operações de escrita
 
 Subclient `sei.operacoes` (`SeiOperacoesClient`):
@@ -166,16 +171,28 @@ Subclient `sei.operacoes` (`SeiOperacoesClient`):
 | `incluirProcessoBloco(params)`          | Inclui processo em bloco                   |
 | `retirarProcessoBloco(params)`          | Retira processo de bloco                   |
 
+> Observação operacional: o SEI diferencia os tipos de bloco. Em HML,
+> `incluirDocumentoBloco`/`retirarDocumentoBloco` foram validados em bloco de
+> assinatura (`Tipo=A`), mas `incluirProcessoBloco`/`retirarProcessoBloco`
+> falharam nesse tipo com a mensagem de que não é possível adicionar processo em
+> bloco de assinatura. Para processos, use bloco interno ou outro tipo de bloco
+> compatível; o par de processo foi validado com bloco interno.
+
 **Andamentos e marcadores:**
 
-| Método                          | Descrição                                |
-| ------------------------------- | ---------------------------------------- |
-| `lancarAndamento(params)`       | Lança andamento em um processo           |
-| `definirMarcador(params)`       | Define marcador em processo ou documento |
-| `definirControlePrazo(params)`  | Define controle de prazo                 |
-| `concluirControlePrazo(params)` | Conclui controle de prazo                |
-| `removerControlePrazo(params)`  | Remove controle de prazo                 |
-| `registrarAnotacao(params)`     | Registra anotação em processo            |
+| Método                          | Descrição                      |
+| ------------------------------- | ------------------------------ |
+| `lancarAndamento(params)`       | Lança andamento em um processo |
+| `definirMarcador(params)`       | Registra marcador em processo  |
+| `definirControlePrazo(params)`  | Define controle de prazo       |
+| `concluirControlePrazo(params)` | Conclui controle de prazo      |
+| `removerControlePrazo(params)`  | Remove controle de prazo       |
+| `registrarAnotacao(params)`     | Registra anotação em processo  |
+
+> Observação operacional: `definirMarcador` registra um andamento de marcador
+> no processo. O Web Service do SEI não expõe uma operação par para remover esse
+> marcador, então testes automatizados dessa chamada deixam rastro funcional no
+> processo usado como massa.
 
 **Publicações:**
 
@@ -193,6 +210,11 @@ Subclient `sei.operacoes` (`SeiOperacoesClient`):
 | `atualizarContatos(params)`  | Atualiza contatos vinculados       |
 | `enviarEmail(params)`        | Envia e-mail institucional via SEI |
 | `registrarOuvidoria(params)` | Registra dados de ouvidoria        |
+
+> Observação operacional: em `atualizarContatos`, `StaOperacao=A` cria/altera e
+> exige cadastro completo do contato; `E`, `D` e `R` exercem exclusão,
+> desativação e reativação. `enviarEmail` produz efeito externo real e gera
+> documento de e-mail no processo.
 
 ## DTOs principais
 

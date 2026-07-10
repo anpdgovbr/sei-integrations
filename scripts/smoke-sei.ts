@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto"
 import { readFileSync } from "node:fs"
 
 import { createSeiClient, encodeSeiBase64, SeiSoapError } from "../packages/sei-client/src"
@@ -242,6 +243,9 @@ installSmokeDebugFetch()
 const sei = planOnly || listOnly ? null : createSeiClient(getCoreConfig())
 const idUnidade = () => requiredEnv("SEI_SMOKE_ID_UNIDADE")
 let cycle3GeneratedProcedure: string | undefined
+let cycle5GeneratedBlock: string | undefined
+let cycle7GeneratedFileId: string | undefined
+let cycle7UploadBuffer: Buffer | undefined
 
 const smokeLabel = () => {
   const prefix = optionalEnv("SEI_SMOKE_WRITE_LABEL_PREFIX") ?? "sei-client smoke ciclo 3"
@@ -258,6 +262,87 @@ const cycle3Procedure = (): string => {
   }
   return protocolo
 }
+
+const relatedProcedure = (): string => requiredEnv("SEI_SMOKE_RELATED_PROTOCOLO_PROCEDIMENTO")
+
+const cycle4Motivo = (): string => optionalEnv("SEI_SMOKE_CYCLE4_MOTIVO") ?? smokeLabel()
+
+const cycle5Block = (): string => {
+  const idBloco = cycle5GeneratedBlock ?? optionalEnv("SEI_SMOKE_ID_BLOCO")
+  if (!idBloco) {
+    throw new Error(
+      "Variavel obrigatoria ausente: SEI_SMOKE_ID_BLOCO; rode gerarBloco antes ou informe um bloco de teste.",
+    )
+  }
+  return idBloco
+}
+
+const existingBlock = (): string => requiredEnv("SEI_SMOKE_ID_BLOCO")
+
+const blockDocument = (): string =>
+  optionalEnv("SEI_SMOKE_WRITE_PROTOCOLO_DOCUMENTO") ?? requiredEnv("SEI_SMOKE_PROTOCOLO_DOCUMENTO")
+
+const blockUnits = (): string[] => envList("SEI_SMOKE_ID_UNIDADE_DESTINO")
+
+const cycle6MarkerText = (): string =>
+  optionalEnv("SEI_SMOKE_CYCLE6_MARCADOR_TEXTO") ?? smokeLabel()
+
+const cycle6ControlePrazoData = (): string =>
+  optionalEnv("SEI_SMOKE_CYCLE6_CONTROLE_PRAZO_DATA") ?? ""
+
+const cycle6ControlePrazoDias = (): string =>
+  optionalEnv("SEI_SMOKE_CYCLE6_CONTROLE_PRAZO_DIAS") ?? "1"
+
+const cycle6ControlePrazoSinDiasUteis = (): string =>
+  optionalEnv("SEI_SMOKE_CYCLE6_CONTROLE_PRAZO_SIN_DIAS_UTEIS") ?? "S"
+
+const cycle7UploadName = (): string =>
+  optionalEnv("SEI_SMOKE_UPLOAD_NOME") ?? "smoke-sei-client.txt"
+
+const cycle7UploadContent = (): Buffer => {
+  cycle7UploadBuffer ??= Buffer.from(
+    optionalEnv("SEI_SMOKE_UPLOAD_CONTEUDO") ??
+      `Arquivo temporario do smoke @anpdgovbr/sei-client ${new Date().toISOString()}\n`,
+    "utf8",
+  )
+  return cycle7UploadBuffer
+}
+
+const cycle7UploadParts = (): readonly [Buffer, Buffer] => {
+  const content = cycle7UploadContent()
+  const splitAt = Math.max(1, Math.floor(content.length / 2))
+  return [content.subarray(0, splitAt), content.subarray(splitAt)]
+}
+
+const cycle7UploadHash = (): string => createHash("md5").update(cycle7UploadContent()).digest("hex")
+
+const cycle7FileId = (): string => {
+  const idArquivo = cycle7GeneratedFileId ?? optionalEnv("SEI_SMOKE_ID_ARQUIVO")
+  if (!idArquivo) {
+    throw new Error(
+      "Variavel obrigatoria ausente: SEI_SMOKE_ID_ARQUIVO; rode adicionarArquivo antes ou informe um arquivo temporario de teste.",
+    )
+  }
+  return idArquivo
+}
+
+const cycle7ContatoId = (): string => requiredEnv("SEI_SMOKE_CONTATO_ID")
+
+const cycle7ContatoOperacao = (): string => optionalEnv("SEI_SMOKE_CONTATO_OPERACAO") ?? "R"
+
+const cycle7EmailDestinatario = (): string => requiredEnv("SEI_SMOKE_EMAIL_DESTINATARIO")
+
+const cycle7EmailRemetente = (): string =>
+  optionalEnv("SEI_SMOKE_EMAIL_REMETENTE") ?? "sei@anpd.gov.br"
+
+const cycle7OuvidoriaTipoProcedimento = (): string =>
+  optionalEnv("SEI_SMOKE_OUVIDORIA_ID_TIPO_PROCEDIMENTO") ?? "100000337"
+
+const cycle7OuvidoriaMensagem = (): string =>
+  optionalEnv("SEI_SMOKE_OUVIDORIA_MENSAGEM") ?? smokeLabel()
+
+const cycle7OuvidoriaSinAnonimo = (): string =>
+  optionalEnv("SEI_SMOKE_OUVIDORIA_SIN_ANONIMO") ?? "N"
 
 const generatedDocumentHtml = (label: string): string =>
   `<p>Documento gerado automaticamente pelo smoke do @anpdgovbr/sei-client.</p><p>${label}</p>`
@@ -664,45 +749,528 @@ const operations: SmokeOperation[] = [
         ],
       }),
   },
+  {
+    cycle: 4,
+    name: "concluirProcesso",
+    method: "sei.operacoes.concluirProcesso",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.concluirProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "reabrirProcesso",
+    method: "sei.operacoes.reabrirProcesso",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.reabrirProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "bloquearProcesso",
+    method: "sei.operacoes.bloquearProcesso",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.bloquearProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "desbloquearProcesso",
+    method: "sei.operacoes.desbloquearProcesso",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.desbloquearProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "relacionarProcesso",
+    method: "sei.operacoes.relacionarProcesso",
+    effect: "write",
+    requiredEnv: [
+      "SEI_SMOKE_ID_UNIDADE",
+      "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO",
+      "SEI_SMOKE_RELATED_PROTOCOLO_PROCEDIMENTO",
+    ],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.relacionarProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento1: cycle3Procedure(),
+        protocoloProcedimento2: relatedProcedure(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "removerRelacionamentoProcesso",
+    method: "sei.operacoes.removerRelacionamentoProcesso",
+    effect: "write",
+    requiredEnv: [
+      "SEI_SMOKE_ID_UNIDADE",
+      "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO",
+      "SEI_SMOKE_RELATED_PROTOCOLO_PROCEDIMENTO",
+    ],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.removerRelacionamentoProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento1: cycle3Procedure(),
+        protocoloProcedimento2: relatedProcedure(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "anexarProcesso",
+    method: "sei.operacoes.anexarProcesso",
+    effect: "write",
+    requiredEnv: [
+      "SEI_SMOKE_ID_UNIDADE",
+      "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO",
+      "SEI_SMOKE_RELATED_PROTOCOLO_PROCEDIMENTO",
+    ],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.anexarProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimentoPrincipal: relatedProcedure(),
+        protocoloProcedimentoAnexado: cycle3Procedure(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "desanexarProcesso",
+    method: "sei.operacoes.desanexarProcesso",
+    effect: "write",
+    requiredEnv: [
+      "SEI_SMOKE_ID_UNIDADE",
+      "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO",
+      "SEI_SMOKE_RELATED_PROTOCOLO_PROCEDIMENTO",
+    ],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.desanexarProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimentoPrincipal: relatedProcedure(),
+        protocoloProcedimentoAnexado: cycle3Procedure(),
+        motivo: cycle4Motivo(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "sobrestarProcesso",
+    method: "sei.operacoes.sobrestarProcesso",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.sobrestarProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+        protocoloProcedimentoVinculado: optionalEnv("SEI_SMOKE_RELATED_PROTOCOLO_PROCEDIMENTO"),
+        motivo: cycle4Motivo(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "removerSobrestamentoProcesso",
+    method: "sei.operacoes.removerSobrestamentoProcesso",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.removerSobrestamentoProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "gerarBloco",
+    method: "sei.operacoes.gerarBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE"],
+    status: "automated",
+    run: async () => {
+      const result = await sei!.operacoes.gerarBloco({
+        idUnidade: idUnidade(),
+        tipo: optionalEnv("SEI_SMOKE_BLOCO_TIPO") ?? "A",
+        descricao: smokeLabel(),
+        unidadesDisponibilizacao: blockUnits(),
+        sinDisponibilizar: optionalEnv("SEI_SMOKE_BLOCO_SIN_DISPONIBILIZAR") ?? "N",
+      })
+      cycle5GeneratedBlock = result
+      return result
+    },
+  },
+  {
+    cycle: 5,
+    name: "alterarBloco",
+    method: "sei.operacoes.alterarBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.alterarBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+        descricao: smokeLabel(),
+        unidadesDisponibilizacao: blockUnits(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "incluirDocumentoBloco",
+    method: "sei.operacoes.incluirDocumentoBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_PROTOCOLO_DOCUMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.incluirDocumentoBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+        protocoloDocumento: blockDocument(),
+        anotacao: smokeLabel(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "incluirProcessoBloco",
+    method: "sei.operacoes.incluirProcessoBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.incluirProcessoBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+        protocoloProcedimento: cycle3Procedure(),
+        anotacao: smokeLabel(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "retirarProcessoBloco",
+    method: "sei.operacoes.retirarProcessoBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.retirarProcessoBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+        protocoloProcedimento: cycle3Procedure(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "disponibilizarBloco",
+    method: "sei.operacoes.disponibilizarBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_ID_UNIDADE_DESTINO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.disponibilizarBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "cancelarDisponibilizacaoBloco",
+    method: "sei.operacoes.cancelarDisponibilizacaoBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_ID_UNIDADE_DESTINO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.cancelarDisponibilizacaoBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "retirarDocumentoBloco",
+    method: "sei.operacoes.retirarDocumentoBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_PROTOCOLO_DOCUMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.retirarDocumentoBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+        protocoloDocumento: blockDocument(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "concluirBloco",
+    method: "sei.operacoes.concluirBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.concluirBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "reabrirBloco",
+    method: "sei.operacoes.reabrirBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.reabrirBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "excluirBloco",
+    method: "sei.operacoes.excluirBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.excluirBloco({
+        idUnidade: idUnidade(),
+        idBloco: cycle5Block(),
+      }),
+  },
+  {
+    cycle: 5,
+    name: "devolverBloco",
+    method: "sei.operacoes.devolverBloco",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_ID_BLOCO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.devolverBloco({
+        idUnidade: idUnidade(),
+        idBloco: existingBlock(),
+      }),
+  },
+  {
+    cycle: 6,
+    name: "definirMarcador",
+    method: "sei.operacoes.definirMarcador",
+    effect: "write",
+    requiredEnv: [
+      "SEI_SMOKE_ID_UNIDADE",
+      "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO",
+      "SEI_SMOKE_ID_MARCADOR",
+    ],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.definirMarcador({
+        idUnidade: idUnidade(),
+        definicoes: [
+          {
+            protocoloProcedimento: cycle3Procedure(),
+            idMarcador: requiredEnv("SEI_SMOKE_ID_MARCADOR"),
+            texto: cycle6MarkerText(),
+          },
+        ],
+      }),
+  },
+  {
+    cycle: 6,
+    name: "definirControlePrazo",
+    method: "sei.operacoes.definirControlePrazo",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.definirControlePrazo({
+        idUnidade: idUnidade(),
+        definicoes: [
+          {
+            protocoloProcedimento: cycle3Procedure(),
+            dataPrazo: cycle6ControlePrazoData(),
+            dias: cycle6ControlePrazoDias(),
+            sinDiasUteis: cycle6ControlePrazoSinDiasUteis(),
+          },
+        ],
+      }),
+  },
+  {
+    cycle: 6,
+    name: "concluirControlePrazo",
+    method: "sei.operacoes.concluirControlePrazo",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.concluirControlePrazo({
+        idUnidade: idUnidade(),
+        protocolosProcedimentos: [cycle3Procedure()],
+      }),
+  },
+  {
+    cycle: 6,
+    name: "removerControlePrazo",
+    method: "sei.operacoes.removerControlePrazo",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.removerControlePrazo({
+        idUnidade: idUnidade(),
+        protocolosProcedimentos: [cycle3Procedure()],
+      }),
+  },
+  {
+    cycle: 7,
+    name: "adicionarArquivo",
+    method: "sei.consultas.adicionarArquivo",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE"],
+    status: "automated",
+    run: async () => {
+      const [firstPart] = cycle7UploadParts()
+      const result = await sei!.consultas.adicionarArquivo({
+        idUnidade: idUnidade(),
+        nome: cycle7UploadName(),
+        tamanho: String(cycle7UploadContent().length),
+        hash: cycle7UploadHash(),
+        conteudo: firstPart.toString("base64"),
+      })
+      cycle7GeneratedFileId = result
+      return result
+    },
+  },
+  {
+    cycle: 7,
+    name: "adicionarConteudoArquivo",
+    method: "sei.consultas.adicionarConteudoArquivo",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE"],
+    status: "automated",
+    run: () => {
+      const [, secondPart] = cycle7UploadParts()
+      return sei!.consultas.adicionarConteudoArquivo({
+        idUnidade: idUnidade(),
+        idArquivo: cycle7FileId(),
+        conteudo: secondPart.toString("base64"),
+      })
+    },
+  },
+  {
+    cycle: 7,
+    name: "atualizarContatos",
+    method: "sei.operacoes.atualizarContatos",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_CONTATO_ID"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.atualizarContatos({
+        idUnidade: idUnidade(),
+        contatos: [
+          {
+            staOperacao: cycle7ContatoOperacao(),
+            idContato: cycle7ContatoId(),
+            idTipoContato: "",
+            sigla: "",
+            nome: "Smoke sei-client",
+            staNatureza: "",
+            sinEnderecoAssociado: "N",
+            endereco: "",
+            complemento: "",
+            bairro: "",
+            cep: "",
+            staGenero: "",
+            cpf: "",
+            cnpj: "",
+            rg: "",
+            orgaoExpedidor: "",
+            matricula: "",
+            matriculaOab: "",
+            telefoneComercial: "",
+            telefoneResidencial: "",
+            telefoneCelular: "",
+            dataNascimento: "",
+            email: "",
+            sitioInternet: "",
+            observacao: smokeLabel(),
+            sinAtivo: "S",
+          },
+        ],
+      }),
+  },
+  {
+    cycle: 7,
+    name: "enviarEmail",
+    method: "sei.operacoes.enviarEmail",
+    effect: "external",
+    requiredEnv: [
+      "SEI_SMOKE_ID_UNIDADE",
+      "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO",
+      "SEI_SMOKE_EMAIL_DESTINATARIO",
+    ],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.enviarEmail({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+        de: cycle7EmailRemetente(),
+        para: cycle7EmailDestinatario(),
+        assunto: optionalEnv("SEI_SMOKE_EMAIL_ASSUNTO") ?? smokeLabel(),
+        mensagem:
+          optionalEnv("SEI_SMOKE_EMAIL_MENSAGEM") ??
+          "Mensagem automatizada de teste HML do @anpdgovbr/sei-client.",
+        nivelAcesso: optionalEnv("SEI_SMOKE_WRITE_NIVEL_ACESSO") ?? "0",
+        idHipoteseLegal: optionalEnv("SEI_SMOKE_WRITE_ID_HIPOTESE_LEGAL"),
+      }),
+  },
+  {
+    cycle: 7,
+    name: "registrarOuvidoria",
+    method: "sei.operacoes.registrarOuvidoria",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_ORGAO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.registrarOuvidoria({
+        idOrgao: requiredEnv("SEI_SMOKE_ID_ORGAO"),
+        nome: optionalEnv("SEI_SMOKE_OUVIDORIA_NOME") ?? "Smoke sei-client",
+        email: optionalEnv("SEI_SMOKE_EMAIL_DESTINATARIO"),
+        idTipoProcedimento: cycle7OuvidoriaTipoProcedimento(),
+        sinRetorno: optionalEnv("SEI_SMOKE_OUVIDORIA_SIN_RETORNO") ?? "N",
+        mensagem: cycle7OuvidoriaMensagem(),
+        sinAnonimo: cycle7OuvidoriaSinAnonimo(),
+        sinSigilo: optionalEnv("SEI_SMOKE_OUVIDORIA_SIN_SIGILO") ?? "N",
+      }),
+  },
   ...(
     [
       [4, "enviarProcesso", "sei.operacoes.enviarProcesso"],
       [4, "atribuirProcesso", "sei.operacoes.atribuirProcesso"],
-      [4, "concluirProcesso", "sei.operacoes.concluirProcesso"],
-      [4, "reabrirProcesso", "sei.operacoes.reabrirProcesso"],
-      [4, "bloquearProcesso", "sei.operacoes.bloquearProcesso"],
-      [4, "desbloquearProcesso", "sei.operacoes.desbloquearProcesso"],
       [4, "bloquearDocumento", "sei.operacoes.bloquearDocumento"],
       [4, "cancelarDocumento", "sei.operacoes.cancelarDocumento"],
       [4, "excluirDocumento", "sei.operacoes.excluirDocumento"],
       [4, "excluirProcesso", "sei.operacoes.excluirProcesso"],
-      [4, "relacionarProcesso", "sei.operacoes.relacionarProcesso"],
-      [4, "removerRelacionamentoProcesso", "sei.operacoes.removerRelacionamentoProcesso"],
-      [4, "anexarProcesso", "sei.operacoes.anexarProcesso"],
-      [4, "desanexarProcesso", "sei.operacoes.desanexarProcesso"],
-      [4, "sobrestarProcesso", "sei.operacoes.sobrestarProcesso"],
-      [4, "removerSobrestamentoProcesso", "sei.operacoes.removerSobrestamentoProcesso"],
-      [5, "gerarBloco", "sei.operacoes.gerarBloco"],
-      [5, "alterarBloco", "sei.operacoes.alterarBloco"],
-      [5, "disponibilizarBloco", "sei.operacoes.disponibilizarBloco"],
-      [5, "cancelarDisponibilizacaoBloco", "sei.operacoes.cancelarDisponibilizacaoBloco"],
-      [5, "incluirDocumentoBloco", "sei.operacoes.incluirDocumentoBloco"],
-      [5, "retirarDocumentoBloco", "sei.operacoes.retirarDocumentoBloco"],
-      [5, "incluirProcessoBloco", "sei.operacoes.incluirProcessoBloco"],
-      [5, "retirarProcessoBloco", "sei.operacoes.retirarProcessoBloco"],
-      [5, "concluirBloco", "sei.operacoes.concluirBloco"],
-      [5, "reabrirBloco", "sei.operacoes.reabrirBloco"],
-      [5, "devolverBloco", "sei.operacoes.devolverBloco"],
-      [5, "excluirBloco", "sei.operacoes.excluirBloco"],
-      [6, "definirMarcador", "sei.operacoes.definirMarcador"],
-      [6, "definirControlePrazo", "sei.operacoes.definirControlePrazo"],
-      [6, "concluirControlePrazo", "sei.operacoes.concluirControlePrazo"],
-      [6, "removerControlePrazo", "sei.operacoes.removerControlePrazo"],
-      [7, "atualizarContatos", "sei.operacoes.atualizarContatos"],
-      [7, "adicionarArquivo", "sei.consultas.adicionarArquivo"],
-      [7, "adicionarConteudoArquivo", "sei.consultas.adicionarConteudoArquivo"],
-      [7, "enviarEmail", "sei.operacoes.enviarEmail"],
-      [7, "registrarOuvidoria", "sei.operacoes.registrarOuvidoria"],
       [8, "agendarPublicacao", "sei.operacoes.agendarPublicacao"],
       [8, "alterarPublicacao", "sei.operacoes.alterarPublicacao"],
       [8, "cancelarAgendamentoPublicacao", "sei.operacoes.cancelarAgendamentoPublicacao"],
@@ -716,7 +1284,7 @@ const operations: SmokeOperation[] = [
     cycle: cycle as SmokeCycle,
     name: String(name),
     method: String(method),
-    effect: (cycle === 7 && name === "enviarEmail" ? "external" : "write") as SmokeEffect,
+    effect: "write" as SmokeEffect,
     status: "planned" as SmokeStatus,
   })),
 ]
