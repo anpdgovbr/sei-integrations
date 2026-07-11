@@ -1,7 +1,7 @@
 {
-  "name": "@anpdgovbr/soap-base",
+  "name": "@anpdgovbr/sei-sip-soap",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "Infraestrutura SOAP interna compartilhada entre sip-client e sei-client.",
   "license": "MIT",
@@ -16,7 +16,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsup",
@@ -36,6 +37,25 @@
     "node": ">=22.0.0"
   },
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.anpd.gov.br"
+  },
+  "author": {
+    "name": "Luciano Édipo Pereira da Silva",
+    "email": "luciano.psilva@anpd.gov.br",
+    "url": "https://github.com/lucianoedipo"
+  },
+  "bugs": {
+    "url": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/issues",
+    "email": "desenvolvimento@anpd.gov.br"
+  },
+  "homepage": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.anpd.gov.br/publico/libs/sei-integrations.git",
+    "directory": "packages/sei-sip-soap"
+  },
   "typedocOptions": {
     "entryPoints": [
       "src/index.ts"

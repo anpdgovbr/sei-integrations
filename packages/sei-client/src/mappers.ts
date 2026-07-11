@@ -54,7 +54,7 @@ import type {
   SeiUsuario,
 } from "./types"
 
-import { asArray, boolFromSin, isMap, requiredString, stringValue } from "@anpdgovbr/soap-base"
+import { asArray, boolFromSin, isMap, requiredString, stringValue } from "@anpdgovbr/sei-sip-soap"
 
 /**
  * Mapeia itens de uma lista SOAP para o tipo `T` usando o mapper fornecido.

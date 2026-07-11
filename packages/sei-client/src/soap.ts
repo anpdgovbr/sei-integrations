@@ -18,7 +18,7 @@
  * 4. **Erros** — encapsular falhas HTTP e SOAP Fault em {@link SeiSoapError}.
  *
  * A infraestrutura genérica (parser XML, serialização, normalização) é
- * compartilhada com sip-client via `@anpdgovbr/soap-base`.
+ * compartilhada com sip-client via `@anpdgovbr/sei-sip-soap`.
  *
  * @see {@link SeiClient}
  * @see {@link callSeiSoap}
@@ -30,7 +30,7 @@ import {
   callSoap,
   createSoapArray as baseSoapArray,
   parseSoapResponse,
-} from "@anpdgovbr/soap-base"
+} from "@anpdgovbr/sei-sip-soap"
 
 import type {
   SeiConfig,

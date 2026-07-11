@@ -73,7 +73,7 @@ export type SeiConfig = Readonly<{
   requestTimeoutMs: number
 }>
 
-// ─── Tipos SOAP de baixo nível (re-exportados de @anpdgovbr/soap-base) ────────
+// ─── Tipos SOAP de baixo nível (re-exportados de @anpdgovbr/sei-sip-soap) ────────
 
 export type {
   ScalarSoapValue as SeiScalarSoapValue,
@@ -83,7 +83,7 @@ export type {
   RawValue as SeiRawValue,
   RawMap as SeiRawMap,
   SoapCallOptions as SeiSoapCallOptions,
-} from "@anpdgovbr/soap-base"
+} from "@anpdgovbr/sei-sip-soap"
 
 // ─── Entidades de domínio simples ────────────────────────────────────────────
 
@@ -833,24 +833,42 @@ export type SeiPublicacaoImprensaNacionalInput = Readonly<{
 
 /**
  * Atributo adicional de ouvidoria para `registrarOuvidoria`.
+ *
+ * Use para campos complementares exigidos pela configuração local da ouvidoria.
+ * O SEI recebe cada item como `AtributoOuvidoria`.
+ *
  * @category Input Types
  */
 export type SeiAtributoOuvidoriaInput = Readonly<{
+  /** Identificador do atributo, quando conhecido/configurado no SEI. */
   id?: string | null
+  /** Nome técnico do atributo adicional. */
   nome: string
+  /** Título exibido/esperado para o atributo. */
   titulo: string
+  /** Valor textual enviado no registro da manifestação. */
   valor: string
 }>
 
 /**
  * Anexo de ouvidoria para `registrarOuvidoria`.
+ *
+ * O conteúdo deve ser enviado em Base64, no formato esperado pelo Web Service
+ * do SEI. Para anexos temporários maiores, valide previamente tamanho e
+ * extensão permitida no ambiente.
+ *
  * @category Input Types
  */
 export type SeiAnexoInput = Readonly<{
+  /** Identificador prévio do anexo, quando aplicável. */
   idAnexo?: string | null
+  /** Nome do arquivo enviado à ouvidoria. */
   nome: string
+  /** Data/hora textual do anexo, quando exigida pela instalação. */
   dataHora?: string | null
+  /** Tamanho textual/numérico conforme contrato SOAP do SEI. */
   tamanho?: string | null
+  /** Conteúdo do arquivo em Base64. */
   conteudo: string
 }>
 
@@ -1088,14 +1106,28 @@ export type SeiAtualizarContatosParams = Readonly<{
   contatos: readonly SeiContatoInput[]
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.cancelarDocumento}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.cancelarDocumento}.
+ *
+ * Operação sensível: cancela o documento informado e exige motivo. Em smoke/HML,
+ * execute apenas com massa descartável e guarda explícita.
+ *
+ * @category Operation Parameters
+ */
 export type SeiCancelarDocumentoParams = Readonly<{
   idUnidade: string
   protocoloDocumento: string
   motivo: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.bloquearDocumento}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.bloquearDocumento}.
+ *
+ * Bloqueia o documento informado. O Web Service não expõe, nesta lib, uma
+ * operação simétrica de desbloqueio de documento; valide com documento de teste.
+ *
+ * @category Operation Parameters
+ */
 export type SeiBloquearDocumentoParams = Readonly<{
   idUnidade: string
   protocoloDocumento: string
@@ -1135,13 +1167,27 @@ export type SeiExcluirBlocoParams = Readonly<{
   idBloco: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.excluirProcesso}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.excluirProcesso}.
+ *
+ * Operação destrutiva para processo de teste/rascunho. Não use como limpeza
+ * genérica de massa sem confirmar previamente as regras do SEI no ambiente.
+ *
+ * @category Operation Parameters
+ */
 export type SeiExcluirProcessoParams = Readonly<{
   idUnidade: string
   protocoloProcedimento: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.excluirDocumento}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.excluirDocumento}.
+ *
+ * Operação destrutiva para documento de teste/rascunho. Em smoke/HML, execute
+ * isoladamente com guarda explícita.
+ *
+ * @category Operation Parameters
+ */
 export type SeiExcluirDocumentoParams = Readonly<{
   idUnidade: string
   protocoloDocumento: string
@@ -1220,7 +1266,15 @@ export type SeiOperacaoProcessoParams = Readonly<{
   protocoloProcedimento: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.enviarProcesso}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.enviarProcesso}.
+ *
+ * Tramita o processo para uma ou mais unidades. Para testes, prefira
+ * `sinManterAbertoUnidade='S'` quando a unidade de origem precisa seguir usando
+ * a mesma massa.
+ *
+ * @category Operation Parameters
+ */
 export type SeiEnviarProcessoParams = Readonly<{
   idUnidade: string
   protocoloProcedimento: string
@@ -1234,7 +1288,14 @@ export type SeiEnviarProcessoParams = Readonly<{
   sinReabrir?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.atribuirProcesso}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.atribuirProcesso}.
+ *
+ * Altera o usuário responsável pelo processo na unidade. O `idUsuario` deve ser
+ * válido para a unidade informada.
+ *
+ * @category Operation Parameters
+ */
 export type SeiAtribuirProcessoParams = Readonly<{
   idUnidade: string
   protocoloProcedimento: string
@@ -1305,7 +1366,14 @@ export type SeiRegistrarAnotacaoParams = Readonly<{
   anotacoes: readonly SeiAnotacaoInput[]
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.agendarPublicacao}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.agendarPublicacao}.
+ *
+ * Cria agendamento de publicação para documento publicável. Para smoke/HML,
+ * prefira parear com `cancelarAgendamentoPublicacao` para limpar o agendamento.
+ *
+ * @category Operation Parameters
+ */
 export type SeiAgendarPublicacaoParams = Readonly<{
   idUnidade: string
   idDocumento?: string | null
@@ -1317,7 +1385,14 @@ export type SeiAgendarPublicacaoParams = Readonly<{
   imprensaNacional?: SeiPublicacaoImprensaNacionalInput | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.alterarPublicacao}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.alterarPublicacao}.
+ *
+ * Altera um agendamento existente, identificado por `idPublicacao`, `idDocumento`
+ * ou `protocoloDocumento`.
+ *
+ * @category Operation Parameters
+ */
 export type SeiAlterarPublicacaoParams = Readonly<{
   idUnidade: string
   idPublicacao?: string | null
@@ -1330,7 +1405,14 @@ export type SeiAlterarPublicacaoParams = Readonly<{
   imprensaNacional?: SeiPublicacaoImprensaNacionalInput | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.cancelarAgendamentoPublicacao}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.cancelarAgendamentoPublicacao}.
+ *
+ * Cancela um agendamento existente e é a operação de limpeza natural para
+ * `agendarPublicacao` em testes.
+ *
+ * @category Operation Parameters
+ */
 export type SeiCancelarAgendamentoPublicacaoParams = Readonly<{
   idUnidade: string
   idPublicacao?: string | null
@@ -1338,12 +1420,25 @@ export type SeiCancelarAgendamentoPublicacaoParams = Readonly<{
   protocoloDocumento?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.confirmarDisponibilizacaoPublicacao}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.confirmarDisponibilizacaoPublicacao}.
+ *
+ * Confirma disponibilização/publicação no veículo informado. É uma operação
+ * finalística, sem par simples de reversão no Web Service. O smoke HML exige
+ * `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1` para executar essa chamada.
+ *
+ * @category Operation Parameters
+ */
 export type SeiConfirmarDisponibilizacaoPublicacaoParams = Readonly<{
+  /** Identificador do veículo de publicação no SEI. */
   idVeiculoPublicacao: string
+  /** Data de disponibilização no formato aceito pelo SEI, normalmente `DD/MM/AAAA`. */
   dataDisponibilizacao: string
+  /** Data de publicação no formato aceito pelo SEI, normalmente `DD/MM/AAAA`. */
   dataPublicacao: string
+  /** Número/edição usado na confirmação de publicação. */
   numero: string
+  /** Identificadores internos dos documentos a confirmar. */
   idDocumentos: readonly string[]
 }>
 
@@ -1368,24 +1463,57 @@ export type SeiEnviarEmailParams = Readonly<{
   idHipoteseLegal?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.registrarOuvidoria}. @category Operation Parameters */
+/**
+ * Parâmetros para {@link SeiOperacoesClient.registrarOuvidoria}.
+ *
+ * Registra manifestação de ouvidoria e cria/reusa contato conforme as regras da
+ * instalação do SEI. Em HML, a serialização do `sei-client` chegou ao SEI, mas a
+ * chamada ficou bloqueada pela configuração do ambiente com erro
+ * `Tipo do Contato não informado.`, provavelmente ligado ao parâmetro
+ * `ID_TIPO_CONTATO_OUVIDORIA`.
+ *
+ * Quando `sinAnonimo='N'`, informe dados de contato suficientes para a regra
+ * local. Em HML, os tipos retornados por `listarTiposProcedimentoOuvidoria`
+ * estavam com `sinOuvidoriaAnonimo=false`, então o smoke usa manifestação
+ * não-anônima por padrão.
+ *
+ * @category Operation Parameters
+ */
 export type SeiRegistrarOuvidoriaParams = Readonly<{
+  /** Órgão no qual a manifestação será registrada. */
   idOrgao: string
+  /** Nome do manifestante, quando não anônimo. */
   nome?: string | null
+  /** Nome social do manifestante, quando aplicável. */
   nomeSocial?: string | null
+  /** E-mail do manifestante, quando não anônimo ou quando retorno for esperado. */
   email?: string | null
+  /** CPF do manifestante, quando exigido pela regra local. */
   cpf?: string | null
+  /** RG do manifestante, quando exigido pela regra local. */
   rg?: string | null
+  /** Órgão expedidor do RG. */
   orgaoExpedidor?: string | null
+  /** Telefone de contato do manifestante. */
   telefone?: string | null
+  /** Estado do manifestante, quando exigido pela regra local. */
   idEstado?: string | null
+  /** Cidade do manifestante, quando exigida pela regra local. */
   idCidade?: string | null
+  /** Tipo de procedimento de ouvidoria retornado por `listarTiposProcedimentoOuvidoria`. */
   idTipoProcedimento: string
+  /** Processos relacionados informados como texto, conforme contrato SOAP do SEI. */
   processos?: string | null
+  /** Indica se deve haver retorno ao manifestante, usando os valores esperados pelo SEI. */
   sinRetorno?: string | null
+  /** Texto principal da manifestação. */
   mensagem: string
+  /** Atributos adicionais configurados para o formulário/local da ouvidoria. */
   atributosAdicionais?: readonly SeiAtributoOuvidoriaInput[]
+  /** Indica manifestação anônima. Em HML, o smoke usa `N` por padrão. */
   sinAnonimo?: string | null
+  /** Indica sigilo da manifestação, conforme regra do SEI. */
   sinSigilo?: string | null
+  /** Anexos Base64 enviados com a manifestação. */
   anexos?: readonly SeiAnexoInput[]
 }>

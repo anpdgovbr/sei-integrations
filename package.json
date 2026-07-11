@@ -18,7 +18,7 @@
     "type": "git",
     "url": "git+https://gitlab.anpd.gov.br/publico/libs/sei-integrations.git"
   },
-  "packageManager": "pnpm@11.10.0",
+  "packageManager": "pnpm@11.11.0",
   "engines": {
     "node": ">=22.0.0",
     "pnpm": ">=10.0.0"
@@ -43,21 +43,22 @@
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
+    "publish:sei-sip-soap": "pnpm --filter @anpdgovbr/sei-sip-soap publish --access public",
     "publish:sip": "pnpm --filter @anpdgovbr/sip-client publish --access public",
-    "publish:sei": "echo \"@anpdgovbr/sei-client ainda esta reservado e private; publicacao desabilitada\"",
+    "publish:sei": "pnpm --filter @anpdgovbr/sei-client publish --access public",
     "coverage:report": "pnpm run test:coverage && pnpm run coverage:merge"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^9.39.5",
     "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "^8.63.0",
     "@typescript-eslint/parser": "^8.63.0",
     "@vitest/coverage-v8": "catalog:",
-    "eslint": "^9.39.4",
+    "eslint": "^9.39.5",
     "fast-xml-parser": "catalog:",
     "globals": "^17.7.0",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.5",
     "rimraf": "catalog:",
     "sonar-scanner": "catalog:",
     "tsup": "catalog:",

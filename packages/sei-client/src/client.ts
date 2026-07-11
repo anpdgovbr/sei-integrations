@@ -1290,6 +1290,14 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Confirma a disponibilização/publicação de documentos em um veículo.
+   *
+   * @remarks
+   * Operação finalística e sem par simples de reversão no Web Service. No smoke
+   * HML, a chamada fica protegida por `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1` e deve
+   * ser executada apenas com roteiro explícito de publicação.
+   */
   async confirmarDisponibilizacaoPublicacao(
     params: SeiConfirmarDisponibilizacaoPublicacaoParams,
   ): Promise<string> {
@@ -1327,6 +1335,16 @@ export class SeiOperacoesClient {
     return mapRetornoEnvioEmail(payload)
   }
 
+  /**
+   * Registra manifestação de ouvidoria no SEI.
+   *
+   * @remarks
+   * A chamada serializa dados do manifestante, tipo de procedimento, mensagem,
+   * atributos adicionais e anexos. Em HML, o smoke comprovou chegada ao SEI, mas
+   * a operação ficou bloqueada por configuração do ambiente com
+   * `Tipo do Contato não informado.`, provavelmente relacionada ao parâmetro
+   * `ID_TIPO_CONTATO_OUVIDORIA`.
+   */
   async registrarOuvidoria(
     params: SeiRegistrarOuvidoriaParams,
   ): Promise<SeiProcedimentoResumido | null> {

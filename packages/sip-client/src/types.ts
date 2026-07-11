@@ -85,10 +85,10 @@ export type SipConfig = Readonly<{
   requestTimeoutMs: number
 }>
 
-// ─── Tipos SOAP de baixo nível (re-exportados de @anpdgovbr/soap-base) ────────
+// ─── Tipos SOAP de baixo nível (re-exportados de @anpdgovbr/sei-sip-soap) ────────
 
 /**
- * @see {@link import("@anpdgovbr/soap-base").ScalarSoapValue}
+ * @see {@link import("@anpdgovbr/sei-sip-soap").ScalarSoapValue}
  */
 export type {
   RawMap as SipRawMap,
@@ -98,7 +98,7 @@ export type {
   SoapCallOptions as SipSoapCallOptions,
   SoapParamValue as SipSoapParamValue,
   SoapStructValue as SipSoapStructValue,
-} from "@anpdgovbr/soap-base"
+} from "@anpdgovbr/sei-sip-soap"
 
 // ─── Enumerações auxiliares ───────────────────────────────────────────────────
 

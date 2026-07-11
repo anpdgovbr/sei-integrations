@@ -1,7 +1,7 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPointStrategy": "packages",
-  "entryPoints": ["packages/soap-base", "packages/sip-client", "packages/sei-client"],
+  "entryPoints": ["packages/sei-sip-soap", "packages/sip-client", "packages/sei-client"],
   "out": "docs",
   "name": "ANPD SEI Integrations",
   "includeVersion": true,

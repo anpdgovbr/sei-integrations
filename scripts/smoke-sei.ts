@@ -13,6 +13,7 @@ type SmokeOperation = Readonly<{
   method: string
   effect: SmokeEffect
   requiredEnv?: readonly string[]
+  guardEnv?: string
   status: SmokeStatus
   run?: () => Promise<unknown>
 }>
@@ -110,6 +111,8 @@ const hasEnv = (names: readonly string[] = []): boolean =>
 
 const parseBool = (name: string): boolean =>
   process.env[name] === "1" || process.env[name] === "true"
+
+const isEnabled = (name: string): boolean => parseBool(name)
 
 const summarize = (value: unknown): unknown => {
   if (Array.isArray(value)) {
@@ -267,6 +270,16 @@ const relatedProcedure = (): string => requiredEnv("SEI_SMOKE_RELATED_PROTOCOLO_
 
 const cycle4Motivo = (): string => optionalEnv("SEI_SMOKE_CYCLE4_MOTIVO") ?? smokeLabel()
 
+const cycle4Document = (): string =>
+  optionalEnv("SEI_SMOKE_WRITE_PROTOCOLO_DOCUMENTO") ?? requiredEnv("SEI_SMOKE_PROTOCOLO_DOCUMENTO")
+
+const cycle4DocumentCancelReason = (): string =>
+  optionalEnv("SEI_SMOKE_CANCELAR_DOCUMENTO_MOTIVO") ?? cycle4Motivo()
+
+const cycle4AssignmentUser = (): string => requiredEnv("SEI_SMOKE_ID_USUARIO")
+
+const cycle4TargetUnits = (): string[] => blockUnits()
+
 const cycle5Block = (): string => {
   const idBloco = cycle5GeneratedBlock ?? optionalEnv("SEI_SMOKE_ID_BLOCO")
   if (!idBloco) {
@@ -343,6 +356,43 @@ const cycle7OuvidoriaMensagem = (): string =>
 
 const cycle7OuvidoriaSinAnonimo = (): string =>
   optionalEnv("SEI_SMOKE_OUVIDORIA_SIN_ANONIMO") ?? "N"
+
+const formatSeiDate = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, "0")
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  return `${day}/${month}/${date.getFullYear()}`
+}
+
+const nextBusinessDate = (daysAhead: number): Date => {
+  const date = new Date()
+  date.setHours(12, 0, 0, 0)
+  date.setDate(date.getDate() + daysAhead)
+  while (date.getDay() === 0 || date.getDay() === 6) {
+    date.setDate(date.getDate() + 1)
+  }
+  return date
+}
+
+const cycle8Document = (): string => blockDocument()
+
+const cycle8PublicationVehicle = (): string => optionalEnv("SEI_SMOKE_ID_VEICULO_PUBLICACAO") ?? "1"
+
+const cycle8PublicationReason = (): string => optionalEnv("SEI_SMOKE_PUBLICACAO_STA_MOTIVO") ?? "1"
+
+const cycle8PublicationDate = (): string =>
+  optionalEnv("SEI_SMOKE_PUBLICACAO_DATA_DISPONIBILIZACAO") ?? formatSeiDate(nextBusinessDate(3))
+
+const cycle8AlteredPublicationDate = (): string =>
+  optionalEnv("SEI_SMOKE_PUBLICACAO_DATA_DISPONIBILIZACAO_ALTERADA") ??
+  formatSeiDate(nextBusinessDate(4))
+
+const cycle8PublicationSummary = (): string =>
+  optionalEnv("SEI_SMOKE_PUBLICACAO_RESUMO") ?? smokeLabel()
+
+const cycle8PublicationNumber = (): string => optionalEnv("SEI_SMOKE_PUBLICACAO_NUMERO") ?? "1"
+
+const cycle8PublicationDatePublished = (): string =>
+  optionalEnv("SEI_SMOKE_PUBLICACAO_DATA_PUBLICACAO") ?? cycle8AlteredPublicationDate()
 
 const generatedDocumentHtml = (label: string): string =>
   `<p>Documento gerado automaticamente pelo smoke do @anpdgovbr/sei-client.</p><p>${label}</p>`
@@ -903,6 +953,106 @@ const operations: SmokeOperation[] = [
       }),
   },
   {
+    cycle: 4,
+    name: "enviarProcesso",
+    method: "sei.operacoes.enviarProcesso",
+    effect: "write",
+    requiredEnv: [
+      "SEI_SMOKE_ID_UNIDADE",
+      "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO",
+      "SEI_SMOKE_ID_UNIDADE_DESTINO",
+    ],
+    guardEnv: "SEI_SMOKE_ENABLE_ENVIAR_PROCESSO",
+    status: "automated",
+    run: () =>
+      sei!.operacoes.enviarProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+        unidadesDestino: cycle4TargetUnits(),
+        sinManterAbertoUnidade: optionalEnv("SEI_SMOKE_ENVIAR_PROCESSO_SIN_MANTER_ABERTO") ?? "S",
+        sinRemoverAnotacao: optionalEnv("SEI_SMOKE_ENVIAR_PROCESSO_SIN_REMOVER_ANOTACAO") ?? "N",
+        sinEnviarEmailNotificacao: optionalEnv("SEI_SMOKE_ENVIAR_PROCESSO_SIN_EMAIL") ?? "N",
+        sinReabrir: optionalEnv("SEI_SMOKE_ENVIAR_PROCESSO_SIN_REABRIR") ?? "N",
+      }),
+  },
+  {
+    cycle: 4,
+    name: "atribuirProcesso",
+    method: "sei.operacoes.atribuirProcesso",
+    effect: "write",
+    requiredEnv: [
+      "SEI_SMOKE_ID_UNIDADE",
+      "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO",
+      "SEI_SMOKE_ID_USUARIO",
+    ],
+    guardEnv: "SEI_SMOKE_ENABLE_ATRIBUIR_PROCESSO",
+    status: "automated",
+    run: () =>
+      sei!.operacoes.atribuirProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+        idUsuario: cycle4AssignmentUser(),
+        sinReabrir: optionalEnv("SEI_SMOKE_ATRIBUIR_PROCESSO_SIN_REABRIR") ?? "N",
+      }),
+  },
+  {
+    cycle: 4,
+    name: "bloquearDocumento",
+    method: "sei.operacoes.bloquearDocumento",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_PROTOCOLO_DOCUMENTO"],
+    guardEnv: "SEI_SMOKE_ENABLE_BLOQUEAR_DOCUMENTO",
+    status: "automated",
+    run: () =>
+      sei!.operacoes.bloquearDocumento({
+        idUnidade: idUnidade(),
+        protocoloDocumento: cycle4Document(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "cancelarDocumento",
+    method: "sei.operacoes.cancelarDocumento",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_PROTOCOLO_DOCUMENTO"],
+    guardEnv: "SEI_SMOKE_ENABLE_CANCELAR_DOCUMENTO",
+    status: "automated",
+    run: () =>
+      sei!.operacoes.cancelarDocumento({
+        idUnidade: idUnidade(),
+        protocoloDocumento: cycle4Document(),
+        motivo: cycle4DocumentCancelReason(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "excluirDocumento",
+    method: "sei.operacoes.excluirDocumento",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_PROTOCOLO_DOCUMENTO"],
+    guardEnv: "SEI_SMOKE_ENABLE_EXCLUIR_DOCUMENTO",
+    status: "automated",
+    run: () =>
+      sei!.operacoes.excluirDocumento({
+        idUnidade: idUnidade(),
+        protocoloDocumento: cycle4Document(),
+      }),
+  },
+  {
+    cycle: 4,
+    name: "excluirProcesso",
+    method: "sei.operacoes.excluirProcesso",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_WRITE_PROTOCOLO_PROCEDIMENTO"],
+    guardEnv: "SEI_SMOKE_ENABLE_EXCLUIR_PROCESSO",
+    status: "automated",
+    run: () =>
+      sei!.operacoes.excluirProcesso({
+        idUnidade: idUnidade(),
+        protocoloProcedimento: cycle3Procedure(),
+      }),
+  },
+  {
     cycle: 5,
     name: "gerarBloco",
     method: "sei.operacoes.gerarBloco",
@@ -1263,34 +1413,74 @@ const operations: SmokeOperation[] = [
         sinSigilo: optionalEnv("SEI_SMOKE_OUVIDORIA_SIN_SIGILO") ?? "N",
       }),
   },
-  ...(
-    [
-      [4, "enviarProcesso", "sei.operacoes.enviarProcesso"],
-      [4, "atribuirProcesso", "sei.operacoes.atribuirProcesso"],
-      [4, "bloquearDocumento", "sei.operacoes.bloquearDocumento"],
-      [4, "cancelarDocumento", "sei.operacoes.cancelarDocumento"],
-      [4, "excluirDocumento", "sei.operacoes.excluirDocumento"],
-      [4, "excluirProcesso", "sei.operacoes.excluirProcesso"],
-      [8, "agendarPublicacao", "sei.operacoes.agendarPublicacao"],
-      [8, "alterarPublicacao", "sei.operacoes.alterarPublicacao"],
-      [8, "cancelarAgendamentoPublicacao", "sei.operacoes.cancelarAgendamentoPublicacao"],
-      [
-        8,
-        "confirmarDisponibilizacaoPublicacao",
-        "sei.operacoes.confirmarDisponibilizacaoPublicacao",
-      ],
-    ] as const
-  ).map(([cycle, name, method]) => ({
-    cycle: cycle as SmokeCycle,
-    name: String(name),
-    method: String(method),
-    effect: "write" as SmokeEffect,
-    status: "planned" as SmokeStatus,
-  })),
+  {
+    cycle: 8,
+    name: "agendarPublicacao",
+    method: "sei.operacoes.agendarPublicacao",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_PROTOCOLO_DOCUMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.agendarPublicacao({
+        idUnidade: idUnidade(),
+        protocoloDocumento: cycle8Document(),
+        staMotivo: cycle8PublicationReason(),
+        idVeiculoPublicacao: cycle8PublicationVehicle(),
+        dataDisponibilizacao: cycle8PublicationDate(),
+        resumo: cycle8PublicationSummary(),
+      }),
+  },
+  {
+    cycle: 8,
+    name: "alterarPublicacao",
+    method: "sei.operacoes.alterarPublicacao",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_PROTOCOLO_DOCUMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.alterarPublicacao({
+        idUnidade: idUnidade(),
+        protocoloDocumento: cycle8Document(),
+        staMotivo: cycle8PublicationReason(),
+        idVeiculoPublicacao: cycle8PublicationVehicle(),
+        dataDisponibilizacao: cycle8AlteredPublicationDate(),
+        resumo: cycle8PublicationSummary(),
+      }),
+  },
+  {
+    cycle: 8,
+    name: "cancelarAgendamentoPublicacao",
+    method: "sei.operacoes.cancelarAgendamentoPublicacao",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_UNIDADE", "SEI_SMOKE_PROTOCOLO_DOCUMENTO"],
+    status: "automated",
+    run: () =>
+      sei!.operacoes.cancelarAgendamentoPublicacao({
+        idUnidade: idUnidade(),
+        protocoloDocumento: cycle8Document(),
+      }),
+  },
+  {
+    cycle: 8,
+    name: "confirmarDisponibilizacaoPublicacao",
+    method: "sei.operacoes.confirmarDisponibilizacaoPublicacao",
+    effect: "write",
+    requiredEnv: ["SEI_SMOKE_ID_DOCUMENTO"],
+    guardEnv: "SEI_SMOKE_CONFIRMAR_PUBLICACAO",
+    status: "automated",
+    run: () =>
+      sei!.operacoes.confirmarDisponibilizacaoPublicacao({
+        idVeiculoPublicacao: cycle8PublicationVehicle(),
+        dataDisponibilizacao: cycle8PublicationDate(),
+        dataPublicacao: cycle8PublicationDatePublished(),
+        numero: cycle8PublicationNumber(),
+        idDocumentos: [requiredEnv("SEI_SMOKE_ID_DOCUMENTO")],
+      }),
+  },
 ]
 
 const selectedOperations = operations.filter((operation) => {
-  const cycleMatches = selectedCycle === "all" || operation.cycle === selectedCycle
+  const cycleMatches = listOnly || selectedCycle === "all" || operation.cycle === selectedCycle
   const operationMatches = !selectedOperation || operation.name === selectedOperation
   return cycleMatches && operationMatches
 })
@@ -1299,18 +1489,29 @@ if (!selectedOperations.length) {
   throw new Error("Nenhuma operacao SEI encontrada para os filtros informados.")
 }
 
-const plan = selectedOperations.map(({ cycle, name, method, effect, status, requiredEnv }) => ({
-  cycle,
-  name,
-  method,
-  effect,
-  status,
-  requiredEnv: requiredEnv ?? [],
-}))
+const plan = selectedOperations.map(
+  ({ cycle, name, method, effect, status, requiredEnv, guardEnv }) => ({
+    cycle,
+    name,
+    method,
+    effect,
+    status,
+    requiredEnv: requiredEnv ?? [],
+    guardEnv: guardEnv ?? null,
+  }),
+)
 
 if (planOnly || listOnly) {
   console.log(
-    JSON.stringify({ selectedCycle, selectedOperation: selectedOperation ?? null, plan }, null, 2),
+    JSON.stringify(
+      {
+        selectedCycle: listOnly ? "all" : selectedCycle,
+        selectedOperation: selectedOperation ?? null,
+        plan,
+      },
+      null,
+      2,
+    ),
   )
   process.exit(0)
 }
@@ -1335,6 +1536,17 @@ const runOperation = async (operation: SmokeOperation): Promise<SmokeResult> => 
       effect: operation.effect,
       status: "skipped",
       reason: "Operacao de escrita/efeito externo exige SEI_SMOKE_ALLOW_WRITE=1.",
+    }
+  }
+
+  if (operation.guardEnv && !isEnabled(operation.guardEnv)) {
+    return {
+      operation: operation.name,
+      cycle: operation.cycle,
+      method: operation.method,
+      effect: operation.effect,
+      status: "skipped",
+      reason: `Operacao exige ${operation.guardEnv}=1.`,
     }
   }
 

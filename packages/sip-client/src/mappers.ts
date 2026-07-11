@@ -37,7 +37,7 @@ import type {
   SipUsuarioDiretorio,
 } from "./types"
 
-import { asArray, boolFromSin, isMap, requiredString, stringValue } from "@anpdgovbr/soap-base"
+import { asArray, boolFromSin, isMap, requiredString, stringValue } from "@anpdgovbr/sei-sip-soap"
 
 /** @internal */
 const nonNullStrings = (value: SipRawValue): string[] =>

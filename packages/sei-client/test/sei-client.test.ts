@@ -95,6 +95,18 @@ const stringResponse = (operation: string): string => `<?xml version="1.0" encod
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`
 
+const emptyResponse = (
+  operation: string,
+  returnTag = "return",
+): string => `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="Sei">
+  <SOAP-ENV:Body>
+    <ns1:${operation}Response>
+      <${returnTag}/>
+    </ns1:${operation}Response>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`
+
 const fetchMock = () => vi.mocked(fetch)
 
 const requestBody = (callIndex: number): string => {
@@ -345,5 +357,705 @@ describe("SeiClient", () => {
     expect(requestBody(4)).toContain(">1500</IdBloco>")
     expect(requestBody(5)).toContain("<sei:devolverBloco")
     expect(requestBody(5)).toContain(">865</IdBloco>")
+  })
+
+  it("cobre consultas e operações SOAP restantes com payloads mínimos", async () => {
+    const sei = createSeiClient(config)
+    const calls: Array<{
+      operation: string
+      responseXml?: string
+      run: () => Promise<unknown>
+      expected?: string[]
+    }> = [
+      {
+        operation: "listarTiposProcedimento",
+        run: () => sei.consultas.listarTiposProcedimento({ idUnidade: "110000036" }),
+        expected: ["<IdUnidade", "110000036"],
+      },
+      {
+        operation: "listarTiposPrioridade",
+        run: () => sei.consultas.listarTiposPrioridade({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarSeries",
+        run: () => sei.consultas.listarSeries({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarContatos",
+        run: () => sei.consultas.listarContatos({ idUnidade: "110000036", paginaAtual: "1" }),
+      },
+      {
+        operation: "consultarProcedimentoIndividual",
+        run: () =>
+          sei.consultas.consultarProcedimentoIndividual({
+            idUnidade: "110000036",
+            idOrgaoProcedimento: "0",
+            idTipoProcedimento: "100000337",
+            idOrgaoUsuario: "0",
+            siglaUsuario: "usuario.teste",
+          }),
+      },
+      {
+        operation: "consultarDocumento",
+        run: () =>
+          sei.consultas.consultarDocumento({
+            idUnidade: "110000036",
+            protocoloDocumento: "0178401",
+          }),
+      },
+      {
+        operation: "consultarBloco",
+        run: () => sei.consultas.consultarBloco({ idUnidade: "110000036", idBloco: "1500" }),
+      },
+      {
+        operation: "listarExtensoesPermitidas",
+        run: () => sei.consultas.listarExtensoesPermitidas({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarUsuarios",
+        run: () => sei.consultas.listarUsuarios({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarHipotesesLegais",
+        run: () => sei.consultas.listarHipotesesLegais({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarTiposConferencia",
+        run: () => sei.consultas.listarTiposConferencia({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarPaises",
+        run: () => sei.consultas.listarPaises({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarEstados",
+        run: () => sei.consultas.listarEstados({ idUnidade: "110000036", idPais: "1" }),
+      },
+      {
+        operation: "listarCidades",
+        run: () => sei.consultas.listarCidades({ idUnidade: "110000036", idEstado: "1" }),
+      },
+      {
+        operation: "listarTiposProcedimentoOuvidoria",
+        run: () => sei.consultas.listarTiposProcedimentoOuvidoria(),
+      },
+      {
+        operation: "listarCargos",
+        run: () => sei.consultas.listarCargos({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "adicionarArquivo",
+        responseXml: stringResponse("adicionarArquivo"),
+        run: () =>
+          sei.consultas.adicionarArquivo({
+            idUnidade: "110000036",
+            nome: "teste.txt",
+            tamanho: "4",
+            hash: "abcd",
+            conteudo: "dGVzdA==",
+          }),
+      },
+      {
+        operation: "adicionarConteudoArquivo",
+        responseXml: stringResponse("adicionarConteudoArquivo"),
+        run: () =>
+          sei.consultas.adicionarConteudoArquivo({
+            idUnidade: "110000036",
+            idArquivo: "140563",
+            conteudo: "dGU=",
+          }),
+      },
+      {
+        operation: "listarAndamentos",
+        run: () =>
+          sei.consultas.listarAndamentos({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "listarMarcadoresUnidade",
+        run: () => sei.consultas.listarMarcadoresUnidade({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarAndamentosMarcadores",
+        run: () =>
+          sei.consultas.listarAndamentosMarcadores({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "consultarPublicacao",
+        run: () => sei.consultas.consultarPublicacao({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarFeriados",
+        run: () => sei.consultas.listarFeriados({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "gerarProcedimento",
+        run: () =>
+          sei.operacoes.gerarProcedimento({
+            idUnidade: "110000036",
+            procedimento: {
+              idTipoProcedimento: "100000337",
+              especificacao: "Teste",
+              assuntos: [{ codigoEstruturado: "01.01" }],
+              interessados: [{ nome: "Interessado" }],
+              nivelAcesso: "0",
+            },
+          }),
+      },
+      {
+        operation: "incluirDocumento",
+        run: () =>
+          sei.operacoes.incluirDocumento({
+            idUnidade: "110000036",
+            documento: {
+              tipo: "G",
+              idSerie: "100",
+              numero: "1",
+              descricao: "Teste",
+              conteudo: "PHA+VGVzdGU8L3A+",
+              nivelAcesso: "0",
+            },
+          }),
+      },
+      {
+        operation: "atualizarContatos",
+        responseXml: stringResponse("atualizarContatos"),
+        run: () =>
+          sei.operacoes.atualizarContatos({
+            idUnidade: "110000036",
+            contatos: [
+              {
+                staOperacao: "R",
+                idContato: "100000196",
+                idTipoContato: "",
+                sigla: "",
+                nome: "Smoke",
+                staNatureza: "",
+                sinEnderecoAssociado: "N",
+                endereco: "",
+                complemento: "",
+                bairro: "",
+                cep: "",
+                staGenero: "",
+                cpf: "",
+                cnpj: "",
+                rg: "",
+                orgaoExpedidor: "",
+                matricula: "",
+                matriculaOab: "",
+                telefoneComercial: "",
+                telefoneResidencial: "",
+                telefoneCelular: "",
+                dataNascimento: "",
+                email: "",
+                sitioInternet: "",
+                observacao: "Teste",
+                sinAtivo: "S",
+              },
+            ],
+          }),
+      },
+      {
+        operation: "cancelarDocumento",
+        responseXml: stringResponse("cancelarDocumento"),
+        run: () =>
+          sei.operacoes.cancelarDocumento({
+            idUnidade: "110000036",
+            protocoloDocumento: "0178401",
+            motivo: "Teste",
+          }),
+      },
+      {
+        operation: "bloquearDocumento",
+        responseXml: stringResponse("bloquearDocumento"),
+        run: () =>
+          sei.operacoes.bloquearDocumento({
+            idUnidade: "110000036",
+            protocoloDocumento: "0178401",
+          }),
+      },
+      {
+        operation: "excluirProcesso",
+        responseXml: stringResponse("excluirProcesso"),
+        run: () =>
+          sei.operacoes.excluirProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "excluirDocumento",
+        responseXml: stringResponse("excluirDocumento"),
+        run: () =>
+          sei.operacoes.excluirDocumento({
+            idUnidade: "110000036",
+            protocoloDocumento: "0178401",
+          }),
+      },
+      {
+        operation: "disponibilizarBloco",
+        responseXml: stringResponse("disponibilizarBloco"),
+        run: () => sei.operacoes.disponibilizarBloco({ idUnidade: "110000036", idBloco: "1500" }),
+      },
+      {
+        operation: "cancelarDisponibilizacaoBloco",
+        responseXml: stringResponse("cancelarDisponibilizacaoBloco"),
+        run: () =>
+          sei.operacoes.cancelarDisponibilizacaoBloco({
+            idUnidade: "110000036",
+            idBloco: "1500",
+          }),
+      },
+      {
+        operation: "concluirBloco",
+        responseXml: stringResponse("concluirBloco"),
+        run: () => sei.operacoes.concluirBloco({ idUnidade: "110000036", idBloco: "1500" }),
+      },
+      {
+        operation: "reabrirBloco",
+        responseXml: stringResponse("reabrirBloco"),
+        run: () => sei.operacoes.reabrirBloco({ idUnidade: "110000036", idBloco: "1500" }),
+      },
+      {
+        operation: "incluirProcessoBloco",
+        responseXml: stringResponse("incluirProcessoBloco"),
+        run: () =>
+          sei.operacoes.incluirProcessoBloco({
+            idUnidade: "110000036",
+            idBloco: "1500",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "retirarDocumentoBloco",
+        responseXml: stringResponse("retirarDocumentoBloco"),
+        run: () =>
+          sei.operacoes.retirarDocumentoBloco({
+            idUnidade: "110000036",
+            idBloco: "1500",
+            protocoloDocumento: "0178401",
+          }),
+      },
+      {
+        operation: "enviarProcesso",
+        responseXml: stringResponse("enviarProcesso"),
+        run: () =>
+          sei.operacoes.enviarProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+            unidadesDestino: ["110000029"],
+            sinManterAbertoUnidade: "S",
+          }),
+      },
+      {
+        operation: "atribuirProcesso",
+        responseXml: stringResponse("atribuirProcesso"),
+        run: () =>
+          sei.operacoes.atribuirProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+            idUsuario: "100000001",
+          }),
+      },
+      {
+        operation: "lancarAndamento",
+        run: () =>
+          sei.operacoes.lancarAndamento({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+            idTarefa: "65",
+          }),
+      },
+      {
+        operation: "bloquearProcesso",
+        responseXml: stringResponse("bloquearProcesso"),
+        run: () =>
+          sei.operacoes.bloquearProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "desbloquearProcesso",
+        responseXml: stringResponse("desbloquearProcesso"),
+        run: () =>
+          sei.operacoes.desbloquearProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "removerRelacionamentoProcesso",
+        responseXml: stringResponse("removerRelacionamentoProcesso"),
+        run: () =>
+          sei.operacoes.removerRelacionamentoProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento1: "00261.000004/2026-64",
+            protocoloProcedimento2: "00261.000005/2026-17",
+          }),
+      },
+      {
+        operation: "removerSobrestamentoProcesso",
+        responseXml: stringResponse("removerSobrestamentoProcesso"),
+        run: () =>
+          sei.operacoes.removerSobrestamentoProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "anexarProcesso",
+        responseXml: stringResponse("anexarProcesso"),
+        run: () =>
+          sei.operacoes.anexarProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimentoPrincipal: "00261.000005/2026-17",
+            protocoloProcedimentoAnexado: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "definirMarcador",
+        responseXml: stringResponse("definirMarcador"),
+        run: () =>
+          sei.operacoes.definirMarcador({
+            idUnidade: "110000036",
+            definicoes: [
+              {
+                protocoloProcedimento: "00261.000004/2026-64",
+                idMarcador: "140",
+                texto: "Teste",
+              },
+            ],
+          }),
+      },
+      {
+        operation: "definirControlePrazo",
+        responseXml: stringResponse("definirControlePrazo"),
+        run: () =>
+          sei.operacoes.definirControlePrazo({
+            idUnidade: "110000036",
+            definicoes: [
+              {
+                protocoloProcedimento: "00261.000004/2026-64",
+                dataPrazo: "",
+                dias: "1",
+                sinDiasUteis: "S",
+              },
+            ],
+          }),
+      },
+      {
+        operation: "concluirControlePrazo",
+        responseXml: stringResponse("concluirControlePrazo"),
+        run: () =>
+          sei.operacoes.concluirControlePrazo({
+            idUnidade: "110000036",
+            protocolosProcedimentos: ["00261.000004/2026-64"],
+          }),
+      },
+      {
+        operation: "removerControlePrazo",
+        responseXml: stringResponse("removerControlePrazo"),
+        run: () =>
+          sei.operacoes.removerControlePrazo({
+            idUnidade: "110000036",
+            protocolosProcedimentos: ["00261.000004/2026-64"],
+          }),
+      },
+      {
+        operation: "registrarAnotacao",
+        responseXml: stringResponse("registrarAnotacao"),
+        run: () =>
+          sei.operacoes.registrarAnotacao({
+            idUnidade: "110000036",
+            anotacoes: [
+              {
+                protocoloProcedimento: "00261.000004/2026-64",
+                descricao: "Teste",
+                sinPrioridade: "N",
+              },
+            ],
+          }),
+      },
+      {
+        operation: "agendarPublicacao",
+        responseXml: stringResponse("agendarPublicacao"),
+        run: () =>
+          sei.operacoes.agendarPublicacao({
+            idUnidade: "110000036",
+            protocoloDocumento: "0178401",
+            staMotivo: "1",
+            idVeiculoPublicacao: "1",
+            dataDisponibilizacao: "13/07/2026",
+          }),
+      },
+      {
+        operation: "alterarPublicacao",
+        responseXml: stringResponse("alterarPublicacao"),
+        run: () =>
+          sei.operacoes.alterarPublicacao({
+            idUnidade: "110000036",
+            protocoloDocumento: "0178401",
+            staMotivo: "1",
+            idVeiculoPublicacao: "1",
+            dataDisponibilizacao: "14/07/2026",
+          }),
+      },
+      {
+        operation: "cancelarAgendamentoPublicacao",
+        responseXml: stringResponse("cancelarAgendamentoPublicacao"),
+        run: () =>
+          sei.operacoes.cancelarAgendamentoPublicacao({
+            idUnidade: "110000036",
+            protocoloDocumento: "0178401",
+          }),
+      },
+      {
+        operation: "confirmarDisponibilizacaoPublicacao",
+        responseXml: stringResponse("confirmarDisponibilizacaoPublicacao"),
+        run: () =>
+          sei.operacoes.confirmarDisponibilizacaoPublicacao({
+            idVeiculoPublicacao: "1",
+            dataDisponibilizacao: "13/07/2026",
+            dataPublicacao: "14/07/2026",
+            numero: "1",
+            idDocumentos: ["196908"],
+          }),
+      },
+      {
+        operation: "enviarEmail",
+        run: () =>
+          sei.operacoes.enviarEmail({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+            para: "lucianoedipo@gmail.com",
+            assunto: "Teste",
+            mensagem: "Mensagem",
+          }),
+      },
+      {
+        operation: "registrarOuvidoria",
+        run: () =>
+          sei.operacoes.registrarOuvidoria({
+            idOrgao: "0",
+            nome: "Manifestante",
+            email: "manifestante@example.gov.br",
+            idTipoProcedimento: "100000337",
+            mensagem: "Manifestacao",
+            sinAnonimo: "N",
+          }),
+      },
+    ]
+
+    for (const [index, call] of calls.entries()) {
+      fetchMock().mockResolvedValueOnce(response(call.responseXml ?? emptyResponse(call.operation)))
+      await expect(call.run()).resolves.not.toThrow()
+      expect(requestBody(index)).toContain(`<sei:${call.operation}`)
+      for (const expected of call.expected ?? []) {
+        expect(requestBody(index)).toContain(expected)
+      }
+    }
+  })
+
+  it("expõe atalhos da fachada principal para consultas e operações comuns", async () => {
+    const sei = createSeiClient(config)
+    const calls: Array<{ operation: string; responseXml?: string; run: () => Promise<unknown> }> = [
+      {
+        operation: "listarUnidades",
+        responseXml: unidadesResponse,
+        run: () => sei.listarUnidades({ idTipoProcedimento: "100000337" }),
+      },
+      {
+        operation: "listarTiposProcedimento",
+        run: () => sei.listarTiposProcedimento({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarTiposPrioridade",
+        run: () => sei.listarTiposPrioridade({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarSeries",
+        run: () => sei.listarSeries({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarContatos",
+        run: () => sei.listarContatos({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "consultarProcedimento",
+        responseXml: procedimentoResponse,
+        run: () =>
+          sei.consultarProcedimento({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "consultarProcedimentoIndividual",
+        run: () =>
+          sei.consultarProcedimentoIndividual({
+            idUnidade: "110000036",
+            idOrgaoProcedimento: "0",
+            idTipoProcedimento: "100000337",
+            idOrgaoUsuario: "0",
+            siglaUsuario: "usuario.teste",
+          }),
+      },
+      {
+        operation: "consultarDocumento",
+        run: () =>
+          sei.consultarDocumento({
+            idUnidade: "110000036",
+            protocoloDocumento: "0178401",
+          }),
+      },
+      {
+        operation: "consultarBloco",
+        run: () => sei.consultarBloco({ idUnidade: "110000036", idBloco: "1500" }),
+      },
+      {
+        operation: "listarExtensoesPermitidas",
+        run: () => sei.listarExtensoesPermitidas({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarUsuarios",
+        run: () => sei.listarUsuarios({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarHipotesesLegais",
+        run: () => sei.listarHipotesesLegais({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarTiposConferencia",
+        run: () => sei.listarTiposConferencia({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarPaises",
+        run: () => sei.listarPaises({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarEstados",
+        run: () => sei.listarEstados({ idUnidade: "110000036", idPais: "1" }),
+      },
+      {
+        operation: "listarCidades",
+        run: () => sei.listarCidades({ idUnidade: "110000036", idEstado: "1" }),
+      },
+      {
+        operation: "listarTiposProcedimentoOuvidoria",
+        run: () => sei.listarTiposProcedimentoOuvidoria(),
+      },
+      {
+        operation: "listarCargos",
+        run: () => sei.listarCargos({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarAndamentos",
+        run: () =>
+          sei.listarAndamentos({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "listarMarcadoresUnidade",
+        run: () => sei.listarMarcadoresUnidade({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "consultarPublicacao",
+        run: () => sei.consultarPublicacao({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "listarFeriados",
+        run: () => sei.listarFeriados({ idUnidade: "110000036" }),
+      },
+      {
+        operation: "gerarProcedimento",
+        run: () =>
+          sei.gerarProcedimento({
+            idUnidade: "110000036",
+            procedimento: {
+              idTipoProcedimento: "100000337",
+              especificacao: "Teste",
+              assuntos: [{ codigoEstruturado: "01.01" }],
+              interessados: [{ nome: "Interessado" }],
+              nivelAcesso: "0",
+            },
+          }),
+      },
+      {
+        operation: "incluirDocumento",
+        run: () =>
+          sei.incluirDocumento({
+            idUnidade: "110000036",
+            documento: {
+              tipo: "G",
+              idSerie: "100",
+              numero: "1",
+              descricao: "Teste",
+              conteudo: "PHA+VGVzdGU8L3A+",
+              nivelAcesso: "0",
+            },
+          }),
+      },
+      {
+        operation: "enviarProcesso",
+        responseXml: stringResponse("enviarProcesso"),
+        run: () =>
+          sei.enviarProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+            unidadesDestino: ["110000029"],
+          }),
+      },
+      {
+        operation: "concluirProcesso",
+        responseXml: stringResponse("concluirProcesso"),
+        run: () =>
+          sei.concluirProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "reabrirProcesso",
+        responseXml: stringResponse("reabrirProcesso"),
+        run: () =>
+          sei.reabrirProcesso({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "lancarAndamento",
+        run: () =>
+          sei.lancarAndamento({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+          }),
+      },
+      {
+        operation: "enviarEmail",
+        run: () =>
+          sei.enviarEmail({
+            idUnidade: "110000036",
+            protocoloProcedimento: "00261.000004/2026-64",
+            para: "teste@example.gov.br",
+            assunto: "Teste",
+            mensagem: "Mensagem",
+          }),
+      },
+    ]
+
+    for (const [index, call] of calls.entries()) {
+      fetchMock().mockResolvedValueOnce(response(call.responseXml ?? emptyResponse(call.operation)))
+      await expect(call.run()).resolves.not.toThrow()
+      expect(requestBody(index)).toContain(`<sei:${call.operation}`)
+    }
   })
 })

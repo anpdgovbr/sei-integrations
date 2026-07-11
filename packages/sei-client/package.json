@@ -54,7 +54,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anpdgovbr/soap-base": "workspace:*"
+    "@anpdgovbr/sei-sip-soap": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

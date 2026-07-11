@@ -32,7 +32,8 @@ O README raiz deve permanecer como visão geral para consumo e operação.
     upload em partes.
   - `SeiOperacoesClient` — 43 operações que alteram estado ou produzem efeitos
     no SEI.
-- Infraestrutura SOAP compartilhada em `@anpdgovbr/soap-base` (privado),
+- Infraestrutura SOAP compartilhada em `@anpdgovbr/sei-sip-soap` (pacote técnico
+  publicado para uso pelos clientes),
   reutilizada por ambos os clientes.
 - Testes automatizados iniciais cobrem envelope SOAP, parsing, mappers, SOAP
   Fault e chamadas básicas da fachada do `sei-client`; falta validação com SOAP
@@ -538,10 +539,23 @@ Resultado do ciclo 4 em HML após liberação do serviço:
 | `sobrestarProcesso`             | OK        |
 | `removerSobrestamentoProcesso`  | OK        |
 
-As operações `enviarProcesso`, `atribuirProcesso`, `bloquearDocumento`,
-`cancelarDocumento`, `excluirDocumento` e `excluirProcesso` continuam
-catalogadas como `planned` no runner até haver roteiro de massa/limpeza HML
-específico.
+Em 2026-07-11, as operações `enviarProcesso`, `atribuirProcesso`,
+`bloquearDocumento`, `cancelarDocumento`, `excluirDocumento` e
+`excluirProcesso` foram convertidas de `planned` para `automated` no runner,
+mas com guarda explícita por operação. Elas continuam fora da execução padrão:
+cada chamada só roda quando a flag `SEI_SMOKE_ENABLE_*` correspondente estiver
+ativa.
+
+Guardas do ciclo 4:
+
+| Operação            | Guarda                                  | Observação                                                        |
+| ------------------- | --------------------------------------- | ----------------------------------------------------------------- |
+| `enviarProcesso`    | `SEI_SMOKE_ENABLE_ENVIAR_PROCESSO=1`    | Tramita para `SEI_SMOKE_ID_UNIDADE_DESTINO`; padrão mantém aberto |
+| `atribuirProcesso`  | `SEI_SMOKE_ENABLE_ATRIBUIR_PROCESSO=1`  | Exige `SEI_SMOKE_ID_USUARIO` válido na unidade                    |
+| `bloquearDocumento` | `SEI_SMOKE_ENABLE_BLOQUEAR_DOCUMENTO=1` | Sem par de desbloqueio exposto nesta lib                          |
+| `cancelarDocumento` | `SEI_SMOKE_ENABLE_CANCELAR_DOCUMENTO=1` | Exige motivo; usar documento descartável                          |
+| `excluirDocumento`  | `SEI_SMOKE_ENABLE_EXCLUIR_DOCUMENTO=1`  | Destrutiva; usar documento descartável                            |
+| `excluirProcesso`   | `SEI_SMOKE_ENABLE_EXCLUIR_PROCESSO=1`   | Destrutiva; usar processo descartável                             |
 
 Em 2026-07-10, o ciclo 5 foi preparado no runner para operações de bloco usando
 bloco de assinatura (`SEI_SMOKE_BLOCO_TIPO=A`), unidade `FIS`, destino `CGTI`
@@ -628,9 +642,9 @@ Resultado inicial do ciclo 7 em HML antes da liberação de upload:
 | -------------------------- | --------------------------------------------------------------------------------------------- |
 | `adicionarArquivo`         | Falha: operação não configurada no serviço `SEI-INTEGRATIONS-HML-CICLO1` para a unidade `FIS` |
 | `adicionarConteudoArquivo` | Não chegou ao SEI; depende do `IdArquivo` retornado por `adicionarArquivo`                    |
-| `atualizarContatos`        | `planned`; requer massa de contato de teste                                                   |
-| `enviarEmail`              | `planned`; requer destinatário controlado por produzir efeito externo                         |
-| `registrarOuvidoria`       | `planned`; requer massa específica de ouvidoria                                               |
+| `atualizarContatos`        | Ainda não executada nesse ponto; requer massa de contato de teste                             |
+| `enviarEmail`              | Ainda não executada nesse ponto; requer destinatário controlado por produzir efeito externo   |
+| `registrarOuvidoria`       | Ainda não executada nesse ponto; requer massa específica de ouvidoria                         |
 
 Após liberação das permissões do ciclo 7, o runner foi expandido para contato,
 e-mail e ouvidoria. A massa validada usou `SEI_SMOKE_CONTATO_ID=100000196`,
@@ -659,6 +673,44 @@ Observações do ciclo 7:
 - A falha restante de `registrarOuvidoria` indica configuração faltante no SEI,
   provavelmente o parâmetro `ID_TIPO_CONTATO_OUVIDORIA`, e não falha de
   serialização do `sei-client`.
+- Exceto por `registrarOuvidoria`, as operações do ciclo 7 ficaram
+  automatizadas e validadas em HML. `registrarOuvidoria` também está automatizada
+  no runner, mas permanece bloqueada por configuração do ambiente.
+
+Em 2026-07-10, o ciclo 8 foi automatizado no runner para o fluxo reversível de
+publicação: `agendarPublicacao`, `alterarPublicacao` e
+`cancelarAgendamentoPublicacao`. O smoke usa por padrão o veículo `1`
+(`Boletim de Serviço Eletrônico`, conforme seed SEI), motivo `1` (`Publicação`)
+e uma data de disponibilização no próximo dia útil calculado. A operação
+`confirmarDisponibilizacaoPublicacao` está automatizada com guarda explícita
+`SEI_SMOKE_CONFIRMAR_PUBLICACAO=1`, pois confirma a publicação e não tem par
+simples de reversão no Web Service.
+
+Resultado inicial do ciclo 8 em HML:
+
+| Operação                              | Resultado                                                                                                                    |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `agendarPublicacao`                   | Falha: operação não configurada no serviço para `ANPD: Procedimento de Fiscalização` + documento `Despacho` na unidade `FIS` |
+| `alterarPublicacao`                   | Falha: operação não configurada no serviço para `ANPD: Procedimento de Fiscalização` + documento `Despacho` na unidade `FIS` |
+| `cancelarAgendamentoPublicacao`       | Falha: operação não configurada no serviço para `ANPD: Procedimento de Fiscalização` + documento `Despacho` na unidade `FIS` |
+| `confirmarDisponibilizacaoPublicacao` | Automatizada com guarda `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1`; não executada sem roteiro específico de confirmação em HML       |
+
+Após ajuste de permissões, o fluxo reversível do ciclo 8 passou integralmente
+em HML com o documento `0176343`.
+
+Resultado do ciclo 8 em HML após liberação:
+
+| Operação                              | Resultado                                                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `agendarPublicacao`                   | OK, criou publicação `356`                                                                                    |
+| `alterarPublicacao`                   | OK                                                                                                            |
+| `cancelarAgendamentoPublicacao`       | OK, limpou o agendamento                                                                                      |
+| `confirmarDisponibilizacaoPublicacao` | Automatizada com guarda `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1`; não executada no ciclo padrão por ser finalística |
+
+Em 2026-07-11, o ciclo 8 foi reexecutado para validar a guarda finalística: o
+fluxo reversível criou a publicação `357`, alterou e cancelou o agendamento; a
+confirmação de disponibilização ficou `skipped` por ausência de
+`SEI_SMOKE_CONFIRMAR_PUBLICACAO=1`, como esperado.
 
 ## Próximos passos
 
@@ -682,14 +734,20 @@ Observações do ciclo 7:
    ouvidoria.
 6. Reexecutar `SEI_SMOKE_ALLOW_WRITE=1 SEI_SMOKE_CONTATO_ID=100000196 SEI_SMOKE_EMAIL_DESTINATARIO=lucianoedipo@gmail.com pnpm smoke:sei -- --cycle 7`
    após o ajuste de ouvidoria.
-7. Manter `enviarProcesso`, `atribuirProcesso`, operações de documento e
-   exclusões do ciclo 4 como `planned` até haver roteiro de massa/limpeza HML
-   específico.
+7. Executar `confirmarDisponibilizacaoPublicacao` apenas com roteiro específico
+   de confirmação de disponibilização/publicação em HML, usando
+   `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1`.
+8. Executar as operações sensíveis restantes do ciclo 4 apenas de forma
+   isolada, com massa descartável e a flag `SEI_SMOKE_ENABLE_*` correspondente:
+   `enviarProcesso`, `atribuirProcesso`, `bloquearDocumento`,
+   `cancelarDocumento`, `excluirDocumento` e `excluirProcesso`.
 
 O ciclo 0 do SEI já está preparado em `scripts/smoke-sei.ts` e registrado como
 `pnpm smoke:sei`. O runner carrega `.env`, mascara `IdentificacaoServico` no
-debug SOAP, permite `--plan`, `--cycle` e `--operation`, e reaproveita
-configuração compartilhável do SIP quando possível:
+debug SOAP, permite `--plan`, `--cycle`, `--operation` e `--list`, e reaproveita
+configuração compartilhável do SIP quando possível. Em `--list`, o runner lista
+todas as operações catalogadas, incluindo `guardEnv` quando houver guarda
+explícita.
 
 - `SEI_SOAP_ENDPOINT` pode ficar vazio se `SIP_SOAP_ENDPOINT` terminar em
   `/sip/ws/SipWS.php`; nesse caso o smoke deriva `/sei/ws/SeiWS.php` no mesmo
