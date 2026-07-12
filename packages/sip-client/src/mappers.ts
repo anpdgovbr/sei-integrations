@@ -1,3 +1,28 @@
+/**
+ * @packageDocumentation
+ *
+ * Funções de mapeamento de respostas SOAP do SIP para entidades de domínio.
+ *
+ * Este módulo converte os valores brutos ({@link SipRawValue}) normalizados
+ * por {@link parseSipSoapResponse} nas entidades tipadas do domínio expostas
+ * pelo pacote. Cada função exportada corresponde a uma operação SOAP do SIP:
+ *
+ * | Função                    | Operação SOAP                        | Retorno                     |
+ * |---------------------------|--------------------------------------|-----------------------------|
+ * | {@link mapOrgaos}         | `carregarOrgaos`                     | {@link SipOrgao}`[]`        |
+ * | {@link mapUnidades}       | `carregarUnidades`                   | {@link SipUnidade}`[]`      |
+ * | {@link mapUsuarios}       | `carregarUsuarios` / sem permissão   | {@link SipUsuario}`[]`      |
+ * | {@link mapUsuarioDiretorio} | `carregarUsuario` / `pesquisarUsuario` | {@link SipUsuarioDiretorio} \| `null` |
+ * | {@link mapPerfis}         | `carregarPerfis`                     | {@link SipPerfil}`[]`       |
+ * | {@link mapRecursos}       | `carregarRecursos`                   | `string[]`                  |
+ * | {@link mapPermissoes}     | `listarPermissao`                    | {@link SipPermissao}`[]`    |
+ *
+ * As funções auxiliares internas (marcadas individualmente como `@internal`)
+ * não fazem parte da API pública.
+ *
+ * @categoryDescription Mappers
+ * Funções que convertem respostas SOAP brutas em entidades de domínio tipadas.
+ */
 import type {
   SipGrupoPerfil,
   SipItemMenu,
@@ -5,7 +30,6 @@ import type {
   SipOrgao,
   SipPerfil,
   SipPermissao,
-  SipRawMap,
   SipRawValue,
   SipRecurso,
   SipUnidade,
@@ -13,53 +37,22 @@ import type {
   SipUsuarioDiretorio,
 } from "./types"
 
-const asArray = (value: SipRawValue): SipRawValue[] => {
-  if (Array.isArray(value)) {
-    return value
-  }
-  if (value === null || value === undefined) {
-    return []
-  }
-  return [value]
-}
+import { asArray, boolFromSin, isMap, requiredString, stringValue } from "@anpdgovbr/sei-sip-soap"
 
-const isMap = (value: SipRawValue): value is SipRawMap =>
-  typeof value === "object" && value !== null && !Array.isArray(value)
-
-const stringValue = (value: SipRawValue): string | null => {
-  if (value === null || value === undefined) {
-    return null
-  }
-  if (typeof value === "string") {
-    return value
-  }
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value)
-  }
-  return null
-}
-
-const requiredString = (value: SipRawValue, field: string): string => {
-  const normalized = stringValue(value)
-  if (!normalized) {
-    throw new Error(`Campo obrigatório ausente na resposta SIP: ${field}.`)
-  }
-  return normalized
-}
-
-const boolFromSin = (value: SipRawValue): boolean => stringValue(value) === "S"
-
+/** @internal */
 const nonNullStrings = (value: SipRawValue): string[] =>
   asArray(value)
     .flatMap((item) => (Array.isArray(item) ? nonNullStrings(item) : [stringValue(item)]))
     .filter((item): item is string => item !== null && item !== "")
 
+/** @internal */
 const isScalarLike = (value: SipRawValue): boolean =>
   value === null ||
   typeof value === "string" ||
   typeof value === "number" ||
   typeof value === "boolean"
 
+/** @internal */
 const mapNestedArray = (value: SipRawValue): string[][] => {
   const items = Array.isArray(value) && value.every(isScalarLike) ? [value] : asArray(value)
   return items
@@ -70,6 +63,7 @@ const mapNestedArray = (value: SipRawValue): string[][] => {
     .filter((item) => item.length > 0)
 }
 
+/** @internal */
 const mapRecordArray = (value: SipRawValue): SipRawValue[][] => {
   const items = Array.isArray(value) && value.every(isScalarLike) ? [value] : asArray(value)
   return items
@@ -81,8 +75,15 @@ const mapRecordArray = (value: SipRawValue): SipRawValue[][] => {
 }
 
 /**
- * Map SOAP PHP: cada item tem `key` e `value`.
- * Depois do parser, isso vira objetos `{ key: "0", value: "..." }`.
+ * Extrai e ordena as entradas de um mapa SOAP PHP.
+ *
+ * No SIP, dados de usuários são retornados como maps PHP serializados em SOAP,
+ * onde cada entrada tem `<key>` (índice inteiro) e `<value>` (dado). Após o
+ * parser, cada entrada vira `{ key: "0", value: "..." }`. Esta função ordena
+ * pelo índice numérico e retorna apenas os valores, preservando a ordem
+ * posicional esperada pelo {@link mapUsuarios}.
+ *
+ * @internal
  */
 const mapPhpMapEntries = (value: SipRawValue): SipRawValue[] => {
   const entries = asArray(value)
@@ -96,6 +97,16 @@ const mapPhpMapEntries = (value: SipRawValue): SipRawValue[] => {
   return entries.map((entry) => entry.value)
 }
 
+/**
+ * Converte o payload bruto de `carregarOrgaos` em uma lista de {@link SipOrgao}.
+ *
+ * @param value - Payload normalizado retornado por {@link parseSipSoapResponse}
+ *   para a operação `carregarOrgaos`.
+ * @returns Lista de órgãos, possivelmente vazia.
+ *
+ * @see {@link SipConsultasClient.listarOrgaos}
+ * @category Mappers
+ */
 export const mapOrgaos = (value: SipRawValue): SipOrgao[] =>
   mapNestedArray(value).map((item) => ({
     id: item[0] ?? "",
@@ -104,6 +115,24 @@ export const mapOrgaos = (value: SipRawValue): SipOrgao[] =>
     ativo: item[3] === "S",
   }))
 
+/**
+ * Converte o payload bruto de `carregarUnidades` em uma lista de {@link SipUnidade}.
+ *
+ * @remarks
+ * O SIP retorna unidades em dois formatos diferentes dependendo da versão e dos
+ * filtros aplicados:
+ * - **Formato completo** (8+ campos): inclui `idOrgao`, `subunidades`,
+ *   `unidadesSuperiores` e `idOrigem`.
+ * - **Formato reduzido** (4 campos): omite `idOrgao` e os arrays hierárquicos.
+ * - **Formato mínimo** (3 campos): sem `id`, apenas `sigla`, `descricao` e `ativo`.
+ *
+ * @param value - Payload normalizado retornado por {@link parseSipSoapResponse}
+ *   para a operação `carregarUnidades`.
+ * @returns Lista de unidades, possivelmente vazia.
+ *
+ * @see {@link SipConsultasClient.listarUnidades}
+ * @category Mappers
+ */
 export const mapUnidades = (value: SipRawValue): SipUnidade[] =>
   mapRecordArray(value).map((item) => {
     if (item.length >= 5) {
@@ -144,6 +173,24 @@ export const mapUnidades = (value: SipRawValue): SipUnidade[] =>
     }
   })
 
+/**
+ * Converte o payload bruto de `carregarUsuarios` ou
+ * `carregarUsuariosSemPermissao` em uma lista de {@link SipUsuario}.
+ *
+ * @remarks
+ * O SIP serializa usuários como mapas PHP aninhados (`ns2:Map`), onde cada
+ * usuário é um mapa de índices inteiros para valores. {@link mapPhpMapEntries}
+ * ordena essas entradas e extrai os valores na posição esperada.
+ *
+ * @param value - Payload normalizado retornado por {@link parseSipSoapResponse}.
+ * @returns Lista de usuários, possivelmente vazia.
+ * @throws `Error` se um campo obrigatório (`IdUsuario`, `Sigla`, `Nome`)
+ *   estiver ausente na resposta.
+ *
+ * @see {@link SipConsultasClient.buscarUsuarios}
+ * @see {@link SipConsultasClient.buscarUsuariosSemPermissao}
+ * @category Mappers
+ */
 export const mapUsuarios = (value: SipRawValue): SipUsuario[] => {
   const userMaps =
     isMap(value) && "key" in value && "value" in value
@@ -171,6 +218,24 @@ export const mapUsuarios = (value: SipRawValue): SipUsuario[] => {
   }))
 }
 
+/**
+ * Converte o payload bruto de `carregarUsuario` ou `pesquisarUsuario` em um
+ * {@link SipUsuarioDiretorio}, ou `null` se a resposta estiver vazia.
+ *
+ * @remarks
+ * Aceita tanto nomes de campos com inicial maiúscula (`Sigla`, `Nome`) quanto
+ * minúscula (`sigla`, `nome`), pois diferentes versões do SIP variam a
+ * capitalização.
+ *
+ * @param value - Payload normalizado.
+ * @returns O usuário do diretório, ou `null` se o servidor retornou nulo ou
+ *   um valor não mapeado.
+ * @throws `Error` se `Sigla` ou `Nome` estiverem ausentes na resposta.
+ *
+ * @see {@link SipConsultasClient.carregarUsuario}
+ * @see {@link SipConsultasClient.pesquisarUsuario}
+ * @category Mappers
+ */
 export const mapUsuarioDiretorio = (value: SipRawValue): SipUsuarioDiretorio | null => {
   if (!isMap(value)) {
     return null
@@ -186,6 +251,7 @@ export const mapUsuarioDiretorio = (value: SipRawValue): SipUsuarioDiretorio | n
   }
 }
 
+/** @internal */
 const mapGrupoPerfis = (value: SipRawValue): SipGrupoPerfil[] =>
   mapRecordArray(value).map((item) => ({
     id: requiredString(item[0] ?? null, "GrupoPerfil.IdGrupoPerfil"),
@@ -193,6 +259,7 @@ const mapGrupoPerfis = (value: SipRawValue): SipGrupoPerfil[] =>
     ativo: boolFromSin(item[2] ?? null),
   }))
 
+/** @internal */
 const mapRecursosPerfil = (value: SipRawValue): SipRecurso[] =>
   mapRecordArray(value).map((item) => ({
     id: requiredString(item[0] ?? null, "Recurso.IdRecurso"),
@@ -201,6 +268,7 @@ const mapRecursosPerfil = (value: SipRawValue): SipRecurso[] =>
     ativo: boolFromSin(item[3] ?? null),
   }))
 
+/** @internal */
 const mapItensMenu = (value: SipRawValue): SipItemMenu[] =>
   mapRecordArray(value).map((item) => ({
     id: requiredString(item[0] ?? null, "ItemMenu.IdItemMenu"),
@@ -210,6 +278,7 @@ const mapItensMenu = (value: SipRawValue): SipItemMenu[] =>
     ativo: boolFromSin(item[4] ?? null),
   }))
 
+/** @internal */
 const mapMenus = (value: SipRawValue): SipMenu[] =>
   mapRecordArray(value).map((item) => ({
     id: requiredString(item[0] ?? null, "Menu.IdMenu"),
@@ -218,6 +287,27 @@ const mapMenus = (value: SipRawValue): SipMenu[] =>
     itens: mapItensMenu(item[3] ?? null),
   }))
 
+/**
+ * Converte o payload bruto de `carregarPerfis` em uma lista de {@link SipPerfil}.
+ *
+ * @remarks
+ * Perfis retornam em dois formatos:
+ * - **Formato completo** (4+ campos): inclui `id`, `nome`, `descricao`, `ativo`,
+ *   `grupos`, `recursos` e `menus`. A profundidade de `recursos` e `menus`
+ *   depende do parâmetro `StaFiltroRecursosMenus` enviado na requisição.
+ * - **Formato reduzido** (3 campos): apenas `nome`, `descricao` e `ativo`,
+ *   sem `id`. Esses registros recebem `id: ""`.
+ *
+ * Perfis com `nome` vazio são filtrados do resultado.
+ *
+ * @param value - Payload normalizado retornado por {@link parseSipSoapResponse}
+ *   para a operação `carregarPerfis`.
+ * @returns Lista de perfis, possivelmente vazia.
+ *
+ * @see {@link SipConsultasClient.listarPerfis}
+ * @see {@link SipFiltroRecursosMenus}
+ * @category Mappers
+ */
 export const mapPerfis = (value: SipRawValue): SipPerfil[] =>
   mapRecordArray(value)
     .map((item) => {
@@ -245,8 +335,38 @@ export const mapPerfis = (value: SipRawValue): SipPerfil[] =>
     })
     .filter((item) => item.nome)
 
+/**
+ * Converte o payload bruto de `carregarRecursos` em uma lista de nomes de
+ * recursos (strings).
+ *
+ * @param value - Payload normalizado retornado por {@link parseSipSoapResponse}
+ *   para a operação `carregarRecursos`.
+ * @returns Lista de nomes de recursos (ex.: `["documento_gerar", "processo_consultar"]`),
+ *   possivelmente vazia.
+ *
+ * @see {@link SipConsultasClient.listarRecursos}
+ * @category Mappers
+ */
 export const mapRecursos = (value: SipRawValue): string[] => nonNullStrings(value)
 
+/**
+ * Converte o payload bruto de `listarPermissao` em uma lista de
+ * {@link SipPermissao}.
+ *
+ * @remarks
+ * Diferente da maioria das operações do SIP, `listarPermissao` retorna
+ * objetos nomeados (`Permissao`) com campos `PascalCase`, não arrays
+ * posicionais.
+ *
+ * @param value - Payload normalizado retornado por {@link parseSipSoapResponse}
+ *   para a operação `listarPermissao`.
+ * @returns Lista de permissões, possivelmente vazia.
+ * @throws `Error` se campos obrigatórios (`IdSistema`, `IdUsuario`,
+ *   `IdUnidade`, `IdPerfil`, `DataInicial`) estiverem ausentes.
+ *
+ * @see {@link SipConsultasClient.listarPermissoes}
+ * @category Mappers
+ */
 export const mapPermissoes = (value: SipRawValue): SipPermissao[] =>
   asArray(value)
     .filter(isMap)

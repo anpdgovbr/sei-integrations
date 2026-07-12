@@ -61,7 +61,8 @@ Mantenha na aplicação consumidora:
 - Trate `client.replicacao.*` como operação sensível.
 - Não libere serviços de replicação no SIP para consumidores somente leitura.
 - Não confunda SIP com SEI direto: permissões e cadastros vêm do SIP; operações
-  próprias do SEI devem ser modeladas no futuro `@anpdgovbr/sei-client`.
+  próprias do SEI (processos, documentos, envios) usam o `@anpdgovbr/sei-client`.
+  Veja [sei-client.md](sei-client.md).
 - Preserve a compatibilidade do consumidor com uma fachada local até trocar os
   imports internos.
 
