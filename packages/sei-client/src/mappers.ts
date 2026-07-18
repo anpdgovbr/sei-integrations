@@ -4,7 +4,8 @@
  * Funções de mapeamento de respostas SOAP do SEI para entidades de domínio.
  *
  * Este módulo converte os valores brutos ({@link SeiRawValue}) normalizados
- * por {@link parseSeiSoapResponse} nas entidades tipadas expostas pelo pacote.
+ * por {@link index!parseSeiSoapResponse | parseSeiSoapResponse} nas entidades
+ * tipadas expostas pelo pacote.
  *
  * O SEI serializa respostas como structs SOAP nomeados (campos PascalCase
  * correspondendo aos elementos do WSDL), diferente do SIP que usa arrays PHP

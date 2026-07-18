@@ -255,7 +255,7 @@ export type SipUsuarioDiretorio = Readonly<{
 /**
  * Grupo de perfis no SIP.
  *
- * Agrupa perfis relacionados. Retornado como parte de {@link SipPerfil.grupos}.
+ * Agrupa perfis relacionados. Retornado como parte de {@link SipPerfil | SipPerfil.grupos}.
  *
  * @see {@link SipPerfil}
  * @category Domain Entities
@@ -275,7 +275,7 @@ export type SipGrupoPerfil = Readonly<{
  * Um recurso representa uma permissão atômica (ex.: `"documento_gerar"`,
  * `"processo_consultar"`). Perfis agrupam recursos.
  *
- * @see {@link SipPerfil.recursos}
+ * @see {@link SipPerfil | SipPerfil.recursos}
  * @see {@link SipConsultasClient.listarRecursos}
  * @category Domain Entities
  */
@@ -293,7 +293,7 @@ export type SipRecurso = Readonly<{
 /**
  * Item de menu associado a um perfil no SIP.
  *
- * @see {@link SipMenu.itens}
+ * @see {@link SipMenu | SipMenu.itens}
  * @category Domain Entities
  */
 export type SipItemMenu = Readonly<{
@@ -312,7 +312,7 @@ export type SipItemMenu = Readonly<{
 /**
  * Menu de navegação associado a um perfil no SIP.
  *
- * @see {@link SipPerfil.menus}
+ * @see {@link SipPerfil | SipPerfil.menus}
  * @category Domain Entities
  */
 export type SipMenu = Readonly<{
@@ -331,7 +331,7 @@ export type SipMenu = Readonly<{
  *
  * Um perfil agrupa recursos e menus que definem o que um usuário pode fazer
  * dentro do sistema. A profundidade das informações retornadas depende do
- * parâmetro {@link SipListarPerfisParams.filtroRecursosMenus}.
+ * parâmetro {@link SipListarPerfisParams | SipListarPerfisParams.filtroRecursosMenus}.
  *
  * @see {@link SipConsultasClient.listarPerfis}
  * @see {@link SipFiltroRecursosMenus}
