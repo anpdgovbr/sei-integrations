@@ -4,6 +4,13 @@
   "private": false,
   "type": "module",
   "description": "Infraestrutura SOAP interna compartilhada entre sip-client e sei-client.",
+  "keywords": [
+    "anpd",
+    "sei",
+    "sip",
+    "soap",
+    "typescript"
+  ],
   "license": "MIT",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

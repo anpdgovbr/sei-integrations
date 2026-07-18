@@ -15,10 +15,11 @@
   },
   "groupOrder": ["Classes", "Functions", "Type Aliases", "Interfaces", "Variables", "*"],
   "validation": {
-    "invalidLink": false,
-    "notExported": false,
-    "notDocumented": false
+    "invalidLink": true,
+    "notExported": true,
+    "notDocumented": true
   },
+  "treatValidationWarningsAsErrors": true,
   "visibilityFilters": {
     "protected": true,
     "private": false,

@@ -1,6 +1,6 @@
 # @anpdgovbr/sip-client
 
-[![npm.anpd.gov.br](https://img.shields.io/badge/npm.anpd.gov.br-0.1.2-CB3837?logo=npm&logoColor=white)](https://npm.anpd.gov.br)
+[![npm.anpd.gov.br](https://img.shields.io/badge/npm.anpd.gov.br-1.0.0-CB3837?logo=npm&logoColor=white)](https://npm.anpd.gov.br)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](package.json)
 [![module](https://img.shields.io/badge/module-ESM%20%2B%20CJS-yellow.svg)](package.json)

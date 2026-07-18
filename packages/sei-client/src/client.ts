@@ -65,6 +65,7 @@ import type {
   SeiAlterarBlocoParams,
   SeiAlterarPublicacaoParams,
   SeiAndamento,
+  SeiAndamentoMarcador,
   SeiAnexarProcessoParams,
   SeiArquivoExtensao,
   SeiAtribuirProcessoParams,
@@ -284,6 +285,18 @@ export class SeiConsultasClient {
   /** @param config - Configuração de conexão com o SEI. */
   constructor(private readonly config: SeiConfig) {}
 
+  /**
+   * Lista as unidades liberadas para o sistema integrador no SEI.
+   *
+   * @param params - Filtros opcionais por tipo de procedimento e série.
+   * @returns Lista de unidades habilitadas para a integração.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @example
+   * ```ts
+   * const unidades = await sei.consultas.listarUnidades()
+   * ```
+   */
   async listarUnidades(params: SeiListarUnidadesParams = {}): Promise<SeiUnidade[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarUnidades",
@@ -297,6 +310,13 @@ export class SeiConsultasClient {
     return mapUnidades(payload)
   }
 
+  /**
+   * Lista os tipos de procedimento (tipos de processo) disponíveis na unidade.
+   *
+   * @param params - Unidade e filtros opcionais por série e individualização.
+   * @returns Lista de tipos de procedimento.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarTiposProcedimento(
     params: SeiListarTiposProcedimentoParams,
   ): Promise<SeiTipoProcedimento[]> {
@@ -311,6 +331,13 @@ export class SeiConsultasClient {
     return mapTiposProcedimento(payload)
   }
 
+  /**
+   * Lista os tipos de prioridade de processo configurados no SEI.
+   *
+   * @param params - Unidade de contexto da consulta.
+   * @returns Lista de tipos de prioridade.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarTiposPrioridade(
     params: SeiListarTiposPrioridadeParams,
   ): Promise<SeiTipoPrioridade[]> {
@@ -321,6 +348,13 @@ export class SeiConsultasClient {
     return mapTiposPrioridade(payload)
   }
 
+  /**
+   * Lista as séries (tipos de documento) disponíveis na unidade.
+   *
+   * @param params - Unidade e filtro opcional por tipo de procedimento.
+   * @returns Lista de séries documentais.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarSeries(params: SeiListarSeriesParams): Promise<SeiSerie[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarSeries",
@@ -332,6 +366,14 @@ export class SeiConsultasClient {
     return mapSeries(payload)
   }
 
+  /**
+   * Lista contatos cadastrados no SEI com filtros combinativos e paginação.
+   *
+   * @param params - Unidade, filtros (tipo, sigla, nome, CPF, CNPJ, matrícula,
+   *   IDs) e controle de paginação (`paginaRegistros`/`paginaAtual`).
+   * @returns Lista de contatos que atendem aos filtros.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarContatos(params: SeiListarContatosParams): Promise<SeiContato[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarContatos",
@@ -351,6 +393,29 @@ export class SeiConsultasClient {
     return mapContatos(payload)
   }
 
+  /**
+   * Consulta os dados completos de um processo pelo protocolo.
+   *
+   * @remarks
+   * Por padrão todos os sinalizadores `sinRetornar*` são enviados como `"S"`,
+   * retornando assuntos, interessados, observações, andamentos, unidades
+   * abertas e processos relacionados/anexados. Desligue os blocos que não
+   * precisa (`"N"`) para reduzir o custo da consulta no SEI.
+   *
+   * @param params - Unidade, protocolo do processo e sinalizadores de retorno.
+   * @returns Dados do processo, ou `null` quando o SEI não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault
+   *   (ex.: processo inexistente ou sem acesso pela unidade).
+   *
+   * @example
+   * ```ts
+   * const proc = await sei.consultas.consultarProcedimento({
+   *   idUnidade: "110000001",
+   *   protocoloProcedimento: "00000.000001/2026-01",
+   *   sinRetornarAndamentoConclusao: "N",
+   * })
+   * ```
+   */
   async consultarProcedimento(
     params: SeiConsultarProcedimentoParams,
   ): Promise<SeiRetornoConsultaProcedimento | null> {
@@ -373,6 +438,15 @@ export class SeiConsultasClient {
     return mapRetornoConsultaProcedimento(payload)
   }
 
+  /**
+   * Consulta o procedimento individual de um usuário (tipos de processo com
+   * autuação individual, ex.: dossiê funcional).
+   *
+   * @param params - Unidade, órgão do procedimento, tipo de procedimento e
+   *   identificação do usuário (órgão + sigla).
+   * @returns Referência resumida ao processo, ou `null` se não encontrado.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async consultarProcedimentoIndividual(
     params: SeiConsultarProcedimentoIndividualParams,
   ): Promise<SeiProcedimentoResumido | null> {
@@ -389,6 +463,18 @@ export class SeiConsultasClient {
     return mapProcedimentoResumido(payload)
   }
 
+  /**
+   * Consulta os dados completos de um documento pelo protocolo.
+   *
+   * @remarks
+   * Os sinalizadores `sinRetornar*` seguem o padrão `"S"`, exceto
+   * `sinRetornarBlocos`, que por padrão é `"N"` por ser a consulta mais
+   * custosa no SEI.
+   *
+   * @param params - Unidade, protocolo do documento e sinalizadores de retorno.
+   * @returns Dados do documento, ou `null` quando o SEI não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async consultarDocumento(
     params: SeiConsultarDocumentoParams,
   ): Promise<SeiRetornoConsultaDocumento | null> {
@@ -407,6 +493,14 @@ export class SeiConsultasClient {
     return mapRetornoConsultaDocumento(payload)
   }
 
+  /**
+   * Consulta um bloco (assinatura, reunião ou interno) e, opcionalmente, seus
+   * protocolos.
+   *
+   * @param params - Unidade, ID do bloco e sinalizador de retorno de protocolos.
+   * @returns Dados do bloco, ou `null` quando o SEI não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async consultarBloco(params: SeiConsultarBlocoParams): Promise<SeiRetornoConsultaBloco | null> {
     const payload = await callSeiSoap(this.config, {
       operation: "consultarBloco",
@@ -419,6 +513,13 @@ export class SeiConsultasClient {
     return mapRetornoConsultaBloco(payload)
   }
 
+  /**
+   * Lista as extensões de arquivo permitidas para upload no SEI.
+   *
+   * @param params - Unidade e filtro opcional por ID de extensão.
+   * @returns Lista de extensões permitidas.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarExtensoesPermitidas(
     params: SeiListarExtensoesPermitidasParams,
   ): Promise<SeiArquivoExtensao[]> {
@@ -432,6 +533,13 @@ export class SeiConsultasClient {
     return mapArquivosExtensao(payload)
   }
 
+  /**
+   * Lista os usuários com acesso à unidade informada.
+   *
+   * @param params - Unidade e filtro opcional por ID de usuário.
+   * @returns Lista de usuários da unidade.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarUsuarios(params: SeiListarUsuariosParams): Promise<SeiUsuario[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarUsuarios",
@@ -443,6 +551,14 @@ export class SeiConsultasClient {
     return mapUsuarios(payload)
   }
 
+  /**
+   * Lista as hipóteses legais de restrição de acesso configuradas no SEI.
+   *
+   * @param params - Unidade e filtro opcional por nível de acesso
+   *   (`"1"` restrito, `"2"` sigiloso).
+   * @returns Lista de hipóteses legais.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarHipotesesLegais(params: SeiListarHipotesesLegaisParams): Promise<SeiHipoteseLegal[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarHipotesesLegais",
@@ -454,6 +570,13 @@ export class SeiConsultasClient {
     return mapHipotesesLegais(payload)
   }
 
+  /**
+   * Lista os tipos de conferência usados em documentos digitalizados.
+   *
+   * @param params - Unidade de contexto da consulta.
+   * @returns Lista de tipos de conferência.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarTiposConferencia(
     params: SeiListarTiposConferenciaParams,
   ): Promise<SeiTipoConferencia[]> {
@@ -464,6 +587,13 @@ export class SeiConsultasClient {
     return mapTiposConferencia(payload)
   }
 
+  /**
+   * Lista os países cadastrados no SEI.
+   *
+   * @param params - Unidade de contexto da consulta.
+   * @returns Lista de países.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarPaises(params: SeiListarPaisesParams): Promise<SeiPais[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarPaises",
@@ -472,6 +602,13 @@ export class SeiConsultasClient {
     return mapPaises(payload)
   }
 
+  /**
+   * Lista os estados/UF cadastrados no SEI.
+   *
+   * @param params - Unidade e filtro opcional por país.
+   * @returns Lista de estados.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarEstados(params: SeiListarEstadosParams): Promise<SeiEstado[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarEstados",
@@ -483,6 +620,13 @@ export class SeiConsultasClient {
     return mapEstados(payload)
   }
 
+  /**
+   * Lista os municípios cadastrados no SEI.
+   *
+   * @param params - Unidade e filtros opcionais por país e estado.
+   * @returns Lista de municípios.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarCidades(params: SeiListarCidadesParams): Promise<SeiCidade[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarCidades",
@@ -495,6 +639,19 @@ export class SeiConsultasClient {
     return mapCidades(payload)
   }
 
+  /**
+   * Lista os tipos de procedimento habilitados para manifestações de
+   * ouvidoria.
+   *
+   * @remarks
+   * Diferente das demais consultas, esta operação não exige unidade: o SEI a
+   * resolve apenas com as credenciais do sistema integrador.
+   *
+   * @returns Lista de tipos de procedimento de ouvidoria.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link SeiOperacoesClient.registrarOuvidoria}
+   */
   async listarTiposProcedimentoOuvidoria(): Promise<SeiTipoProcedimento[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarTiposProcedimentoOuvidoria",
@@ -506,6 +663,13 @@ export class SeiConsultasClient {
     return mapTiposProcedimento(payload)
   }
 
+  /**
+   * Lista os cargos cadastrados no SEI.
+   *
+   * @param params - Unidade e filtro opcional por ID de cargo.
+   * @returns Lista de cargos com expressões de tratamento e vocativo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarCargos(params: SeiListarCargosParams): Promise<SeiCargo[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarCargos",
@@ -517,6 +681,23 @@ export class SeiConsultasClient {
     return mapCargos(payload)
   }
 
+  /**
+   * Inicia o upload de um arquivo temporário no SEI (upload em partes).
+   *
+   * @remarks
+   * Informe o tamanho total em bytes, o hash MD5 hexadecimal do arquivo
+   * completo e a primeira parte do conteúdo em Base64. Se a primeira parte não
+   * completar o tamanho declarado, envie o restante via
+   * {@link adicionarConteudoArquivo}. O ID retornado pode ser usado em
+   * `SeiDocumentoInput.idArquivo`.
+   *
+   * @param params - Unidade, nome, tamanho, hash MD5 e primeira parte em Base64.
+   * @returns O ID do arquivo temporário criado no SEI.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link adicionarConteudoArquivo}
+   * @see {@link SeiOperacoesClient.incluirDocumento}
+   */
   async adicionarArquivo(params: SeiAdicionarArquivoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "adicionarArquivo",
@@ -531,6 +712,18 @@ export class SeiConsultasClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Envia uma parte adicional de conteúdo para um arquivo temporário iniciado
+   * por {@link adicionarArquivo}.
+   *
+   * @remarks
+   * Quando o conteúdo acumulado atinge o tamanho declarado na criação, o SEI
+   * valida o hash MD5 informado e ativa o arquivo.
+   *
+   * @param params - Unidade, ID do arquivo e parte do conteúdo em Base64.
+   * @returns O ID do arquivo temporário.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async adicionarConteudoArquivo(params: SeiAdicionarConteudoArquivoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "adicionarConteudoArquivo",
@@ -543,6 +736,14 @@ export class SeiConsultasClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Lista o histórico de andamentos de um processo.
+   *
+   * @param params - Unidade, protocolo do processo e filtros opcionais por
+   *   andamentos, tarefas e tarefas de módulos.
+   * @returns Lista de andamentos do processo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarAndamentos(params: SeiListarAndamentosParams): Promise<SeiAndamento[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarAndamentos",
@@ -558,6 +759,15 @@ export class SeiConsultasClient {
     return mapAndamentos(payload)
   }
 
+  /**
+   * Lista os marcadores configurados para a unidade.
+   *
+   * @param params - Unidade de contexto da consulta.
+   * @returns Lista de marcadores da unidade.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link SeiOperacoesClient.definirMarcador}
+   */
   async listarMarcadoresUnidade(params: SeiListarMarcadoresUnidadeParams): Promise<SeiMarcador[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarMarcadoresUnidade",
@@ -566,9 +776,19 @@ export class SeiConsultasClient {
     return mapMarcadores(payload)
   }
 
+  /**
+   * Lista os andamentos de marcadores registrados em um processo.
+   *
+   * @param params - Unidade, protocolo do processo e filtro opcional por IDs
+   *   de marcadores.
+   * @returns Lista de andamentos de marcadores.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link SeiOperacoesClient.definirMarcador}
+   */
   async listarAndamentosMarcadores(
     params: SeiListarAndamentosMarcadoresParams,
-  ): Promise<ReturnType<typeof mapAndamentosMarcadores>> {
+  ): Promise<SeiAndamentoMarcador[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarAndamentosMarcadores",
       params: {
@@ -580,6 +800,16 @@ export class SeiConsultasClient {
     return mapAndamentosMarcadores(payload)
   }
 
+  /**
+   * Consulta uma publicação oficial associada a um documento.
+   *
+   * @param params - Unidade e identificação da publicação (`idPublicacao`,
+   *   `idDocumento` ou `protocoloDocumento`), com sinalizadores de retorno.
+   * @returns Dados da publicação, ou `null` quando o SEI não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link SeiOperacoesClient.agendarPublicacao}
+   */
   async consultarPublicacao(
     params: SeiConsultarPublicacaoParams,
   ): Promise<SeiRetornoConsultaPublicacao | null> {
@@ -597,6 +827,13 @@ export class SeiConsultasClient {
     return mapRetornoConsultaPublicacao(payload)
   }
 
+  /**
+   * Lista os feriados cadastrados para o órgão/unidade em um período.
+   *
+   * @param params - Unidade e filtros opcionais por órgão e intervalo de datas.
+   * @returns Lista de feriados.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async listarFeriados(params: SeiListarFeriadosParams): Promise<SeiFeriado[]> {
     const payload = await callSeiSoap(this.config, {
       operation: "listarFeriados",
@@ -624,8 +861,35 @@ export class SeiConsultasClient {
  * @category Client
  */
 export class SeiOperacoesClient {
+  /** @param config - Configuração de conexão com o SEI. */
   constructor(private readonly config: SeiConfig) {}
 
+  /**
+   * Cria um processo no SEI, opcionalmente já com documentos, relacionamentos,
+   * envio para unidades, marcador e controle de prazo.
+   *
+   * @param params - Unidade, dados do processo ({@link SeiProcedimentoInput}) e
+   *   opções de criação.
+   * @returns Protocolo gerado com link de acesso e retorno da inclusão de cada
+   *   documento, ou `null` quando o SEI não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault
+   *   (ex.: tipo de procedimento inválido ou assunto não permitido).
+   *
+   * @example
+   * ```ts
+   * const retorno = await sei.operacoes.gerarProcedimento({
+   *   idUnidade: "110000001",
+   *   procedimento: {
+   *     idTipoProcedimento: "100000101",
+   *     especificacao: "Integração via sei-client",
+   *     assuntos: [{ codigoEstruturado: "06.01.01" }],
+   *     interessados: [{ nome: "Fulano de Tal", cpf: "00000000000" }],
+   *     nivelAcesso: "0",
+   *   },
+   * })
+   * console.log(retorno?.procedimentoFormatado)
+   * ```
+   */
   async gerarProcedimento(
     params: SeiGerarProcedimentoParams,
   ): Promise<SeiRetornoGeracaoProcedimento | null> {
@@ -659,6 +923,35 @@ export class SeiOperacoesClient {
     return mapRetornoGeracaoProcedimento(payload)
   }
 
+  /**
+   * Inclui um documento (gerado ou recebido) em um processo existente.
+   *
+   * @remarks
+   * O conteúdo deve ser informado em Base64 via `conteudo`, `conteudoSecoes`
+   * ou `idArquivo` (upload prévio com
+   * {@link SeiConsultasClient.adicionarArquivo}). Use {@link encodeSeiBase64}
+   * para codificar HTML/texto.
+   *
+   * @param params - Unidade e dados do documento ({@link SeiDocumentoInput}).
+   * @returns Protocolo do documento gerado com link de acesso, ou `null`
+   *   quando o SEI não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault
+   *   (ex.: série inválida ou extensão de arquivo não permitida).
+   *
+   * @example
+   * ```ts
+   * const doc = await sei.operacoes.incluirDocumento({
+   *   idUnidade: "110000001",
+   *   documento: {
+   *     tipo: "G",
+   *     protocoloProcedimento: "00000.000001/2026-01",
+   *     idSerie: "5",
+   *     nivelAcesso: "0",
+   *     conteudo: encodeSeiBase64("<p>Conteúdo</p>"),
+   *   },
+   * })
+   * ```
+   */
   async incluirDocumento(
     params: SeiIncluirDocumentoParams,
   ): Promise<SeiRetornoInclusaoDocumento | null> {
@@ -672,6 +965,18 @@ export class SeiOperacoesClient {
     return mapRetornoInclusaoDocumento(payload)
   }
 
+  /**
+   * Cria, altera, exclui, desativa ou reativa contatos em lote.
+   *
+   * @remarks
+   * O efeito de cada item é controlado por `staOperacao` em
+   * {@link SeiContatoInput}: `"A"` cria/altera, `"E"` exclui, `"D"` desativa e
+   * `"R"` reativa. Para alteração, envie o cadastro completo do contato.
+   *
+   * @param params - Unidade e lista de contatos com as operações desejadas.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async atualizarContatos(params: SeiAtualizarContatosParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "atualizarContatos",
@@ -727,6 +1032,17 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Cancela um documento no processo, registrando o motivo.
+   *
+   * @remarks
+   * Operação sensível e sem reversão simples pelo Web Service — o documento
+   * permanece na árvore do processo com a tarja de cancelado.
+   *
+   * @param params - Unidade, protocolo do documento e motivo do cancelamento.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async cancelarDocumento(params: SeiCancelarDocumentoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "cancelarDocumento",
@@ -739,6 +1055,17 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Bloqueia um documento contra edição.
+   *
+   * @remarks
+   * O Web Service do SEI não expõe, nesta lib, operação simétrica de
+   * desbloqueio de documento — valide o fluxo com documento de teste.
+   *
+   * @param params - Unidade e protocolo do documento.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async bloquearDocumento(params: SeiBloquearDocumentoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "bloquearDocumento",
@@ -754,9 +1081,17 @@ export class SeiOperacoesClient {
    * Cria um bloco no SEI.
    *
    * @remarks
-   * O tipo do bloco determina quais protocolos podem ser adicionados. Em HML,
-   * documentos foram validados em bloco de assinatura (`Tipo=A`), mas processos
-   * exigiram bloco interno ou outro tipo compatível.
+   * O SEI define três tipos de bloco: `"A"` (assinatura), `"R"` (reunião) e
+   * `"I"` (interno). O tipo determina quais protocolos podem ser adicionados:
+   * documentos foram validados em bloco de assinatura (`Tipo=A`), mas
+   * processos exigem bloco interno ou outro tipo compatível.
+   *
+   * @param params - Unidade, tipo, descrição e opções de disponibilização.
+   * @returns O ID do bloco criado.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link incluirDocumentoBloco}
+   * @see {@link incluirProcessoBloco}
    */
   async gerarBloco(params: SeiGerarBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
@@ -776,6 +1111,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Altera a descrição e as unidades de disponibilização de um bloco.
+   *
+   * @param params - Unidade, ID do bloco, nova descrição e unidades.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async alterarBloco(params: SeiAlterarBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "alterarBloco",
@@ -792,6 +1134,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Exclui um bloco.
+   *
+   * @param params - Unidade e ID do bloco.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async excluirBloco(params: SeiExcluirBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "excluirBloco",
@@ -803,6 +1152,18 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Exclui um processo.
+   *
+   * @remarks
+   * Operação destrutiva. O SEI só permite excluir processo sem andamentos
+   * relevantes, gerado pela própria unidade — pensada para limpeza de massa
+   * de teste/rascunho, não para descarte de processos reais.
+   *
+   * @param params - Unidade e protocolo do processo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async excluirProcesso(params: SeiExcluirProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "excluirProcesso",
@@ -814,6 +1175,17 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Exclui um documento.
+   *
+   * @remarks
+   * Operação destrutiva, sujeita às regras de exclusão do SEI (documento sem
+   * assinatura/tramitação, gerado pela própria unidade).
+   *
+   * @param params - Unidade e protocolo do documento.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async excluirDocumento(params: SeiExcluirDocumentoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "excluirDocumento",
@@ -825,6 +1197,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Disponibiliza um bloco para as unidades configuradas.
+   *
+   * @param params - Unidade e ID do bloco.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async disponibilizarBloco(params: SeiOperacaoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "disponibilizarBloco",
@@ -836,6 +1215,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Cancela a disponibilização de um bloco.
+   *
+   * @param params - Unidade e ID do bloco.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async cancelarDisponibilizacaoBloco(params: SeiOperacaoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "cancelarDisponibilizacaoBloco",
@@ -847,6 +1233,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Conclui um bloco.
+   *
+   * @param params - Unidade e ID do bloco.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async concluirBloco(params: SeiOperacaoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "concluirBloco",
@@ -858,6 +1251,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Reabre um bloco concluído.
+   *
+   * @param params - Unidade e ID do bloco.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async reabrirBloco(params: SeiOperacaoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "reabrirBloco",
@@ -869,6 +1269,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Devolve um bloco recebido à unidade de origem.
+   *
+   * @param params - Unidade e ID do bloco.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async devolverBloco(params: SeiOperacaoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "devolverBloco",
@@ -886,6 +1293,10 @@ export class SeiOperacoesClient {
    * @remarks
    * Validado em HML com bloco de assinatura (`Tipo=A`). Essa compatibilidade não
    * se aplica automaticamente a processos.
+   *
+   * @param params - Unidade, ID do bloco, protocolo do documento e anotação.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
    */
   async incluirDocumentoBloco(params: SeiIncluirDocumentoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
@@ -905,6 +1316,10 @@ export class SeiOperacoesClient {
    *
    * @remarks
    * Validado em HML com bloco de assinatura (`Tipo=A`).
+   *
+   * @param params - Unidade, ID do bloco e protocolo do documento.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
    */
   async retirarDocumentoBloco(params: SeiRetirarDocumentoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
@@ -923,7 +1338,11 @@ export class SeiOperacoesClient {
    *
    * @remarks
    * Não use bloco de assinatura (`Tipo=A`) para processo: o SEI rejeita essa
-   * combinação. Em HML, o fluxo foi validado com bloco interno.
+   * combinação. Em HML, o fluxo foi validado com bloco interno (`Tipo=I`).
+   *
+   * @param params - Unidade, ID do bloco, protocolo do processo e anotação.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
    */
   async incluirProcessoBloco(params: SeiIncluirProcessoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
@@ -943,7 +1362,11 @@ export class SeiOperacoesClient {
    *
    * @remarks
    * Deve ser usado com bloco compatível com processos. Em HML, o par
-   * incluir/retirar processo foi validado com bloco interno.
+   * incluir/retirar processo foi validado com bloco interno (`Tipo=I`).
+   *
+   * @param params - Unidade, ID do bloco e protocolo do processo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
    */
   async retirarProcessoBloco(params: SeiRetirarProcessoBlocoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
@@ -957,6 +1380,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Reabre um processo concluído na unidade.
+   *
+   * @param params - Unidade e protocolo do processo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async reabrirProcesso(params: SeiOperacaoProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "reabrirProcesso",
@@ -968,6 +1398,13 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Conclui um processo na unidade.
+   *
+   * @param params - Unidade e protocolo do processo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async concluirProcesso(params: SeiOperacaoProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "concluirProcesso",
@@ -979,6 +1416,29 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Tramita um processo para uma ou mais unidades.
+   *
+   * @remarks
+   * Por padrão o processo é fechado na unidade de origem; use
+   * `sinManterAbertoUnidade: "S"` para mantê-lo aberto. Também suporta retorno
+   * programado por data ou prazo em dias.
+   *
+   * @param params - Unidade de origem, protocolo, unidades de destino e opções
+   *   de tramitação.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @example
+   * ```ts
+   * await sei.operacoes.enviarProcesso({
+   *   idUnidade: "110000001",
+   *   protocoloProcedimento: "00000.000001/2026-01",
+   *   unidadesDestino: ["110000002"],
+   *   sinManterAbertoUnidade: "S",
+   * })
+   * ```
+   */
   async enviarProcesso(params: SeiEnviarProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "enviarProcesso",
@@ -1002,6 +1462,14 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Atribui um processo a um usuário da unidade.
+   *
+   * @param params - Unidade, protocolo do processo, ID do usuário e opção de
+   *   reabertura.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async atribuirProcesso(params: SeiAtribuirProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "atribuirProcesso",
@@ -1015,6 +1483,14 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Registra um andamento (histórico) em um processo.
+   *
+   * @param params - Unidade, protocolo do processo, tarefa e atributos do
+   *   andamento.
+   * @returns O andamento registrado, ou `null` quando o SEI não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async lancarAndamento(params: SeiLancarAndamentoParams): Promise<SeiAndamento | null> {
     const payload = await callSeiSoap(this.config, {
       operation: "lancarAndamento",
@@ -1037,6 +1513,15 @@ export class SeiOperacoesClient {
     return mapAndamento(payload)
   }
 
+  /**
+   * Bloqueia um processo na unidade.
+   *
+   * @param params - Unidade e protocolo do processo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link desbloquearProcesso}
+   */
   async bloquearProcesso(params: SeiOperacaoProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "bloquearProcesso",
@@ -1048,6 +1533,15 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Desbloqueia um processo bloqueado na unidade.
+   *
+   * @param params - Unidade e protocolo do processo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link bloquearProcesso}
+   */
   async desbloquearProcesso(params: SeiOperacaoProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "desbloquearProcesso",
@@ -1059,6 +1553,15 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Relaciona dois processos entre si.
+   *
+   * @param params - Unidade e os dois protocolos a relacionar.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link removerRelacionamentoProcesso}
+   */
   async relacionarProcesso(params: SeiRelacionarProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "relacionarProcesso",
@@ -1071,6 +1574,15 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Remove o relacionamento entre dois processos.
+   *
+   * @param params - Unidade e os dois protocolos relacionados.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link relacionarProcesso}
+   */
   async removerRelacionamentoProcesso(params: SeiRelacionarProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "removerRelacionamentoProcesso",
@@ -1083,6 +1595,16 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Sobresta (suspende) um processo, opcionalmente vinculado a outro processo.
+   *
+   * @param params - Unidade, protocolo do processo, processo vinculado
+   *   (opcional) e motivo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link removerSobrestamentoProcesso}
+   */
   async sobrestarProcesso(params: SeiSobrestarProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "sobrestarProcesso",
@@ -1096,6 +1618,15 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Remove o sobrestamento de um processo.
+   *
+   * @param params - Unidade e protocolo do processo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link sobrestarProcesso}
+   */
   async removerSobrestamentoProcesso(params: SeiOperacaoProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "removerSobrestamentoProcesso",
@@ -1107,6 +1638,15 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Anexa um processo a outro (o anexado passa a tramitar junto ao principal).
+   *
+   * @param params - Unidade, protocolo do processo principal e do anexado.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link desanexarProcesso}
+   */
   async anexarProcesso(params: SeiAnexarProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "anexarProcesso",
@@ -1119,6 +1659,15 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Desanexa um processo previamente anexado, registrando o motivo.
+   *
+   * @param params - Unidade, protocolos principal e anexado, e motivo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link anexarProcesso}
+   */
   async desanexarProcesso(params: SeiDesanexarProcessoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "desanexarProcesso",
@@ -1132,6 +1681,20 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Define marcadores em processos, em lote.
+   *
+   * @remarks
+   * O Web Service do SEI não expõe operação par de remoção/cancelamento de
+   * marcador — cada definição registra um andamento de marcador no processo.
+   *
+   * @param params - Unidade e lista de definições (protocolo, marcador, texto).
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link SeiConsultasClient.listarMarcadoresUnidade}
+   * @see {@link SeiConsultasClient.listarAndamentosMarcadores}
+   */
   async definirMarcador(params: SeiDefinirMarcadorParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "definirMarcador",
@@ -1151,6 +1714,18 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Define controle de prazo em processos, em lote.
+   *
+   * @remarks
+   * Para prazo absoluto informe `dataPrazo`; para prazo relativo informe
+   * `dias` e `sinDiasUteis`. O ciclo completo é fechado com
+   * {@link concluirControlePrazo} ou {@link removerControlePrazo}.
+   *
+   * @param params - Unidade e lista de definições de prazo.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async definirControlePrazo(params: SeiDefinirControlePrazoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "definirControlePrazo",
@@ -1171,6 +1746,15 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Conclui o controle de prazo dos processos informados.
+   *
+   * @param params - Unidade e protocolos dos processos.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link definirControlePrazo}
+   */
   async concluirControlePrazo(params: SeiControlePrazoProcessosParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "concluirControlePrazo",
@@ -1185,6 +1769,15 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Remove o controle de prazo dos processos informados.
+   *
+   * @param params - Unidade e protocolos dos processos.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link definirControlePrazo}
+   */
   async removerControlePrazo(params: SeiControlePrazoProcessosParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "removerControlePrazo",
@@ -1199,6 +1792,14 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Registra anotações (post-its) em processos, em lote.
+   *
+   * @param params - Unidade e lista de anotações (protocolo, descrição,
+   *   prioridade).
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async registrarAnotacao(params: SeiRegistrarAnotacaoParams): Promise<string> {
     const payload = await callSeiSoap(this.config, {
       operation: "registrarAnotacao",
@@ -1218,6 +1819,18 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Agenda a publicação de um documento em veículo de publicação.
+   *
+   * @remarks
+   * Em testes, prefira parear com {@link cancelarAgendamentoPublicacao} para
+   * limpar o agendamento criado.
+   *
+   * @param params - Unidade, documento, veículo, data de disponibilização e
+   *   dados de Imprensa Nacional quando aplicável.
+   * @returns Retorno textual do SEI (normalmente o ID do agendamento).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async agendarPublicacao(params: SeiAgendarPublicacaoParams): Promise<string> {
     const imprensa = params.imprensaNacional
     const payload = await callSeiSoap(this.config, {
@@ -1246,6 +1859,16 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Altera um agendamento de publicação existente.
+   *
+   * @param params - Unidade, identificação do agendamento (`idPublicacao`,
+   *   `idDocumento` ou `protocoloDocumento`) e novos dados.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link agendarPublicacao}
+   */
   async alterarPublicacao(params: SeiAlterarPublicacaoParams): Promise<string> {
     const imprensa = params.imprensaNacional
     const payload = await callSeiSoap(this.config, {
@@ -1275,6 +1898,16 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Cancela um agendamento de publicação.
+   *
+   * @param params - Unidade e identificação do agendamento (`idPublicacao`,
+   *   `idDocumento` ou `protocoloDocumento`).
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link agendarPublicacao}
+   */
   async cancelarAgendamentoPublicacao(
     params: SeiCancelarAgendamentoPublicacaoParams,
   ): Promise<string> {
@@ -1297,6 +1930,11 @@ export class SeiOperacoesClient {
    * Operação finalística e sem par simples de reversão no Web Service. No smoke
    * HML, a chamada fica protegida por `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1` e deve
    * ser executada apenas com roteiro explícito de publicação.
+   *
+   * @param params - Veículo, datas de disponibilização/publicação, número da
+   *   edição e IDs dos documentos.
+   * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
    */
   async confirmarDisponibilizacaoPublicacao(
     params: SeiConfirmarDisponibilizacaoPublicacaoParams,
@@ -1316,6 +1954,20 @@ export class SeiOperacoesClient {
     return stringReturn(payload)
   }
 
+  /**
+   * Envia um e-mail pelo SEI e gera o documento de e-mail correspondente no
+   * processo.
+   *
+   * @remarks
+   * A operação dispara e-mail real pelo servidor do SEI. Em ambientes de
+   * teste, use apenas destinatários controlados.
+   *
+   * @param params - Unidade, protocolo do processo, remetente/destinatários,
+   *   assunto, mensagem e documentos anexos.
+   * @returns Protocolo do documento de e-mail gerado, ou `null` quando o SEI
+   *   não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   */
   async enviarEmail(params: SeiEnviarEmailParams): Promise<SeiRetornoEnvioEmail | null> {
     const payload = await callSeiSoap(this.config, {
       operation: "enviarEmail",
@@ -1344,6 +1996,14 @@ export class SeiOperacoesClient {
    * a operação ficou bloqueada por configuração do ambiente com
    * `Tipo do Contato não informado.`, provavelmente relacionada ao parâmetro
    * `ID_TIPO_CONTATO_OUVIDORIA`.
+   *
+   * @param params - Órgão, dados do manifestante, tipo de procedimento,
+   *   mensagem, atributos adicionais e anexos.
+   * @returns Referência resumida ao processo criado, ou `null` quando o SEI
+   *   não retorna corpo.
+   * @throws {@link SeiSoapError} em caso de falha de comunicação ou SOAP Fault.
+   *
+   * @see {@link SeiConsultasClient.listarTiposProcedimentoOuvidoria}
    */
   async registrarOuvidoria(
     params: SeiRegistrarOuvidoriaParams,
@@ -1418,9 +2078,12 @@ export class SeiOperacoesClient {
  * @category Client
  */
 export class SeiClient {
+  /** Subclient para operações somente leitura (consultas e listagens). */
   readonly consultas: SeiConsultasClient
+  /** Subclient para operações que alteram estado no SEI. */
   readonly operacoes: SeiOperacoesClient
 
+  /** @param config - Configuração de conexão com o SEI. */
   constructor(config: SeiConfig) {
     this.consultas = new SeiConsultasClient(config)
     this.operacoes = new SeiOperacoesClient(config)
@@ -1428,134 +2091,163 @@ export class SeiClient {
 
   // ── Atalhos de consulta ──────────────────────────────────────────────────
 
+  /** Atalho para {@link SeiConsultasClient.listarUnidades | `consultas.listarUnidades`}. */
   listarUnidades(params: SeiListarUnidadesParams): Promise<SeiUnidade[]> {
     return this.consultas.listarUnidades(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarTiposProcedimento | `consultas.listarTiposProcedimento`}. */
   listarTiposProcedimento(
     params: SeiListarTiposProcedimentoParams,
   ): Promise<SeiTipoProcedimento[]> {
     return this.consultas.listarTiposProcedimento(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarTiposPrioridade | `consultas.listarTiposPrioridade`}. */
   listarTiposPrioridade(params: SeiListarTiposPrioridadeParams): Promise<SeiTipoPrioridade[]> {
     return this.consultas.listarTiposPrioridade(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarSeries | `consultas.listarSeries`}. */
   listarSeries(params: SeiListarSeriesParams): Promise<SeiSerie[]> {
     return this.consultas.listarSeries(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarContatos | `consultas.listarContatos`}. */
   listarContatos(params: SeiListarContatosParams): Promise<SeiContato[]> {
     return this.consultas.listarContatos(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.consultarProcedimento | `consultas.consultarProcedimento`}. */
   consultarProcedimento(
     params: SeiConsultarProcedimentoParams,
   ): Promise<SeiRetornoConsultaProcedimento | null> {
     return this.consultas.consultarProcedimento(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.consultarProcedimentoIndividual | `consultas.consultarProcedimentoIndividual`}. */
   consultarProcedimentoIndividual(
     params: SeiConsultarProcedimentoIndividualParams,
   ): Promise<SeiProcedimentoResumido | null> {
     return this.consultas.consultarProcedimentoIndividual(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.consultarDocumento | `consultas.consultarDocumento`}. */
   consultarDocumento(
     params: SeiConsultarDocumentoParams,
   ): Promise<SeiRetornoConsultaDocumento | null> {
     return this.consultas.consultarDocumento(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.consultarBloco | `consultas.consultarBloco`}. */
   consultarBloco(params: SeiConsultarBlocoParams): Promise<SeiRetornoConsultaBloco | null> {
     return this.consultas.consultarBloco(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarExtensoesPermitidas | `consultas.listarExtensoesPermitidas`}. */
   listarExtensoesPermitidas(
     params: SeiListarExtensoesPermitidasParams,
   ): Promise<SeiArquivoExtensao[]> {
     return this.consultas.listarExtensoesPermitidas(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarUsuarios | `consultas.listarUsuarios`}. */
   listarUsuarios(params: SeiListarUsuariosParams): Promise<SeiUsuario[]> {
     return this.consultas.listarUsuarios(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarHipotesesLegais | `consultas.listarHipotesesLegais`}. */
   listarHipotesesLegais(params: SeiListarHipotesesLegaisParams): Promise<SeiHipoteseLegal[]> {
     return this.consultas.listarHipotesesLegais(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarTiposConferencia | `consultas.listarTiposConferencia`}. */
   listarTiposConferencia(params: SeiListarTiposConferenciaParams): Promise<SeiTipoConferencia[]> {
     return this.consultas.listarTiposConferencia(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarPaises | `consultas.listarPaises`}. */
   listarPaises(params: SeiListarPaisesParams): Promise<SeiPais[]> {
     return this.consultas.listarPaises(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarEstados | `consultas.listarEstados`}. */
   listarEstados(params: SeiListarEstadosParams): Promise<SeiEstado[]> {
     return this.consultas.listarEstados(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarCidades | `consultas.listarCidades`}. */
   listarCidades(params: SeiListarCidadesParams): Promise<SeiCidade[]> {
     return this.consultas.listarCidades(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarTiposProcedimentoOuvidoria | `consultas.listarTiposProcedimentoOuvidoria`}. */
   listarTiposProcedimentoOuvidoria(): Promise<SeiTipoProcedimento[]> {
     return this.consultas.listarTiposProcedimentoOuvidoria()
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarCargos | `consultas.listarCargos`}. */
   listarCargos(params: SeiListarCargosParams): Promise<SeiCargo[]> {
     return this.consultas.listarCargos(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarAndamentos | `consultas.listarAndamentos`}. */
   listarAndamentos(params: SeiListarAndamentosParams): Promise<SeiAndamento[]> {
     return this.consultas.listarAndamentos(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarMarcadoresUnidade | `consultas.listarMarcadoresUnidade`}. */
   listarMarcadoresUnidade(params: SeiListarMarcadoresUnidadeParams): Promise<SeiMarcador[]> {
     return this.consultas.listarMarcadoresUnidade(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.consultarPublicacao | `consultas.consultarPublicacao`}. */
   consultarPublicacao(
     params: SeiConsultarPublicacaoParams,
   ): Promise<SeiRetornoConsultaPublicacao | null> {
     return this.consultas.consultarPublicacao(params)
   }
 
+  /** Atalho para {@link SeiConsultasClient.listarFeriados | `consultas.listarFeriados`}. */
   listarFeriados(params: SeiListarFeriadosParams): Promise<SeiFeriado[]> {
     return this.consultas.listarFeriados(params)
   }
 
   // ── Atalhos de operação ──────────────────────────────────────────────────
 
+  /** Atalho para {@link SeiOperacoesClient.gerarProcedimento | `operacoes.gerarProcedimento`}. */
   gerarProcedimento(
     params: SeiGerarProcedimentoParams,
   ): Promise<SeiRetornoGeracaoProcedimento | null> {
     return this.operacoes.gerarProcedimento(params)
   }
 
+  /** Atalho para {@link SeiOperacoesClient.incluirDocumento | `operacoes.incluirDocumento`}. */
   incluirDocumento(params: SeiIncluirDocumentoParams): Promise<SeiRetornoInclusaoDocumento | null> {
     return this.operacoes.incluirDocumento(params)
   }
 
+  /** Atalho para {@link SeiOperacoesClient.enviarProcesso | `operacoes.enviarProcesso`}. */
   enviarProcesso(params: SeiEnviarProcessoParams): Promise<string> {
     return this.operacoes.enviarProcesso(params)
   }
 
+  /** Atalho para {@link SeiOperacoesClient.concluirProcesso | `operacoes.concluirProcesso`}. */
   concluirProcesso(params: SeiOperacaoProcessoParams): Promise<string> {
     return this.operacoes.concluirProcesso(params)
   }
 
+  /** Atalho para {@link SeiOperacoesClient.reabrirProcesso | `operacoes.reabrirProcesso`}. */
   reabrirProcesso(params: SeiOperacaoProcessoParams): Promise<string> {
     return this.operacoes.reabrirProcesso(params)
   }
 
+  /** Atalho para {@link SeiOperacoesClient.lancarAndamento | `operacoes.lancarAndamento`}. */
   lancarAndamento(params: SeiLancarAndamentoParams): Promise<SeiAndamento | null> {
     return this.operacoes.lancarAndamento(params)
   }
 
+  /** Atalho para {@link SeiOperacoesClient.enviarEmail | `operacoes.enviarEmail`}. */
   enviarEmail(params: SeiEnviarEmailParams): Promise<SeiRetornoEnvioEmail | null> {
     return this.operacoes.enviarEmail(params)
   }
