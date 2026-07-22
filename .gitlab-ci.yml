@@ -1,0 +1,150 @@
+# =====================================================================
+# GitLab CI/CD Pipeline - @anpdgovbr/sei-integrations (Monorepo)
+# =====================================================================
+
+# ==========================================
+# COMPONENTES DO CATÁLOGO
+# ==========================================
+include:
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-gitleaks@v6.3.1
+
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-node@v6.3.1
+    inputs:
+      project_type: "lib"
+      cache_node_modules_path: "node_modules/"
+
+  - component: gitlab.anpd.gov.br/publico/ci-templates/sonarqube@v6.3.1
+    inputs:
+      sonar_project_key: "anpd-sei-integrations"
+      integration_branch: "dev"
+      needs_job: "test"
+
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@v6.3.1
+    inputs:
+      project_type: "lib"
+      npm_scope: "@anpdgovbr"
+      release_mode: "global"
+      global_tag_prefix: "v"
+      require_protected_tag: "true"
+
+  - component: gitlab.anpd.gov.br/publico/ci-templates/pages-typedoc@v6.3.1
+    inputs:
+      project_type: "lib"
+
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/SAST-IaC.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+# ==========================================
+# VARIÁVEIS DO PROJETO
+# ==========================================
+variables:
+  INTEGRATION_BRANCH: "dev"
+  HOMOLOG_BRANCH: "main"
+  NPM_CONFIG_OPTIONAL: "true"
+  SECRET_DETECTION_ENABLED: "true"
+  BUILD_VALIDATION_SCRIPT: |
+    FAILED=""
+    for pkg in packages/*/; do
+      if [ -f "$pkg/package.json" ]; then
+        PKG=$(node -p "require('./$pkg/package.json').name")
+        if [ ! -d "$pkg/dist" ]; then
+          echo "dist ausente: $PKG"
+          FAILED="$FAILED $PKG"
+        else
+          echo "OK: $PKG"
+        fi
+      fi
+    done
+    [ -z "$FAILED" ] || { echo "Falha:$FAILED"; exit 1; }
+
+# ==========================================
+# WORKFLOW RULES
+# ==========================================
+workflow:
+  rules:
+    - if: "$CI_COMMIT_TAG"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $INTEGRATION_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == $HOMOLOG_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+    - when: never
+
+# ==========================================
+# STAGES
+# ==========================================
+stages:
+  - security
+  - install
+  - lint
+  - build
+  - test
+  - sonar
+  - deploy
+
+pages:
+  rules:
+    # Não publica se há changesets pendentes (aguarda bump)
+    - if: '$PROJECT_TYPE == "lib" && $CI_COMMIT_BRANCH == $HOMOLOG_BRANCH'
+      exists:
+        - .changeset/*.md
+      when: never
+    - if: '$PROJECT_TYPE != "lib" && $CI_COMMIT_BRANCH == $PRODUCTION_BRANCH'
+      exists:
+        - .changeset/*.md
+      when: never
+    # Libs publicam na homologacao (main)
+    - if: '$PROJECT_TYPE == "lib" && $CI_COMMIT_BRANCH == $HOMOLOG_BRANCH'
+      when: on_success
+    # Apps/APIs publicam na producao (stable)
+    - if: '$PROJECT_TYPE != "lib" && $CI_COMMIT_BRANCH == $PRODUCTION_BRANCH'
+      when: on_success
+    # Permite override manual
+    - if: '$PAGES_FORCE_DEPLOY == "true"'
+      when: on_success
+    - if: "$CI_COMMIT_BRANCH"
+      when: manual
+      allow_failure: true
+
+secret_detection:
+  stage: security
+
+# O template de lib executa o job de testes; neste monorepo exigimos cobertura
+# agregada no root para publicar junit/cobertura em um único diretório.
+test:
+  needs:
+    - job: install
+      optional: true
+    - job: build
+      artifacts: true
+  script:
+    - |
+      if needs_install; then
+        pnpm install --frozen-lockfile --prefer-offline
+      fi
+    - pnpm test:coverage
+    - |
+      COBERTURA_XML="coverage/cobertura-coverage.xml"
+      if [ ! -f "$COBERTURA_XML" ]; then
+        echo "⚠️ Cobertura XML não encontrado; coverage não será extraído"
+        exit 1
+      fi
+      LINE_RATE=$(grep -m1 -o 'line-rate="[^"]*"' "$COBERTURA_XML" | cut -d'"' -f2 || true)
+      if [ -z "$LINE_RATE" ]; then
+        echo "⚠️ Cobertura XML ilegível (line-rate ausente)"
+        exit 1
+      fi
+      PCT=$(awk "BEGIN {printf \"%.2f\", (${LINE_RATE})*100}")
+      echo "Total Coverage: ${PCT}%"
+  coverage: '/Total Coverage:\s+([\d\.]+)%/'
+  artifacts:
+    when: always
+    reports:
+      junit: coverage/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/
+    expire_in: 1 week

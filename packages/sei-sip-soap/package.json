@@ -1,0 +1,81 @@
+{
+  "name": "@anpdgovbr/sei-sip-soap",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "description": "Infraestrutura SOAP interna compartilhada entre sip-client e sei-client.",
+  "keywords": [
+    "anpd",
+    "sei",
+    "sip",
+    "soap",
+    "typescript"
+  ],
+  "license": "MIT",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rimraf dist coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fast-xml-parser": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "rimraf": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.anpd.gov.br"
+  },
+  "author": {
+    "name": "Luciano Édipo Pereira da Silva",
+    "email": "luciano.psilva@anpd.gov.br",
+    "url": "https://github.com/lucianoedipo"
+  },
+  "bugs": {
+    "url": "https://github.com/anpdgovbr/sei-integrations/issues",
+    "email": "desenvolvimento@anpd.gov.br"
+  },
+  "homepage": "https://github.com/anpdgovbr/sei-integrations#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anpdgovbr/sei-integrations.git",
+    "directory": "packages/sei-sip-soap"
+  },
+  "typedocOptions": {
+    "entryPoints": [
+      "src/index.ts"
+    ],
+    "entryPointStrategy": "resolve",
+    "readme": "none",
+    "categoryOrder": [
+      "Error Handling",
+      "SOAP Transport",
+      "SOAP Primitives",
+      "Configuration",
+      "Mapper Helpers",
+      "*"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+name: Reportar um bug
+description: Algo não está funcionando como esperado em um dos pacotes do monorepo.
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Pacote afetado
+      options:
+        - "@anpdgovbr/sip-client"
+        - "@anpdgovbr/sei-client"
+        - "@anpdgovbr/sei-sip-soap"
+        - Outro / não sei
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Versão do pacote
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do problema
+      description: O que aconteceu? O que você esperava que acontecesse?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Passos para reproduzir
+      description: |
+        Inclua um trecho de código mínimo, se possível. Não inclua chaves de
+        acesso, tokens ou dados reais de processos/documentos — use valores
+        fictícios ou anonimizados.
+      render: ts
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      placeholder: |
+        Node.js:
+        Sistema operacional:
+        Ambiente SEI/SIP (produção, homologação, versão do SEI, se souber):
+    validations:
+      required: false

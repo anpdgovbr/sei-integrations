@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write # necessário para o Trusted Publishing (OIDC) do npm
+
+jobs:
+  release:
+    name: Version / Publish (npmjs.org)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Atualizar npm (necessário para Trusted Publishing/OIDC)
+        run: npm install -g npm@latest
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Testes
+        run: pnpm test:coverage
+
+      # Enquanto houver changesets pendentes, esta action abre/atualiza uma PR
+      # "Version Packages" com o bump de versão e changelog. Quando a PR for
+      # mesclada em `main` (sem changesets pendentes), o passo seguinte publica
+      # os pacotes no registry público.
+      - name: Aplicar changesets pendentes (abre PR de versão)
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm changeset:version
+          commit: "chore: version packages"
+          title: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Publica via Trusted Publishing (OIDC): não usa NPM_TOKEN. É preciso
+      # configurar o "Trusted Publisher" de cada pacote em npmjs.com,
+      # apontando para este repositório e para este workflow
+      # (.github/workflows/release.yml).
+      - name: Publicar pacotes em registry.npmjs.org
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: pnpm release:npmjs

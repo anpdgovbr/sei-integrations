@@ -1,0 +1,110 @@
+{
+  "name": "@anpdgovbr/sei-client",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "description": "Cliente TypeScript para integração SOAP com o SEI (Sistema Eletrônico de Informações).",
+  "keywords": [
+    "anpd",
+    "sei",
+    "soap",
+    "typescript"
+  ],
+  "license": "MIT",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./mappers": {
+      "types": "./dist/mappers.d.ts",
+      "import": "./dist/mappers.js",
+      "require": "./dist/mappers.cjs"
+    },
+    "./soap": {
+      "types": "./dist/soap.d.ts",
+      "import": "./dist/soap.js",
+      "require": "./dist/soap.cjs"
+    },
+    "./encoding": {
+      "types": "./dist/encoding.d.ts",
+      "import": "./dist/encoding.js",
+      "require": "./dist/encoding.cjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup && cp README.md dist/",
+    "clean": "rimraf dist coverage",
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anpdgovbr/sei-sip-soap": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "rimraf": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.anpd.gov.br"
+  },
+  "sideEffects": false,
+  "author": {
+    "name": "Luciano Édipo Pereira da Silva",
+    "email": "luciano.psilva@anpd.gov.br",
+    "url": "https://github.com/lucianoedipo"
+  },
+  "bugs": {
+    "url": "https://github.com/anpdgovbr/sei-integrations/issues",
+    "email": "desenvolvimento@anpd.gov.br"
+  },
+  "homepage": "https://github.com/anpdgovbr/sei-integrations#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anpdgovbr/sei-integrations.git",
+    "directory": "packages/sei-client"
+  },
+  "typedocOptions": {
+    "entryPoints": [
+      "src/index.ts",
+      "src/mappers.ts"
+    ],
+    "entryPointStrategy": "resolve",
+    "categoryOrder": [
+      "Configuration",
+      "Client",
+      "Error Handling",
+      "SOAP Transport",
+      "Domain Entities",
+      "Return Types",
+      "Input Types",
+      "Operation Parameters",
+      "SOAP Primitives",
+      "Mappers",
+      "*"
+    ]
+  }
+}
