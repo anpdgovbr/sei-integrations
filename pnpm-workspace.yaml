@@ -6,7 +6,7 @@ allowBuilds:
   sonar-scanner: true
 
 catalog:
-  "@types/node": "^25.9.4"
+  "@types/node": "^26.1.1"
   "@vitest/coverage-v8": "^4.1.9"
   fast-xml-parser: "^5.9.3"
   rimraf: "^6.1.3"
