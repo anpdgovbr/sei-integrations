@@ -1,0 +1,30 @@
+name: Sugerir uma melhoria
+description: Sugerir uma nova funcionalidade ou operação SOAP ainda não coberta.
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Pacote relacionado
+      options:
+        - "@anpdgovbr/sip-client"
+        - "@anpdgovbr/sei-client"
+        - "@anpdgovbr/sei-sip-soap"
+        - Novo pacote / não sei
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Que problema isso resolveria?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+      description: Descreva a solução desejada. Se envolver uma operação SOAP específica do SEI/SIP, cite o nome da operação no WSDL.
+    validations:
+      required: false

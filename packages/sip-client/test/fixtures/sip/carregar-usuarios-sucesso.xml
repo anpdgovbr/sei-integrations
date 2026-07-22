@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="sipns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns2="http://xml.apache.org/xml-soap" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <SOAP-ENV:Body>
+    <ns1:carregarUsuariosResponse>
+      <returnUsuarios xsi:type="ns2:Map">
+        <item>
+          <key xsi:type="xsd:int">100000103</key>
+          <value xsi:type="ns2:Map">
+            <item><key xsi:type="xsd:int">0</key><value xsi:type="xsd:string">100000103</value></item>
+            <item><key xsi:type="xsd:int">1</key><value xsi:nil="true"/></item>
+            <item><key xsi:type="xsd:int">2</key><value xsi:type="xsd:string">0</value></item>
+            <item><key xsi:type="xsd:int">3</key><value xsi:type="xsd:string">usuario.teste</value></item>
+            <item><key xsi:type="xsd:int">4</key><value xsi:type="xsd:string">Usuario Teste</value></item>
+            <item><key xsi:type="xsd:int">7</key><value xsi:nil="true"/></item>
+            <item><key xsi:type="xsd:int">8</key><value xsi:type="xsd:string">00000000000</value></item>
+            <item><key xsi:type="xsd:int">9</key><value xsi:type="xsd:string">usuario.teste@example.gov.br</value></item>
+            <item><key xsi:type="xsd:int">5</key><value xsi:type="xsd:string">S</value></item>
+            <item><key xsi:type="xsd:int">6</key><value SOAP-ENC:arrayType="xsd:ur-type[1]" xsi:type="SOAP-ENC:Array"><item xsi:type="xsd:string">110000068</item></value></item>
+          </value>
+        </item>
+      </returnUsuarios>
+    </ns1:carregarUsuariosResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

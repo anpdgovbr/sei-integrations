@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Reportar vulnerabilidade de segurança
+    url: https://github.com/anpdgovbr/sei-integrations/security/advisories/new
+    about: Não abra issues públicas para vulnerabilidades. Use o GitHub Security Advisories ou veja SECURITY.md.

@@ -1,0 +1,76 @@
+{
+  "name": "sei-integrations-monorepo",
+  "private": true,
+  "type": "module",
+  "description": "Monorepo de clientes TypeScript para integrações SEI e SIP da ANPD.",
+  "license": "MIT",
+  "author": {
+    "name": "Luciano Édipo Pereira da Silva",
+    "email": "luciano.psilva@anpd.gov.br",
+    "url": "https://github.com/lucianoedipo"
+  },
+  "bugs": {
+    "url": "https://github.com/anpdgovbr/sei-integrations/issues",
+    "email": "desenvolvimento@anpd.gov.br"
+  },
+  "homepage": "https://github.com/anpdgovbr/sei-integrations#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anpdgovbr/sei-integrations.git"
+  },
+  "packageManager": "pnpm@11.11.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r --sort --if-present build",
+    "clean": "pnpm -r --if-present clean",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "pnpm -r --if-present test",
+    "test:coverage": "pnpm build && pnpm exec vitest run --config vitest.workspace.config.ts --coverage",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "docs": "typedoc",
+    "sonar": "set -a && [ -f .env ] && . ./.env; set +a; sonar-scanner -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.token=$SONAR_TOKEN -Dsonar.projectVersion=$(node -p \"require('./packages/sip-client/package.json').version\")",
+    "sonar:scan": "pnpm test:coverage && pnpm sonar",
+    "smoke:sip": "tsx scripts/smoke-sip.ts",
+    "smoke:sei": "tsx scripts/smoke-sei.ts",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "publish:sei-sip-soap": "pnpm --filter @anpdgovbr/sei-sip-soap publish --access public",
+    "publish:sip": "pnpm --filter @anpdgovbr/sip-client publish --access public",
+    "publish:sei": "pnpm --filter @anpdgovbr/sei-client publish --access public",
+    "publish:sei-sip-soap:npmjs": "pnpm --filter @anpdgovbr/sei-sip-soap publish --access public --registry https://registry.npmjs.org --no-git-checks",
+    "publish:sip:npmjs": "pnpm --filter @anpdgovbr/sip-client publish --access public --registry https://registry.npmjs.org --no-git-checks",
+    "publish:sei:npmjs": "pnpm --filter @anpdgovbr/sei-client publish --access public --registry https://registry.npmjs.org --no-git-checks",
+    "release:npmjs": "node scripts/release-npmjs.mjs",
+    "coverage:report": "pnpm run test:coverage && pnpm run coverage:merge"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.31.0",
+    "@eslint/js": "^9.39.5",
+    "@types/node": "catalog:",
+    "@typescript-eslint/eslint-plugin": "^8.63.0",
+    "@typescript-eslint/parser": "^8.63.0",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "^9.39.5",
+    "fast-xml-parser": "catalog:",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.5",
+    "rimraf": "catalog:",
+    "sonar-scanner": "catalog:",
+    "tsup": "catalog:",
+    "tsx": "catalog:",
+    "typedoc": "catalog:",
+    "typedoc-plugin-mdn-links": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "^8.63.0",
+    "vitest": "catalog:"
+  }
+}
