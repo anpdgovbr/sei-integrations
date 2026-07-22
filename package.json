@@ -10,15 +10,15 @@
     "url": "https://github.com/lucianoedipo"
   },
   "bugs": {
-    "url": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/issues",
+    "url": "https://github.com/anpdgovbr/sei-integrations/issues",
     "email": "desenvolvimento@anpd.gov.br"
   },
-  "homepage": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations#readme",
+  "homepage": "https://github.com/anpdgovbr/sei-integrations#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.anpd.gov.br/publico/libs/sei-integrations.git"
+    "url": "git+https://github.com/anpdgovbr/sei-integrations.git"
   },
-  "packageManager": "pnpm@11.11.0",
+  "packageManager": "pnpm@11.16.0+sha512.b767e9a98fc87aec0f42daefcd0e84941c2cdb45d73c4e1e68860fb2bdfdbe032ab592105479e5e05c237f740c8a5ffdbbb52385797ddc2296745a1bbb883e8d",
   "engines": {
     "node": ">=22.0.0",
     "pnpm": ">=10.0.0"
@@ -46,19 +46,23 @@
     "publish:sei-sip-soap": "pnpm --filter @anpdgovbr/sei-sip-soap publish --access public",
     "publish:sip": "pnpm --filter @anpdgovbr/sip-client publish --access public",
     "publish:sei": "pnpm --filter @anpdgovbr/sei-client publish --access public",
+    "publish:sei-sip-soap:npmjs": "pnpm --filter @anpdgovbr/sei-sip-soap publish --access public --registry https://registry.npmjs.org --no-git-checks",
+    "publish:sip:npmjs": "pnpm --filter @anpdgovbr/sip-client publish --access public --registry https://registry.npmjs.org --no-git-checks",
+    "publish:sei:npmjs": "pnpm --filter @anpdgovbr/sei-client publish --access public --registry https://registry.npmjs.org --no-git-checks",
+    "release:npmjs": "node scripts/release-npmjs.mjs",
     "coverage:report": "pnpm run test:coverage && pnpm run coverage:merge"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
+    "@changesets/cli": "^2.31.1",
     "@eslint/js": "^9.39.5",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "^8.63.0",
-    "@typescript-eslint/parser": "^8.63.0",
+    "@typescript-eslint/eslint-plugin": "^8.65.0",
+    "@typescript-eslint/parser": "^8.65.0",
     "@vitest/coverage-v8": "catalog:",
     "eslint": "^9.39.5",
     "fast-xml-parser": "catalog:",
     "globals": "^17.7.0",
-    "prettier": "^3.9.5",
+    "prettier": "^3.9.6",
     "rimraf": "catalog:",
     "sonar-scanner": "catalog:",
     "tsup": "catalog:",
@@ -66,7 +70,7 @@
     "typedoc": "catalog:",
     "typedoc-plugin-mdn-links": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.63.0",
+    "typescript-eslint": "^8.65.0",
     "vitest": "catalog:"
   }
 }

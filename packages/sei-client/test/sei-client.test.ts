@@ -833,7 +833,7 @@ describe("SeiClient", () => {
           sei.operacoes.enviarEmail({
             idUnidade: "110000036",
             protocoloProcedimento: "00261.000004/2026-64",
-            para: "lucianoedipo@gmail.com",
+            para: "destinatario.teste@example.gov.br",
             assunto: "Teste",
             mensagem: "Mensagem",
           }),

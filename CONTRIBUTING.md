@@ -1,7 +1,7 @@
 # Contribuindo
 
-Este repositório interno reúne bibliotecas TypeScript para integrações SEI/SIP
-da ANPD.
+Este repositório reúne bibliotecas TypeScript para integrações SEI/SIP da
+ANPD.
 
 ## Fluxo de trabalho
 
@@ -10,12 +10,12 @@ da ANPD.
 3. Atualize documentação quando houver mudança de API, configuração ou
    comportamento.
 4. Inclua changeset para alterações publicáveis.
-5. Abra MR de `dev` para `main` para validar o pipeline completo antes da
-   publicação.
+5. Abra Pull Request para `dev`. A validação completa do pipeline acontece na
+   promoção de `dev` para `main`.
 
 ## Qualidade
 
-Antes de submeter um MR, execute:
+Antes de submeter um Pull Request, execute:
 
 ```bash
 pnpm format:check
@@ -44,11 +44,14 @@ compatíveis e `major` para breaking changes.
 - Manter `.env` local ignorado.
 - Usar `.env.example` apenas com valores vazios ou exemplos não sensíveis.
 - Chaves de acesso SIP devem existir apenas em contexto server-side.
+- Vulnerabilidades devem ser reportadas conforme [SECURITY.md](.github/SECURITY.md),
+  não em issues públicas.
 
 ## Documentação
 
 - `README.md`: visão geral do monorepo.
 - `doc/sip-client.md`: guia de uso do cliente SIP.
-- `doc/desenvolvimento.md`: decisões de desenvolvimento, fixtures e smoke HML.
-- `doc/sei-sip-inconsistencias-para-dev-sei.md`: evidências para avaliação da
-  equipe SEI/SIP.
+- `doc/sei-client.md`: guia de uso do cliente SEI.
+- `doc/sip-contrato-wsdl.md`: mapeamento da API pública ao contrato WSDL do SIP.
+- `doc/migracao-consumidores.md`: passo a passo para adotar os pacotes em uma
+  aplicação consumidora.

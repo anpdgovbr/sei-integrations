@@ -3,10 +3,8 @@
 Este documento mapeia a API pública do `@anpdgovbr/sip-client` para o WSDL e o
 código-fonte do SIP 5.0.4.
 
-Fontes usadas:
-
-- `/home/luciano/anpdgovbr/sei/src/sip/web/ws/sip.wsdl`
-- `/home/luciano/anpdgovbr/sei/src/sip/web/ws/SipWS.php`
+Fontes usadas: WSDL público do serviço (`sip/web/ws/sip.wsdl`) e código-fonte
+de referência do SIP (`sip/web/ws/SipWS.php`) da versão 5.0.4.
 
 ## Endpoint e SOAP
 
@@ -95,7 +93,7 @@ Essas operações envolvem SSO, autenticação, histórico de acesso ou coordena
 de perfil. Elas devem ser avaliadas separadamente antes de entrar na API
 pública.
 
-## Validação de carregarUsuarios em HML
+## Validação de carregarUsuarios
 
 O contrato implementado para `carregarUsuarios` usa a mesma ordem e os mesmos
 nomes do WSDL:
@@ -110,16 +108,14 @@ nomes do WSDL:
 8. `IdOrigemUsuario`
 9. `SiglaUsuario`
 
-Em HML, a operação foi validada com `IdSistema=100000100` após ajuste de dados
-de hierarquia/permissões da instância. O cliente também possui fixture real
-anonimizada de sucesso para `carregarUsuarios` e fixture real anonimizada de
-SOAP Fault de autorização quando o serviço `Pesquisa de Usuários` não está
-liberado para o sistema consumidor.
+O cliente possui fixture real anonimizada de sucesso para `carregarUsuarios` e
+fixture real anonimizada de SOAP Fault de autorização quando o serviço
+`Pesquisa de Usuários` não está liberado para o sistema consumidor.
 
-Uma falha anterior em HML apontou para `PermissaoBD.php:414`, no acesso a
-`getArrUnidadesInferiores()` sobre item ausente na hierarquia. A hipótese
-confirmada pela revalidação foi dado/permissão inconsistente na instância:
-permissão com `sin_subunidades='S'` apontando para unidade fora da hierarquia
-ativa do sistema. Esse caso está registrado no documento de inconsistências
-como comportamento interno relevante do SIP, não como erro de serialização do
-cliente TypeScript.
+Observação de comportamento do serviço: se houver permissão com
+`sin_subunidades='S'` apontando para uma unidade fora da hierarquia ativa do
+sistema, o SIP responde com SOAP Fault genérico (HTTP 500) em vez de uma
+mensagem diagnóstica. Isso é comportamento interno do serviço, não erro de
+serialização do `sip-client`; se a operação retornar Fault inesperado, vale
+conferir o cadastro de hierarquia/permissão do sistema integrador antes de
+investigar o cliente.

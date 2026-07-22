@@ -1,6 +1,6 @@
 # @anpdgovbr/sip-client
 
-[![npm.anpd.gov.br](https://img.shields.io/badge/npm.anpd.gov.br-1.0.0-CB3837?logo=npm&logoColor=white)](https://npm.anpd.gov.br)
+[![npm](https://img.shields.io/npm/v/%40anpdgovbr%2Fsip-client)](https://www.npmjs.com/package/@anpdgovbr/sip-client)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](package.json)
 [![module](https://img.shields.io/badge/module-ESM%20%2B%20CJS-yellow.svg)](package.json)
@@ -30,7 +30,7 @@ pnpm add @anpdgovbr/sip-client
 import { createSipClient } from "@anpdgovbr/sip-client"
 
 const sip = createSipClient({
-  endpointUrl: "https://sei.anpd.gov.br/sip/ws/SipWS.php",
+  endpointUrl: "https://sei.orgao.gov.br/sip/ws/SipWS.php",
   accessKey: process.env.SIP_ACCESS_KEY!,
   systemId: "100000100",
   requestTimeoutMs: 30_000,
@@ -77,6 +77,6 @@ const usuario = await sip.consultas.buscarUsuarioPorSigla("usuario.exemplo")
 
 ## Documentação
 
-- Repositório: [`gitlab.anpd.gov.br/publico/libs/sei-integrations`](https://gitlab.anpd.gov.br/publico/libs/sei-integrations)
+- Repositório: [`github.com/anpdgovbr/sei-integrations`](https://github.com/anpdgovbr/sei-integrations)
 - Guia completo: [`doc/sip-client.md`](../../doc/sip-client.md)
 - Contrato WSDL/API pública: [`doc/sip-contrato-wsdl.md`](../../doc/sip-contrato-wsdl.md)

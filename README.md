@@ -1,14 +1,15 @@
 # @anpdgovbr/sei-integrations
 
-[![pipeline status](https://gitlab.anpd.gov.br/publico/libs/sei-integrations/badges/dev/pipeline.svg)](https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/commits/dev)
-[![coverage report](https://gitlab.anpd.gov.br/publico/libs/sei-integrations/badges/dev/coverage.svg)](https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/commits/dev)
+[![CI](https://github.com/anpdgovbr/sei-integrations/actions/workflows/ci.yml/badge.svg)](https://github.com/anpdgovbr/sei-integrations/actions/workflows/ci.yml)
+[![npm sip-client](https://img.shields.io/npm/v/%40anpdgovbr%2Fsip-client?label=sip-client)](https://www.npmjs.com/package/@anpdgovbr/sip-client)
+[![npm sei-client](https://img.shields.io/npm/v/%40anpdgovbr%2Fsei-client?label=sei-client)](https://www.npmjs.com/package/@anpdgovbr/sei-client)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](package.json)
 [![pnpm](https://img.shields.io/badge/pnpm-%3E%3D10-F69220?logo=pnpm&logoColor=white)](pnpm-workspace.yaml)
 [![typescript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](tsconfig.base.json)
 
-Monorepo interno de bibliotecas TypeScript para integrações com **SIP** e
-**SEI**. Os pacotes são desenhados para reuso entre aplicações, sem
+Monorepo de bibliotecas TypeScript para integrações com **SIP** e **SEI**,
+mantido pela ANPD. Os pacotes são desenhados para reuso entre aplicações, sem
 dependência de frameworks, bancos de dados, autorização, UI ou runtime
 específico.
 
@@ -20,6 +21,8 @@ específico.
 - [Desenvolvimento](#desenvolvimento)
 - [Documentação](#documentação)
 - [CI/CD e ferramental](#cicd-e-ferramental)
+- [Segurança](#segurança)
+- [Contribuindo](#contribuindo)
 
 ## Pacotes
 
@@ -76,35 +79,42 @@ pnpm test:coverage
 pnpm build
 ```
 
-Notas de desenvolvimento, fixtures de contrato e próximos passos ficam em
-[doc/desenvolvimento.md](doc/desenvolvimento.md).
-
 ## Documentação
 
-| Documento                                                                | Conteúdo                                   |
-| ------------------------------------------------------------------------ | ------------------------------------------ |
-| [Guia do sip-client](doc/sip-client.md)                                  | Uso detalhado do cliente SIP               |
-| [Guia do sei-client](doc/sei-client.md)                                  | Uso detalhado do cliente SEI               |
-| [Contrato SIP WSDL](doc/sip-contrato-wsdl.md)                            | Contrato público do webservice             |
-| [Migração de consumidores](doc/migracao-consumidores.md)                 | Passo a passo de adoção do pacote          |
-| [Inconsistências SEI × SIP](doc/sei-sip-inconsistencias-para-dev-sei.md) | Divergências relevantes para o time do SEI |
+| Documento                                                | Conteúdo                          |
+| -------------------------------------------------------- | --------------------------------- |
+| [Guia do sip-client](doc/sip-client.md)                  | Uso detalhado do cliente SIP      |
+| [Guia do sei-client](doc/sei-client.md)                  | Uso detalhado do cliente SEI      |
+| [Contrato SIP WSDL](doc/sip-contrato-wsdl.md)            | Contrato público do webservice    |
+| [Migração de consumidores](doc/migracao-consumidores.md) | Passo a passo de adoção do pacote |
 
 ## CI/CD e ferramental
 
-O repositório segue o padrão das bibliotecas internas ANPD:
-
 - branch de integração: `dev`;
 - branch de homologação/release: `main`;
-- registry interno: `https://npm.anpd.gov.br`;
-- CI por catálogo em [`.gitlab-ci.yml`](.gitlab-ci.yml): `ci-gitleaks`,
-  `ci-node`, `sonarqube`, `ci-changeset-monorepo` e `pages-typedoc`;
-- SonarQube via componente de catálogo `sonarqube@v6.3.0`, com projeto
-  definido em [`sonar-project.properties`](sonar-project.properties) e
-  `SONAR_HOST_URL`/`SONAR_TOKEN` definidos como variáveis de CI;
+- pacotes publicados em `npmjs.org` sob o escopo `@anpdgovbr`; a ANPD também
+  mantém um espelho interno em registry próprio para uso institucional;
+- CI em GitHub Actions: lint, typecheck, testes com cobertura, build e
+  verificação de changesets a cada push/PR
+  ([`ci.yml`](.github/workflows/ci.yml)), documentação de API publicada via
+  TypeDoc/GitHub Pages ([`docs.yml`](.github/workflows/docs.yml)) e release
+  automatizado por Changesets ([`release.yml`](.github/workflows/release.yml));
+- a ANPD mantém em paralelo um pipeline interno no GitLab
+  ([`.gitlab-ci.yml`](.gitlab-ci.yml)) com SonarQube, detecção de segredos e
+  publicação no registry institucional;
 - dependências base centralizadas no `catalog` do `pnpm-workspace.yaml`;
 - versionamento via [Changesets](https://github.com/changesets/changesets) em
   modo global entre os pacotes;
-- publicação manual por pacote com `pnpm publish:sip`, `pnpm publish:sei` e
-  `pnpm publish:sei-sip-soap`;
 - documentação de API gerada com TypeDoc via `pnpm run docs` (saída em
-  `docs/`, publicada pelo job `pages-typedoc`).
+  `docs/`).
+
+## Segurança
+
+Para relatar vulnerabilidades, siga as instruções em
+[SECURITY.md](.github/SECURITY.md). Não abra issues públicas para problemas de
+segurança.
+
+## Contribuindo
+
+Veja [CONTRIBUTING.md](CONTRIBUTING.md) para o fluxo de contribuição, padrões
+de commit e requisitos antes de abrir um Pull Request.

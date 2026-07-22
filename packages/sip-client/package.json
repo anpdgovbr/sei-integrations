@@ -77,13 +77,13 @@
     "url": "https://github.com/lucianoedipo"
   },
   "bugs": {
-    "url": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/issues",
+    "url": "https://github.com/anpdgovbr/sei-integrations/issues",
     "email": "desenvolvimento@anpd.gov.br"
   },
-  "homepage": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations#readme",
+  "homepage": "https://github.com/anpdgovbr/sei-integrations#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.anpd.gov.br/publico/libs/sei-integrations.git",
+    "url": "git+https://github.com/anpdgovbr/sei-integrations.git",
     "directory": "packages/sip-client"
   },
   "typedocOptions": {

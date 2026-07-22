@@ -9,9 +9,9 @@
   "hideGenerator": true,
   "searchInComments": true,
   "plugin": ["typedoc-plugin-mdn-links"],
-  "sourceLinkTemplate": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations/-/blob/{gitRevision}/{path}#L{line}",
+  "sourceLinkTemplate": "https://github.com/anpdgovbr/sei-integrations/blob/{gitRevision}/{path}#L{line}",
   "navigationLinks": {
-    "GitLab": "https://gitlab.anpd.gov.br/publico/libs/sei-integrations"
+    "GitHub": "https://github.com/anpdgovbr/sei-integrations"
   },
   "groupOrder": ["Classes", "Functions", "Type Aliases", "Interfaces", "Variables", "*"],
   "validation": {
