@@ -38,9 +38,9 @@ específico.
 | [`@anpdgovbr/sei-sip-soap`](packages/sei-sip-soap) | 🟢 publicado | Infraestrutura SOAP compartilhada pelos clientes (uso interno/base). |
 
 <details>
-<summary>Visão geral (diagrama)</summary>
+<summary>Identidade visual</summary>
 <p align="center">
-  <img src="assets/brand/diagrama-completo.png" alt="Diagrama SEI.SIP: integração, padrão, segurança, escalabilidade, agnóstica, modular, reutilizável" width="500">
+  <img src="assets/brand/identidade-visual.png" alt="Marca SEI.SIP: integração, padrão, segurança, escalabilidade, agnóstica, modular, reutilizável" width="500">
 </p>
 </details>
 
