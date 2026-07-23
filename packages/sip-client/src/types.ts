@@ -155,9 +155,13 @@ export type SipFiltroRecursosMenus = "N" | "R" | "M" | "T"
  * @category Entidades de Domínio
  */
 export type SipOrgao = Readonly<{
+  /** Identificador interno do órgão no SIP. */
   id: string
+  /** Sigla do órgão (ex.: `"ANPD"`). */
   sigla: string
+  /** Nome completo do órgão. */
   descricao: string
+  /** Indica se o órgão está ativo. */
   ativo: boolean
 }>
 
@@ -594,9 +598,12 @@ export type SipListarPermissoesParams = Readonly<{
  * Dados de um usuário a ser criado, atualizado ou removido via
  * `replicarUsuario`.
  *
+ * @experimental
  * @remarks
  * A operação `"E"` exige apenas `idOrigem` e `idOrgao`; os demais campos
  * são ignorados pelo SIP nesse caso.
+ *
+ * Ainda não validado de ponta a ponta contra um ambiente SIP real.
  *
  * @see {@link SipReplicacaoClient.replicarUsuarios}
  * @see {@link SipOperacaoReplicacaoUsuario}
@@ -607,7 +614,7 @@ export type SipReplicarUsuario = Readonly<{
   operacao: SipOperacaoReplicacaoUsuario
   /**
    * Identificador de origem do usuário no diretório externo
-   * (ex.: `"ad:luciano.psilva"`).
+   * (ex.: `"ad:joao.silva"`).
    */
   idOrigem: string
   /** Identificador do órgão do usuário no SIP. */
@@ -628,10 +635,13 @@ export type SipReplicarUsuario = Readonly<{
  * Dados de uma permissão a ser criada, alterada ou removida via
  * `replicarPermissao`.
  *
+ * @experimental
  * @remarks
  * Quando `idSistema` é omitido, o cliente usa o `systemId` da configuração.
  * Para a operação `"E"`, apenas `idUsuario`, `idUnidade` e `idPerfil` são
  * necessários; os demais campos são ignorados.
+ *
+ * Ainda não validado de ponta a ponta contra um ambiente SIP real.
  *
  * @see {@link SipReplicacaoClient.replicarPermissoes}
  * @see {@link SipOperacaoReplicacaoPermissao}

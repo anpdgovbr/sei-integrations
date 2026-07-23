@@ -462,10 +462,17 @@ export class SipConsultasClient {
  * do SGI. A tradução para `StaOperacao`, `SinSubunidades` e arrays SOAP fica
  * concentrada aqui.
  *
+ * @experimental
  * @remarks
  * Estas operações requerem que o sistema consumidor tenha os serviços de
  * replicação liberados explicitamente no SIP. Não solicite essas permissões
  * para integrações somente leitura.
+ *
+ * As três operações desta classe (`replicarUsuarios`, `replicarPermissoes` e
+ * `validarReplicacao`) ainda não foram validadas de ponta a ponta contra um
+ * ambiente SIP real — a suíte de smoke test do repositório cobre apenas as
+ * consultas ({@link SipConsultasClient}). Valide em homologação antes de usar
+ * em produção.
  *
  * Em aplicações que usam {@link SipClient}, acesse esta classe via
  * `sipClient.replicacao`.

@@ -1035,9 +1035,13 @@ export class SeiOperacoesClient {
   /**
    * Cancela um documento no processo, registrando o motivo.
    *
+   * @experimental
    * @remarks
    * Operação sensível e sem reversão simples pelo Web Service — o documento
    * permanece na árvore do processo com a tarja de cancelado.
+   *
+   * Esta operação ainda não foi validada de ponta a ponta contra um ambiente
+   * SEI real. Valide em homologação antes de usar em produção.
    *
    * @param params - Unidade, protocolo do documento e motivo do cancelamento.
    * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
@@ -1058,9 +1062,13 @@ export class SeiOperacoesClient {
   /**
    * Bloqueia um documento contra edição.
    *
+   * @experimental
    * @remarks
    * O Web Service do SEI não expõe, nesta lib, operação simétrica de
    * desbloqueio de documento — valide o fluxo com documento de teste.
+   *
+   * Esta operação ainda não foi validada de ponta a ponta contra um ambiente
+   * SEI real. Valide em homologação antes de usar em produção.
    *
    * @param params - Unidade e protocolo do documento.
    * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
@@ -1155,10 +1163,14 @@ export class SeiOperacoesClient {
   /**
    * Exclui um processo.
    *
+   * @experimental
    * @remarks
    * Operação destrutiva. O SEI só permite excluir processo sem andamentos
    * relevantes, gerado pela própria unidade — pensada para limpeza de massa
    * de teste/rascunho, não para descarte de processos reais.
+   *
+   * Esta operação ainda não foi validada de ponta a ponta contra um ambiente
+   * SEI real. Valide em homologação antes de usar em produção.
    *
    * @param params - Unidade e protocolo do processo.
    * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
@@ -1178,9 +1190,13 @@ export class SeiOperacoesClient {
   /**
    * Exclui um documento.
    *
+   * @experimental
    * @remarks
    * Operação destrutiva, sujeita às regras de exclusão do SEI (documento sem
    * assinatura/tramitação, gerado pela própria unidade).
+   *
+   * Esta operação ainda não foi validada de ponta a ponta contra um ambiente
+   * SEI real. Valide em homologação antes de usar em produção.
    *
    * @param params - Unidade e protocolo do documento.
    * @returns Retorno textual do SEI (normalmente `"1"` em caso de sucesso).
@@ -1419,10 +1435,15 @@ export class SeiOperacoesClient {
   /**
    * Tramita um processo para uma ou mais unidades.
    *
+   * @experimental
    * @remarks
    * Por padrão o processo é fechado na unidade de origem; use
    * `sinManterAbertoUnidade: "S"` para mantê-lo aberto. Também suporta retorno
    * programado por data ou prazo em dias.
+   *
+   * Esta operação ainda não foi validada de ponta a ponta contra um ambiente
+   * SEI real (apenas a serialização/desserialização foi verificada). Valide
+   * em homologação antes de usar em produção.
    *
    * @param params - Unidade de origem, protocolo, unidades de destino e opções
    *   de tramitação.
@@ -1464,6 +1485,11 @@ export class SeiOperacoesClient {
 
   /**
    * Atribui um processo a um usuário da unidade.
+   *
+   * @experimental
+   * @remarks
+   * Esta operação ainda não foi validada de ponta a ponta contra um ambiente
+   * SEI real. Valide em homologação antes de usar em produção.
    *
    * @param params - Unidade, protocolo do processo, ID do usuário e opção de
    *   reabertura.
@@ -1926,10 +1952,13 @@ export class SeiOperacoesClient {
   /**
    * Confirma a disponibilização/publicação de documentos em um veículo.
    *
+   * @experimental
    * @remarks
-   * Operação finalística e sem par simples de reversão no Web Service. No smoke
-   * HML, a chamada fica protegida por `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1` e deve
-   * ser executada apenas com roteiro explícito de publicação.
+   * Operação finalística e sem par simples de reversão no Web Service. Execute
+   * apenas com roteiro explícito de confirmação de publicação.
+   *
+   * Esta operação ainda não foi validada de ponta a ponta contra um ambiente
+   * SEI real. Valide em homologação antes de usar em produção.
    *
    * @param params - Veículo, datas de disponibilização/publicação, número da
    *   edição e IDs dos documentos.
@@ -1990,12 +2019,18 @@ export class SeiOperacoesClient {
   /**
    * Registra manifestação de ouvidoria no SEI.
    *
+   * @experimental
    * @remarks
    * A chamada serializa dados do manifestante, tipo de procedimento, mensagem,
-   * atributos adicionais e anexos. Em HML, o smoke comprovou chegada ao SEI, mas
-   * a operação ficou bloqueada por configuração do ambiente com
-   * `Tipo do Contato não informado.`, provavelmente relacionada ao parâmetro
-   * `ID_TIPO_CONTATO_OUVIDORIA`.
+   * atributos adicionais e anexos. Requer que o parâmetro
+   * `ID_TIPO_CONTATO_OUVIDORIA` esteja configurado na instalação do SEI;
+   * caso contrário, a operação pode falhar com um erro indicando tipo de
+   * contato não informado.
+   *
+   * Esta operação ainda não foi validada com sucesso de ponta a ponta contra
+   * um ambiente SEI real (a serialização chega ao serviço, mas a confirmação
+   * completa depende da configuração de ouvidoria da instalação). Valide em
+   * homologação antes de usar em produção.
    *
    * @param params - Órgão, dados do manifestante, tipo de procedimento,
    *   mensagem, atributos adicionais e anexos.

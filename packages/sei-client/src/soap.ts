@@ -48,7 +48,6 @@ const SEI_NS = { uri: "Sei", prefix: "sei", action: "SeiAction" } as const
 
 /**
  * Erro lançado quando uma chamada SOAP ao SEI falha.
- * @category Tratamento de Erros
  *
  * Pode representar três casos:
  * - **SOAP Fault** — o servidor retornou `<Fault>` (`status` é o HTTP real).
@@ -71,6 +70,7 @@ const SEI_NS = { uri: "Sei", prefix: "sei", action: "SeiAction" } as const
  * ```
  *
  * @see {@link callSeiSoap}
+ * @category Tratamento de Erros
  */
 export class SeiSoapError extends SoapError {
   constructor(message: string, operation: string, status: number, fault?: string) {
@@ -94,6 +94,8 @@ const makeSeiError = (
  * @param arrayType - Nome do tipo SOAP do array conforme o WSDL (ex.: `"ArrayOfUnidade"`).
  * @param itemType  - Nome do tipo SOAP de cada item (ex.: `"Unidade"`, `"xsd:string"`).
  * @param items     - Itens do array.
+ * @returns O {@link SeiSoapArrayValue} pronto para ser usado como parâmetro
+ *   em {@link SeiSoapCallOptions}.
  *
  * @see {@link SeiSoapArrayValue}
  * @see {@link buildSeiSoapEnvelope}

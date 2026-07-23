@@ -323,12 +323,22 @@ const mapPublicacaoOrNull = (value: SeiRawValue): SeiPublicacao | null => {
 
 /**
  * Converte o payload de `listarUnidades` em uma lista de {@link SeiUnidade}.
+ *
+ * @param value - Payload normalizado retornado por
+ *   {@link index!parseSeiSoapResponse | parseSeiSoapResponse} para a operação
+ *   `listarUnidades`.
+ * @returns Lista de unidades, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarUnidades | SeiConsultasClient.listarUnidades}
  * @category Mapeadores
  */
 export const mapUnidades = (value: SeiRawValue): SeiUnidade[] => mapItems(value, mapUnidadeFromMap)
 
 /**
  * Converte o payload de `listarTiposProcedimento` em lista de {@link SeiTipoProcedimento}.
+ *
+ * @param value - Payload normalizado para a operação `listarTiposProcedimento`.
+ * @returns Lista de tipos de procedimento, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarTiposProcedimento | SeiConsultasClient.listarTiposProcedimento}
  * @category Mapeadores
  */
 export const mapTiposProcedimento = (value: SeiRawValue): SeiTipoProcedimento[] =>
@@ -336,6 +346,10 @@ export const mapTiposProcedimento = (value: SeiRawValue): SeiTipoProcedimento[] 
 
 /**
  * Converte o payload de `listarTiposPrioridade` em lista de {@link SeiTipoPrioridade}.
+ *
+ * @param value - Payload normalizado para a operação `listarTiposPrioridade`.
+ * @returns Lista de tipos de prioridade, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarTiposPrioridade | SeiConsultasClient.listarTiposPrioridade}
  * @category Mapeadores
  */
 export const mapTiposPrioridade = (value: SeiRawValue): SeiTipoPrioridade[] =>
@@ -343,12 +357,20 @@ export const mapTiposPrioridade = (value: SeiRawValue): SeiTipoPrioridade[] =>
 
 /**
  * Converte o payload de `listarSeries` em lista de {@link SeiSerie}.
+ *
+ * @param value - Payload normalizado para a operação `listarSeries`.
+ * @returns Lista de séries documentais, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarSeries | SeiConsultasClient.listarSeries}
  * @category Mapeadores
  */
 export const mapSeries = (value: SeiRawValue): SeiSerie[] => mapItems(value, mapSerieFromMap)
 
 /**
  * Converte o payload de `listarContatos` em lista de {@link SeiContato}.
+ *
+ * @param value - Payload normalizado para a operação `listarContatos`.
+ * @returns Lista de contatos, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarContatos | SeiConsultasClient.listarContatos}
  * @category Mapeadores
  */
 export const mapContatos = (value: SeiRawValue): SeiContato[] =>
@@ -408,6 +430,10 @@ export const mapContatos = (value: SeiRawValue): SeiContato[] =>
 
 /**
  * Converte o payload de `listarExtensoesPermitidas` em lista de {@link SeiArquivoExtensao}.
+ *
+ * @param value - Payload normalizado para a operação `listarExtensoesPermitidas`.
+ * @returns Lista de extensões de arquivo aceitas, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarExtensoesPermitidas | SeiConsultasClient.listarExtensoesPermitidas}
  * @category Mapeadores
  */
 export const mapArquivosExtensao = (value: SeiRawValue): SeiArquivoExtensao[] =>
@@ -422,12 +448,20 @@ export const mapArquivosExtensao = (value: SeiRawValue): SeiArquivoExtensao[] =>
 
 /**
  * Converte o payload de `listarUsuarios` em lista de {@link SeiUsuario}.
+ *
+ * @param value - Payload normalizado para a operação `listarUsuarios`.
+ * @returns Lista de usuários, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarUsuarios | SeiConsultasClient.listarUsuarios}
  * @category Mapeadores
  */
 export const mapUsuarios = (value: SeiRawValue): SeiUsuario[] => mapItems(value, mapUsuarioFromMap)
 
 /**
  * Converte o payload de `listarHipotesesLegais` em lista de {@link SeiHipoteseLegal}.
+ *
+ * @param value - Payload normalizado para a operação `listarHipotesesLegais`.
+ * @returns Lista de hipóteses legais, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarHipotesesLegais | SeiConsultasClient.listarHipotesesLegais}
  * @category Mapeadores
  */
 export const mapHipotesesLegais = (value: SeiRawValue): SeiHipoteseLegal[] =>
@@ -440,6 +474,10 @@ export const mapHipotesesLegais = (value: SeiRawValue): SeiHipoteseLegal[] =>
 
 /**
  * Converte o payload de `listarTiposConferencia` em lista de {@link SeiTipoConferencia}.
+ *
+ * @param value - Payload normalizado para a operação `listarTiposConferencia`.
+ * @returns Lista de tipos de conferência, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarTiposConferencia | SeiConsultasClient.listarTiposConferencia}
  * @category Mapeadores
  */
 export const mapTiposConferencia = (value: SeiRawValue): SeiTipoConferencia[] =>
@@ -453,6 +491,10 @@ export const mapTiposConferencia = (value: SeiRawValue): SeiTipoConferencia[] =>
 
 /**
  * Converte o payload de `listarPaises` em lista de {@link SeiPais}.
+ *
+ * @param value - Payload normalizado para a operação `listarPaises`.
+ * @returns Lista de países, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarPaises | SeiConsultasClient.listarPaises}
  * @category Mapeadores
  */
 export const mapPaises = (value: SeiRawValue): SeiPais[] =>
@@ -463,6 +505,10 @@ export const mapPaises = (value: SeiRawValue): SeiPais[] =>
 
 /**
  * Converte o payload de `listarEstados` em lista de {@link SeiEstado}.
+ *
+ * @param value - Payload normalizado para a operação `listarEstados`.
+ * @returns Lista de estados, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarEstados | SeiConsultasClient.listarEstados}
  * @category Mapeadores
  */
 export const mapEstados = (value: SeiRawValue): SeiEstado[] =>
@@ -476,6 +522,10 @@ export const mapEstados = (value: SeiRawValue): SeiEstado[] =>
 
 /**
  * Converte o payload de `listarCidades` em lista de {@link SeiCidade}.
+ *
+ * @param value - Payload normalizado para a operação `listarCidades`.
+ * @returns Lista de cidades, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarCidades | SeiConsultasClient.listarCidades}
  * @category Mapeadores
  */
 export const mapCidades = (value: SeiRawValue): SeiCidade[] =>
@@ -492,6 +542,10 @@ export const mapCidades = (value: SeiRawValue): SeiCidade[] =>
 
 /**
  * Converte o payload de `listarCargos` em lista de {@link SeiCargo}.
+ *
+ * @param value - Payload normalizado para a operação `listarCargos`.
+ * @returns Lista de cargos, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarCargos | SeiConsultasClient.listarCargos}
  * @category Mapeadores
  */
 export const mapCargos = (value: SeiRawValue): SeiCargo[] =>
@@ -504,6 +558,10 @@ export const mapCargos = (value: SeiRawValue): SeiCargo[] =>
 
 /**
  * Converte o payload de `listarAndamentos` em lista de {@link SeiAndamento}.
+ *
+ * @param value - Payload normalizado para a operação `listarAndamentos`.
+ * @returns Lista de andamentos, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarAndamentos | SeiConsultasClient.listarAndamentos}
  * @category Mapeadores
  */
 export const mapAndamentos = (value: SeiRawValue): SeiAndamento[] =>
@@ -511,6 +569,10 @@ export const mapAndamentos = (value: SeiRawValue): SeiAndamento[] =>
 
 /**
  * Converte o payload de `listarMarcadoresUnidade` em lista de {@link SeiMarcador}.
+ *
+ * @param value - Payload normalizado para a operação `listarMarcadoresUnidade`.
+ * @returns Lista de marcadores da unidade, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarMarcadoresUnidade | SeiConsultasClient.listarMarcadoresUnidade}
  * @category Mapeadores
  */
 export const mapMarcadores = (value: SeiRawValue): SeiMarcador[] =>
@@ -523,6 +585,10 @@ export const mapMarcadores = (value: SeiRawValue): SeiMarcador[] =>
 
 /**
  * Converte o payload de `listarAndamentosMarcadores` em lista de {@link SeiAndamentoMarcador}.
+ *
+ * @param value - Payload normalizado para a operação `listarAndamentosMarcadores`.
+ * @returns Lista de andamentos com marcadores, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarAndamentosMarcadores | SeiConsultasClient.listarAndamentosMarcadores}
  * @category Mapeadores
  */
 export const mapAndamentosMarcadores = (value: SeiRawValue): SeiAndamentoMarcador[] =>
@@ -546,6 +612,10 @@ export const mapAndamentosMarcadores = (value: SeiRawValue): SeiAndamentoMarcado
 
 /**
  * Converte o payload de `listarFeriados` em lista de {@link SeiFeriado}.
+ *
+ * @param value - Payload normalizado para a operação `listarFeriados`.
+ * @returns Lista de feriados, possivelmente vazia.
+ * @see {@link index!SeiConsultasClient.listarFeriados | SeiConsultasClient.listarFeriados}
  * @category Mapeadores
  */
 export const mapFeriados = (value: SeiRawValue): SeiFeriado[] =>
@@ -556,6 +626,10 @@ export const mapFeriados = (value: SeiRawValue): SeiFeriado[] =>
 
 /**
  * Converte o payload de `gerarProcedimento` em {@link SeiRetornoGeracaoProcedimento}.
+ *
+ * @param value - Payload normalizado para a operação `gerarProcedimento`.
+ * @returns Os dados do processo criado, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiOperacoesClient.gerarProcedimento | SeiOperacoesClient.gerarProcedimento}
  * @category Mapeadores
  */
 export const mapRetornoGeracaoProcedimento = (
@@ -577,6 +651,10 @@ export const mapRetornoGeracaoProcedimento = (
 
 /**
  * Converte o payload de `incluirDocumento` em {@link SeiRetornoInclusaoDocumento}.
+ *
+ * @param value - Payload normalizado para a operação `incluirDocumento`.
+ * @returns Os dados do documento incluído, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiOperacoesClient.incluirDocumento | SeiOperacoesClient.incluirDocumento}
  * @category Mapeadores
  */
 export const mapRetornoInclusaoDocumento = (
@@ -590,6 +668,10 @@ export const mapRetornoInclusaoDocumento = (
 
 /**
  * Converte o payload de `consultarProcedimento` em {@link SeiRetornoConsultaProcedimento}.
+ *
+ * @param value - Payload normalizado para a operação `consultarProcedimento`.
+ * @returns Os dados completos do processo, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiConsultasClient.consultarProcedimento | SeiConsultasClient.consultarProcedimento}
  * @category Mapeadores
  */
 export const mapRetornoConsultaProcedimento = (
@@ -650,6 +732,10 @@ export const mapRetornoConsultaProcedimento = (
 
 /**
  * Converte o payload de `consultarProcedimentoIndividual` em {@link SeiProcedimentoResumido}.
+ *
+ * @param value - Payload normalizado para a operação `consultarProcedimentoIndividual`.
+ * @returns Os dados resumidos do processo, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiConsultasClient.consultarProcedimentoIndividual | SeiConsultasClient.consultarProcedimentoIndividual}
  * @category Mapeadores
  */
 export const mapProcedimentoResumido = (value: SeiRawValue): SeiProcedimentoResumido | null => {
@@ -661,6 +747,10 @@ export const mapProcedimentoResumido = (value: SeiRawValue): SeiProcedimentoResu
 
 /**
  * Converte o payload de `consultarDocumento` em {@link SeiRetornoConsultaDocumento}.
+ *
+ * @param value - Payload normalizado para a operação `consultarDocumento`.
+ * @returns Os dados completos do documento, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiConsultasClient.consultarDocumento | SeiConsultasClient.consultarDocumento}
  * @category Mapeadores
  */
 export const mapRetornoConsultaDocumento = (
@@ -700,6 +790,10 @@ export const mapRetornoConsultaDocumento = (
 
 /**
  * Converte o payload de `consultarBloco` em {@link SeiRetornoConsultaBloco}.
+ *
+ * @param value - Payload normalizado para a operação `consultarBloco`.
+ * @returns Os dados do bloco e seus protocolos, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiConsultasClient.consultarBloco | SeiConsultasClient.consultarBloco}
  * @category Mapeadores
  */
 export const mapRetornoConsultaBloco = (value: SeiRawValue): SeiRetornoConsultaBloco | null => {
@@ -723,12 +817,20 @@ export const mapRetornoConsultaBloco = (value: SeiRawValue): SeiRetornoConsultaB
 
 /**
  * Converte o payload de `lancarAndamento` em {@link SeiAndamento}.
+ *
+ * @param value - Payload normalizado para a operação `lancarAndamento`.
+ * @returns O andamento lançado, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiOperacoesClient.lancarAndamento | SeiOperacoesClient.lancarAndamento}
  * @category Mapeadores
  */
 export const mapAndamento = (value: SeiRawValue): SeiAndamento | null => mapAndamentoOrNull(value)
 
 /**
  * Converte o payload de `consultarPublicacao` em {@link SeiRetornoConsultaPublicacao}.
+ *
+ * @param value - Payload normalizado para a operação `consultarPublicacao`.
+ * @returns Os dados da publicação, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiConsultasClient.consultarPublicacao | SeiConsultasClient.consultarPublicacao}
  * @category Mapeadores
  */
 export const mapRetornoConsultaPublicacao = (
@@ -746,6 +848,10 @@ export const mapRetornoConsultaPublicacao = (
 
 /**
  * Converte o payload de `enviarEmail` em {@link SeiRetornoEnvioEmail}.
+ *
+ * @param value - Payload normalizado para a operação `enviarEmail`.
+ * @returns Os dados do e-mail enviado, ou `null` se a resposta não for um mapa.
+ * @see {@link index!SeiOperacoesClient.enviarEmail | SeiOperacoesClient.enviarEmail}
  * @category Mapeadores
  */
 export const mapRetornoEnvioEmail = (value: SeiRawValue): SeiRetornoEnvioEmail | null => {
@@ -761,6 +867,11 @@ export const mapRetornoEnvioEmail = (value: SeiRawValue): SeiRetornoEnvioEmail |
 
 /**
  * Converte o payload de `registrarOuvidoria` em {@link SeiProcedimentoResumido}.
+ *
+ * @param value - Payload normalizado para a operação `registrarOuvidoria`.
+ * @returns Os dados resumidos do processo de ouvidoria gerado, ou `null` se a
+ *   resposta não for um mapa.
+ * @see {@link index!SeiOperacoesClient.registrarOuvidoria | SeiOperacoesClient.registrarOuvidoria}
  * @category Mapeadores
  */
 export const mapProcedimentoResumidoOuvidoria = (

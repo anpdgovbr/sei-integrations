@@ -910,7 +910,7 @@ export type SeiCampoInput = Readonly<{
 export type SeiSecaoDocumentoInput = Readonly<{
   /** Nome do registro. */
   nome: string
-  /** Conteúdo da seção em Base64, normalmente Latin-1 no SEI legado. */
+  /** Conteúdo da seção em Base64 UTF-8. Veja {@link encodeSeiBase64}. */
   conteudo: string
 }>
 
@@ -949,6 +949,12 @@ export type SeiProcedimentoInput = Readonly<{
  * Para conteúdo, use `conteudo` (Base64), `idArquivo` (arquivo já carregado
  * via `adicionarArquivo`) ou `conteudoSecoes` (conteúdo por seção em Base64).
  * Use {@link encodeSeiBase64} para codificar HTML/texto de documentos.
+ *
+ * `sinBloqueado: "S"` impede a edição do conteúdo pela interface web do SEI,
+ * mas não impede a assinatura: o botão de assinar verifica apenas se a série
+ * permite assinatura e se o tipo de documento é compatível, sem considerar
+ * `sinBloqueado`. Não é possível, via SOAP, criar um documento editável que
+ * também fique impedido de ser assinado.
  * @category Tipos de Entrada
  */
 export type SeiDocumentoInput = Readonly<{
@@ -1562,9 +1568,12 @@ export type SeiAtualizarContatosParams = Readonly<{
 /**
  * Parâmetros para {@link SeiOperacoesClient.cancelarDocumento}.
  *
- * Operação sensível: cancela o documento informado e exige motivo. Em smoke/HML,
- * execute apenas com massa descartável e guarda explícita.
+ * Operação sensível: cancela o documento informado e exige motivo. Execute
+ * apenas com massa descartável.
  *
+ * Ainda não validada de ponta a ponta contra um ambiente SEI real.
+ *
+ * @experimental
  * @category Parâmetros de Operação
  */
 export type SeiCancelarDocumentoParams = Readonly<{
@@ -1582,6 +1591,9 @@ export type SeiCancelarDocumentoParams = Readonly<{
  * Bloqueia o documento informado. O Web Service não expõe, nesta lib, uma
  * operação simétrica de desbloqueio de documento; valide com documento de teste.
  *
+ * Ainda não validada de ponta a ponta contra um ambiente SEI real.
+ *
+ * @experimental
  * @category Parâmetros de Operação
  */
 export type SeiBloquearDocumentoParams = Readonly<{
@@ -1642,6 +1654,9 @@ export type SeiExcluirBlocoParams = Readonly<{
  * Operação destrutiva para processo de teste/rascunho. Não use como limpeza
  * genérica de massa sem confirmar previamente as regras do SEI no ambiente.
  *
+ * Ainda não validada de ponta a ponta contra um ambiente SEI real.
+ *
+ * @experimental
  * @category Parâmetros de Operação
  */
 export type SeiExcluirProcessoParams = Readonly<{
@@ -1654,9 +1669,12 @@ export type SeiExcluirProcessoParams = Readonly<{
 /**
  * Parâmetros para {@link SeiOperacoesClient.excluirDocumento}.
  *
- * Operação destrutiva para documento de teste/rascunho. Em smoke/HML, execute
- * isoladamente com guarda explícita.
+ * Operação destrutiva para documento de teste/rascunho. Execute isoladamente,
+ * com massa descartável.
  *
+ * Ainda não validada de ponta a ponta contra um ambiente SEI real.
+ *
+ * @experimental
  * @category Parâmetros de Operação
  */
 export type SeiExcluirDocumentoParams = Readonly<{
@@ -1764,6 +1782,9 @@ export type SeiOperacaoProcessoParams = Readonly<{
  * `sinManterAbertoUnidade='S'` quando a unidade de origem precisa seguir usando
  * a mesma massa.
  *
+ * Ainda não validada de ponta a ponta contra um ambiente SEI real.
+ *
+ * @experimental
  * @category Parâmetros de Operação
  */
 export type SeiEnviarProcessoParams = Readonly<{
@@ -1795,6 +1816,9 @@ export type SeiEnviarProcessoParams = Readonly<{
  * Altera o usuário responsável pelo processo na unidade. O `idUsuario` deve ser
  * válido para a unidade informada.
  *
+ * Ainda não validada de ponta a ponta contra um ambiente SEI real.
+ *
+ * @experimental
  * @category Parâmetros de Operação
  */
 export type SeiAtribuirProcessoParams = Readonly<{
@@ -1977,9 +2001,12 @@ export type SeiCancelarAgendamentoPublicacaoParams = Readonly<{
  * Parâmetros para {@link SeiOperacoesClient.confirmarDisponibilizacaoPublicacao}.
  *
  * Confirma disponibilização/publicação no veículo informado. É uma operação
- * finalística, sem par simples de reversão no Web Service. O smoke HML exige
- * `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1` para executar essa chamada.
+ * finalística, sem par simples de reversão no Web Service. Execute apenas com
+ * roteiro explícito de confirmação.
  *
+ * Ainda não validada de ponta a ponta contra um ambiente SEI real.
+ *
+ * @experimental
  * @category Parâmetros de Operação
  */
 export type SeiConfirmarDisponibilizacaoPublicacaoParams = Readonly<{
@@ -2030,16 +2057,18 @@ export type SeiEnviarEmailParams = Readonly<{
  * Parâmetros para {@link SeiOperacoesClient.registrarOuvidoria}.
  *
  * Registra manifestação de ouvidoria e cria/reusa contato conforme as regras da
- * instalação do SEI. Em HML, a serialização do `sei-client` chegou ao SEI, mas a
- * chamada ficou bloqueada pela configuração do ambiente com erro
- * `Tipo do Contato não informado.`, provavelmente ligado ao parâmetro
- * `ID_TIPO_CONTATO_OUVIDORIA`.
+ * instalação do SEI. Requer que o parâmetro `ID_TIPO_CONTATO_OUVIDORIA` esteja
+ * configurado; caso contrário, a chamada pode falhar com um erro indicando
+ * tipo de contato não informado.
  *
  * Quando `sinAnonimo='N'`, informe dados de contato suficientes para a regra
- * local. Em HML, os tipos retornados por `listarTiposProcedimentoOuvidoria`
- * estavam com `sinOuvidoriaAnonimo=false`, então o smoke usa manifestação
- * não-anônima por padrão.
+ * local. Verifique com {@link SeiConsultasClient.listarTiposProcedimentoOuvidoria}
+ * se o tipo de procedimento aceita manifestação anônima
+ * (`sinOuvidoriaAnonimo`) antes de assumir esse valor.
  *
+ * Ainda não validada com sucesso de ponta a ponta contra um ambiente SEI real.
+ *
+ * @experimental
  * @category Parâmetros de Operação
  */
 export type SeiRegistrarOuvidoriaParams = Readonly<{
@@ -2073,7 +2102,13 @@ export type SeiRegistrarOuvidoriaParams = Readonly<{
   mensagem: string
   /** Atributos adicionais configurados para o formulário/local da ouvidoria. */
   atributosAdicionais?: readonly SeiAtributoOuvidoriaInput[]
-  /** Indica manifestação anônima. Em HML, o smoke usa `N` por padrão. */
+  /**
+   * Sinalizador `S`/`N`: indica manifestação anônima.
+   *
+   * Só é aceita quando o tipo de procedimento de ouvidoria permite
+   * manifestação anônima (`sinOuvidoriaAnonimo`); confira antes com
+   * {@link SeiConsultasClient.listarTiposProcedimentoOuvidoria}.
+   */
   sinAnonimo?: string | null
   /** Indica sigilo da manifestação, conforme regra do SEI. */
   sinSigilo?: string | null
