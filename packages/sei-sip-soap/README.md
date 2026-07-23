@@ -1,5 +1,7 @@
 # @anpdgovbr/sei-sip-soap
 
+<img src="../../assets/brand/logo-196.png" alt="SEI.SIP" width="64" align="right">
+
 Infraestrutura SOAP compartilhada pelos clientes `@anpdgovbr/sei-client` e
 `@anpdgovbr/sip-client`.
 

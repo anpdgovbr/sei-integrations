@@ -6,6 +6,7 @@
   "name": "ANPD SEI Integrations",
   "includeVersion": true,
   "readme": "README.md",
+  "favicon": "assets/brand/logo-196.png",
   "hideGenerator": true,
   "searchInComments": true,
   "highlightLanguages": [
