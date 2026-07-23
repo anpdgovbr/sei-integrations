@@ -84,13 +84,24 @@ pnpm test:coverage
 pnpm build
 ```
 
-No consumidor:
+No consumidor, instale as dependências de forma reprodutível com o gerenciador
+de pacotes do projeto:
 
 ```bash
+npm ci
+# ou
+yarn install --frozen-lockfile
+# ou
 pnpm install --frozen-lockfile
-pnpm typecheck
-pnpm lint
-pnpm test
+```
+
+E rode os scripts de qualidade já configurados no projeto consumidor (nomes
+podem variar, mas normalmente incluem):
+
+```bash
+<seu-gerenciador> run typecheck
+<seu-gerenciador> run lint
+<seu-gerenciador> run test
 ```
 
 Quando houver acesso ao ambiente SIP, faça um smoke test server-side usando um

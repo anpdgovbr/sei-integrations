@@ -21,6 +21,10 @@ consumidora resolve configuração, cache, autorização e persistência.
 ## Instalação
 
 ```bash
+npm install @anpdgovbr/sip-client
+# ou
+yarn add @anpdgovbr/sip-client
+# ou
 pnpm add @anpdgovbr/sip-client
 ```
 
