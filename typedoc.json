@@ -8,12 +8,32 @@
   "readme": "README.md",
   "hideGenerator": true,
   "searchInComments": true,
+  "highlightLanguages": [
+    "bash",
+    "console",
+    "css",
+    "html",
+    "javascript",
+    "json",
+    "jsonc",
+    "json5",
+    "yaml",
+    "tsx",
+    "typescript",
+    "dotenv"
+  ],
   "plugin": ["typedoc-plugin-mdn-links"],
   "sourceLinkTemplate": "https://github.com/anpdgovbr/sei-integrations/blob/{gitRevision}/{path}#L{line}",
   "navigationLinks": {
     "GitHub": "https://github.com/anpdgovbr/sei-integrations"
   },
-  "groupOrder": ["Classes", "Functions", "Type Aliases", "Interfaces", "Variables", "*"],
+  "projectDocuments": [
+    "doc/sip-client.md",
+    "doc/sei-client.md",
+    "doc/sip-contrato-wsdl.md",
+    "doc/migracao-consumidores.md"
+  ],
+  "groupOrder": ["Guias", "Classes", "Functions", "Type Aliases", "Interfaces", "Variables", "*"],
   "validation": {
     "invalidLink": true,
     "notExported": true,

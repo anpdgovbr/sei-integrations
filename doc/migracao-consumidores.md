@@ -1,3 +1,8 @@
+---
+title: Migração de consumidores
+group: Guias
+---
+
 # Migração de consumidores
 
 Este guia ajuda a extrair integrações SIP implementadas dentro de aplicações

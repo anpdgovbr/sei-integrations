@@ -94,16 +94,16 @@
     ],
     "entryPointStrategy": "resolve",
     "categoryOrder": [
-      "Configuration",
-      "Client",
-      "Error Handling",
-      "SOAP Transport",
-      "Domain Entities",
-      "Return Types",
-      "Input Types",
-      "Operation Parameters",
-      "SOAP Primitives",
-      "Mappers",
+      "Configuração",
+      "Cliente",
+      "Tratamento de Erros",
+      "Transporte SOAP",
+      "Entidades de Domínio",
+      "Tipos de Retorno",
+      "Tipos de Entrada",
+      "Parâmetros de Operação",
+      "Primitivas SOAP",
+      "Mapeadores",
       "*"
     ]
   }

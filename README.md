@@ -81,6 +81,12 @@ pnpm build
 
 ## Documentação
 
+Referência completa da API (classes, tipos e funções dos três pacotes),
+gerada com TypeDoc: **https://anpdgovbr.github.io/sei-integrations/**
+
+Guias de uso, também disponíveis na própria referência acima (seção
+"Guias"):
+
 | Documento                                                | Conteúdo                          |
 | -------------------------------------------------------- | --------------------------------- |
 | [Guia do sip-client](doc/sip-client.md)                  | Uso detalhado do cliente SIP      |

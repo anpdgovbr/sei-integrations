@@ -93,16 +93,16 @@
     ],
     "entryPointStrategy": "resolve",
     "categoryOrder": [
-      "Configuration",
-      "Client",
-      "Error Handling",
-      "SOAP Transport",
-      "Domain Entities",
-      "Operation Parameters",
-      "Replication",
-      "Enumerations",
-      "SOAP Primitives",
-      "Mappers",
+      "Configuração",
+      "Cliente",
+      "Tratamento de Erros",
+      "Transporte SOAP",
+      "Entidades de Domínio",
+      "Parâmetros de Operação",
+      "Replicação",
+      "Enumerações",
+      "Primitivas SOAP",
+      "Mapeadores",
       "*"
     ]
   }

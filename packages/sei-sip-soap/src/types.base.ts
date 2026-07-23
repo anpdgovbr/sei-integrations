@@ -5,21 +5,21 @@
  * (`Sip*` / `Sei*`) para manter APIs públicas distintas.
  *
  * @packageDocumentation
- * @categoryDescription SOAP Primitives
+ * @categoryDescription Primitivas SOAP
  * Tipos de baixo nível usados na serialização e desserialização de mensagens SOAP.
- * @categoryDescription Configuration
+ * @categoryDescription Configuração
  * Tipos de configuração de conexão e namespace SOAP.
  */
 
 /**
  * Valor escalar aceito como parâmetro SOAP.
- * @category SOAP Primitives
+ * @category Primitivas SOAP
  */
 export type ScalarSoapValue = string | number | boolean | null | undefined
 
 /**
  * Estrutura SOAP aninhada (objeto literal) sem tipagem de array.
- * @category SOAP Primitives
+ * @category Primitivas SOAP
  */
 export interface SoapStructValue {
   readonly [key: string]: SoapParamValue
@@ -27,7 +27,7 @@ export interface SoapStructValue {
 
 /**
  * Array SOAP RPC/encoded com arrayType e itemType explícitos.
- * @category SOAP Primitives
+ * @category Primitivas SOAP
  */
 export type SoapArrayValue = Readonly<{
   arrayType: string
@@ -37,19 +37,19 @@ export type SoapArrayValue = Readonly<{
 
 /**
  * União de todos os valores aceitos como parâmetro em chamadas SOAP.
- * @category SOAP Primitives
+ * @category Primitivas SOAP
  */
 export type SoapParamValue = ScalarSoapValue | SoapStructValue | SoapArrayValue
 
 /**
  * Valor bruto retornado pelo parser XML após normalização.
- * @category SOAP Primitives
+ * @category Primitivas SOAP
  */
 export type RawValue = string | number | boolean | null | RawMap | RawValue[]
 
 /**
  * Mapa de chaves/valores brutos resultante da normalização de um objeto XML.
- * @category SOAP Primitives
+ * @category Primitivas SOAP
  */
 export interface RawMap {
   readonly [key: string]: RawValue
@@ -57,7 +57,7 @@ export interface RawMap {
 
 /**
  * Opções para uma chamada SOAP genérica.
- * @category SOAP Primitives
+ * @category Primitivas SOAP
  */
 export type SoapCallOptions = Readonly<{
   operation: string
@@ -66,7 +66,7 @@ export type SoapCallOptions = Readonly<{
 
 /**
  * Campos de configuração comuns a qualquer endpoint SOAP.
- * @category Configuration
+ * @category Configuração
  */
 export type BaseSoapConfig = Readonly<{
   endpointUrl: string
@@ -78,7 +78,7 @@ export type BaseSoapConfig = Readonly<{
  *
  * @example SIP: `{ uri: "sipns", prefix: "sip", action: "sipnsAction" }`
  * @example SEI: `{ uri: "Sei",   prefix: "sei", action: "SeiAction"   }`
- * @category Configuration
+ * @category Configuração
  */
 export type SoapNamespaceConfig = Readonly<{
   /** Namespace URI (ex.: `"sipns"` ou `"Sei"`). */

@@ -279,7 +279,7 @@ const serializedDocumento = (d: SeiIncluirDocumentoParams["documento"]) => ({
  *
  * @see {@link SeiClient}
  * @see {@link createSeiClient}
- * @category Client
+ * @category Cliente
  */
 export class SeiConsultasClient {
   /** @param config - Configuração de conexão com o SEI. */
@@ -858,7 +858,7 @@ export class SeiConsultasClient {
  * publicação, marcadores, controle de prazo e ouvidoria.
  *
  * Em aplicações que usam {@link SeiClient}, acesse via `seiClient.operacoes`.
- * @category Client
+ * @category Cliente
  */
 export class SeiOperacoesClient {
   /** @param config - Configuração de conexão com o SEI. */
@@ -2075,7 +2075,7 @@ export class SeiOperacoesClient {
  * // Via atalhos na raiz (equivalentes)
  * const proc2 = await sei.consultarProcedimento({ ... })
  * ```
- * @category Client
+ * @category Cliente
  */
 export class SeiClient {
   /** Subclient para operações somente leitura (consultas e listagens). */
@@ -2267,6 +2267,6 @@ export class SeiClient {
  *   requestTimeoutMs: 30_000,
  * })
  * ```
- * @category Client
+ * @category Cliente
  */
 export const createSeiClient = (config: SeiConfig): SeiClient => new SeiClient(config)

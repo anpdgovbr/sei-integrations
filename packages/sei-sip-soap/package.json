@@ -70,11 +70,11 @@
     "entryPointStrategy": "resolve",
     "readme": "none",
     "categoryOrder": [
-      "Error Handling",
-      "SOAP Transport",
-      "SOAP Primitives",
-      "Configuration",
-      "Mapper Helpers",
+      "Tratamento de Erros",
+      "Transporte SOAP",
+      "Primitivas SOAP",
+      "Configuração",
+      "Auxiliares de Mapeamento",
       "*"
     ]
   }

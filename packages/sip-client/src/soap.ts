@@ -48,7 +48,7 @@ const SIP_NS = { uri: "sipns", prefix: "sip", action: "sipnsAction" } as const
 
 /**
  * Erro lançado quando uma chamada SOAP ao SIP falha.
- * @category Error Handling
+ * @category Tratamento de Erros
  *
  * Pode representar três casos:
  * - **SOAP Fault** — o servidor retornou `<Fault>` (`status` é o HTTP real).
@@ -98,7 +98,7 @@ const makeSipError = (
  *
  * @see {@link SipSoapArrayValue}
  * @see {@link buildSipSoapEnvelope}
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const createSoapArray = (
   arrayType: string,
@@ -114,7 +114,7 @@ export const createSoapArray = (
  *
  * @see {@link callSipSoap}
  * @see {@link createSoapArray}
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const buildSipSoapEnvelope = (options: SipSoapCallOptions): string =>
   buildSoapEnvelope(options, SIP_NS)
@@ -128,7 +128,7 @@ export const buildSipSoapEnvelope = (options: SipSoapCallOptions): string =>
  * @throws {@link SipSoapError} quando a resposta contém um elemento `<Fault>`.
  *
  * @see {@link callSipSoap}
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const parseSipSoapResponse = (xml: string, operation: string): SipRawValue =>
   parseSoapResponse(xml, operation, makeSipError)
@@ -144,7 +144,7 @@ export const parseSipSoapResponse = (xml: string, operation: string): SipRawValu
  * @see {@link buildSipSoapEnvelope}
  * @see {@link parseSipSoapResponse}
  * @see {@link SipSoapError}
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const callSipSoap = (config: SipConfig, options: SipSoapCallOptions): Promise<SipRawValue> =>
   callSoap(config, options, SIP_NS, makeSipError)

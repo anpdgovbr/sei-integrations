@@ -1,3 +1,8 @@
+---
+title: Contrato SIP WSDL
+group: Guias
+---
+
 # Contrato SIP WSDL
 
 Este documento mapeia a API pública do `@anpdgovbr/sip-client` para o WSDL e o
