@@ -22,6 +22,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Configurar git (necessário para as tags de release criadas pelo publish)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v7
@@ -44,22 +49,18 @@ jobs:
 
       # Enquanto houver changesets pendentes, esta action abre/atualiza uma PR
       # "Version Packages" com o bump de versão e changelog. Quando a PR for
-      # mesclada em `main` (sem changesets pendentes), o passo seguinte publica
-      # os pacotes no registry público.
-      - name: Aplicar changesets pendentes (abre PR de versão)
+      # mesclada em `main` (sem changesets pendentes), a action roda o
+      # `publish:` abaixo, que publica no npmjs.org via Trusted Publishing
+      # (OIDC, sem NPM_TOKEN — é preciso configurar o "Trusted Publisher" de
+      # cada pacote em npmjs.com apontando para este repositório e para este
+      # workflow) e cria a tag + GitHub Release de cada pacote publicado.
+      - name: Aplicar changesets pendentes e publicar no npmjs.org
         id: changesets
         uses: changesets/action@v1
         with:
           version: pnpm changeset:version
+          publish: pnpm release:npmjs
           commit: "chore: version packages"
           title: "chore: version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Publica via Trusted Publishing (OIDC): não usa NPM_TOKEN. É preciso
-      # configurar o "Trusted Publisher" de cada pacote em npmjs.com,
-      # apontando para este repositório e para este workflow
-      # (.github/workflows/release.yml).
-      - name: Publicar pacotes em registry.npmjs.org
-        if: steps.changesets.outputs.hasChangesets == 'false'
-        run: pnpm release:npmjs
