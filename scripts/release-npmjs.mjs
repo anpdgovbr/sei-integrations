@@ -52,7 +52,9 @@ function changelogNotes(dir, version) {
 
 function tagAndRelease(name, version, dir) {
   if (!IS_CI) {
-    console.log(`[release-npmjs] fora de CI: pulando tag/release do GitHub para ${name}@${version}.`)
+    console.log(
+      `[release-npmjs] fora de CI: pulando tag/release do GitHub para ${name}@${version}.`,
+    )
     return
   }
 
