@@ -10,14 +10,20 @@
 // workspace:*/catalog: para versões reais, sem depender de registry nenhum)
 // e publicar esse tarball com `npm publish`, que respeita --registry e
 // suporta --provenance via Trusted Publishing (OIDC) em CI.
+//
+// Em CI (usado como `publish:` do changesets/action em release.yml), cada
+// pacote publicado com sucesso também ganha uma tag `nome@versão` e uma
+// GitHub Release com o changelog daquela versão — o changesets/action só
+// cria releases automaticamente quando é ele mesmo quem publica via
+// `changeset publish`, o que não é o nosso caso aqui.
 import { execFileSync } from "node:child_process"
 import { mkdtempSync, readFileSync, readdirSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
 const REGISTRY = "https://registry.npmjs.org"
-
 const PACKAGES = ["sei-sip-soap", "sei-client", "sip-client"]
+const IS_CI = process.env.CI === "true"
 
 function readPackageJson(dir) {
   return JSON.parse(readFileSync(`packages/${dir}/package.json`, "utf8"))
@@ -32,6 +38,30 @@ function isPublished(name, version) {
   } catch {
     return false
   }
+}
+
+function changelogNotes(dir, version) {
+  try {
+    const changelog = readFileSync(`packages/${dir}/CHANGELOG.md`, "utf8")
+    const match = changelog.match(new RegExp(`^## ${version}\\n([\\s\\S]*?)(?=\\n## |$)`, "m"))
+    return match ? match[1].trim() : ""
+  } catch {
+    return ""
+  }
+}
+
+function tagAndRelease(name, version, dir) {
+  if (!IS_CI) {
+    console.log(`[release-npmjs] fora de CI: pulando tag/release do GitHub para ${name}@${version}.`)
+    return
+  }
+
+  const tag = `${name}@${version}`
+  execFileSync("git", ["tag", "-a", tag, "-m", tag])
+  execFileSync("git", ["push", "origin", tag])
+
+  const notes = changelogNotes(dir, version) || `Publicação de ${tag} em ${REGISTRY}.`
+  execFileSync("gh", ["release", "create", tag, "--title", tag, "--notes", notes])
 }
 
 for (const dir of PACKAGES) {
@@ -56,4 +86,7 @@ for (const dir of PACKAGES) {
     ["publish", tarballPath, "--access", "public", "--registry", REGISTRY, "--provenance"],
     { stdio: "inherit" },
   )
+
+  console.log(`[release-npmjs] criando tag e release no GitHub para ${name}@${version}...`)
+  tagAndRelease(name, version, dir)
 }
