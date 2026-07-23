@@ -48,7 +48,7 @@ const SEI_NS = { uri: "Sei", prefix: "sei", action: "SeiAction" } as const
 
 /**
  * Erro lançado quando uma chamada SOAP ao SEI falha.
- * @category Error Handling
+ * @category Tratamento de Erros
  *
  * Pode representar três casos:
  * - **SOAP Fault** — o servidor retornou `<Fault>` (`status` é o HTTP real).
@@ -97,7 +97,7 @@ const makeSeiError = (
  *
  * @see {@link SeiSoapArrayValue}
  * @see {@link buildSeiSoapEnvelope}
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const createSeiSoapArray = (
   arrayType: string,
@@ -113,7 +113,7 @@ export const createSeiSoapArray = (
  *
  * @see {@link callSeiSoap}
  * @see {@link createSeiSoapArray}
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const buildSeiSoapEnvelope = (options: SeiSoapCallOptions): string =>
   buildSoapEnvelope(options, SEI_NS)
@@ -127,7 +127,7 @@ export const buildSeiSoapEnvelope = (options: SeiSoapCallOptions): string =>
  * @throws {@link SeiSoapError} quando a resposta contém um elemento `<Fault>`.
  *
  * @see {@link callSeiSoap}
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const parseSeiSoapResponse = (xml: string, operation: string): SeiRawValue =>
   parseSoapResponse(xml, operation, makeSeiError)
@@ -143,7 +143,7 @@ export const parseSeiSoapResponse = (xml: string, operation: string): SeiRawValu
  * @see {@link buildSeiSoapEnvelope}
  * @see {@link parseSeiSoapResponse}
  * @see {@link SeiSoapError}
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const callSeiSoap = (config: SeiConfig, options: SeiSoapCallOptions): Promise<SeiRawValue> =>
   callSoap(config, options, SEI_NS, makeSeiError)

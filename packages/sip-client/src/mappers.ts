@@ -20,7 +20,7 @@
  * As funções auxiliares internas (marcadas individualmente como `@internal`)
  * não fazem parte da API pública.
  *
- * @categoryDescription Mappers
+ * @categoryDescription Mapeadores
  * Funções que convertem respostas SOAP brutas em entidades de domínio tipadas.
  */
 import type {
@@ -105,7 +105,7 @@ const mapPhpMapEntries = (value: SipRawValue): SipRawValue[] => {
  * @returns Lista de órgãos, possivelmente vazia.
  *
  * @see {@link index!SipConsultasClient.listarOrgaos | SipConsultasClient.listarOrgaos}
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapOrgaos = (value: SipRawValue): SipOrgao[] =>
   mapNestedArray(value).map((item) => ({
@@ -131,7 +131,7 @@ export const mapOrgaos = (value: SipRawValue): SipOrgao[] =>
  * @returns Lista de unidades, possivelmente vazia.
  *
  * @see {@link index!SipConsultasClient.listarUnidades | SipConsultasClient.listarUnidades}
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapUnidades = (value: SipRawValue): SipUnidade[] =>
   mapRecordArray(value).map((item) => {
@@ -189,7 +189,7 @@ export const mapUnidades = (value: SipRawValue): SipUnidade[] =>
  *
  * @see {@link index!SipConsultasClient.buscarUsuarios | SipConsultasClient.buscarUsuarios}
  * @see {@link index!SipConsultasClient.buscarUsuariosSemPermissao | SipConsultasClient.buscarUsuariosSemPermissao}
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapUsuarios = (value: SipRawValue): SipUsuario[] => {
   const userMaps =
@@ -234,7 +234,7 @@ export const mapUsuarios = (value: SipRawValue): SipUsuario[] => {
  *
  * @see {@link index!SipConsultasClient.carregarUsuario | SipConsultasClient.carregarUsuario}
  * @see {@link index!SipConsultasClient.pesquisarUsuario | SipConsultasClient.pesquisarUsuario}
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapUsuarioDiretorio = (value: SipRawValue): SipUsuarioDiretorio | null => {
   if (!isMap(value)) {
@@ -306,7 +306,7 @@ const mapMenus = (value: SipRawValue): SipMenu[] =>
  *
  * @see {@link index!SipConsultasClient.listarPerfis | SipConsultasClient.listarPerfis}
  * @see {@link index!SipFiltroRecursosMenus | SipFiltroRecursosMenus}
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapPerfis = (value: SipRawValue): SipPerfil[] =>
   mapRecordArray(value)
@@ -345,7 +345,7 @@ export const mapPerfis = (value: SipRawValue): SipPerfil[] =>
  *   possivelmente vazia.
  *
  * @see {@link index!SipConsultasClient.listarRecursos | SipConsultasClient.listarRecursos}
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapRecursos = (value: SipRawValue): string[] => nonNullStrings(value)
 
@@ -365,7 +365,7 @@ export const mapRecursos = (value: SipRawValue): string[] => nonNullStrings(valu
  *   `IdUnidade`, `IdPerfil`, `DataInicial`) estiverem ausentes.
  *
  * @see {@link index!SipConsultasClient.listarPermissoes | SipConsultasClient.listarPermissoes}
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapPermissoes = (value: SipRawValue): SipPermissao[] =>
   asArray(value)

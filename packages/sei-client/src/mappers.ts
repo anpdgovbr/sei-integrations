@@ -11,7 +11,7 @@
  * correspondendo aos elementos do WSDL), diferente do SIP que usa arrays PHP
  * posicionais. Os mappers leem os campos pelo nome (ex.: `item.IdUnidade`).
  *
- * @categoryDescription Mappers
+ * @categoryDescription Mapeadores
  * Funções que convertem respostas SOAP brutas em entidades de domínio tipadas.
  */
 import type {
@@ -323,33 +323,33 @@ const mapPublicacaoOrNull = (value: SeiRawValue): SeiPublicacao | null => {
 
 /**
  * Converte o payload de `listarUnidades` em uma lista de {@link SeiUnidade}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapUnidades = (value: SeiRawValue): SeiUnidade[] => mapItems(value, mapUnidadeFromMap)
 
 /**
  * Converte o payload de `listarTiposProcedimento` em lista de {@link SeiTipoProcedimento}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapTiposProcedimento = (value: SeiRawValue): SeiTipoProcedimento[] =>
   mapItems(value, mapTipoProcedimentoFromMap)
 
 /**
  * Converte o payload de `listarTiposPrioridade` em lista de {@link SeiTipoPrioridade}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapTiposPrioridade = (value: SeiRawValue): SeiTipoPrioridade[] =>
   mapItems(value, mapTipoPrioridadeFromMap)
 
 /**
  * Converte o payload de `listarSeries` em lista de {@link SeiSerie}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapSeries = (value: SeiRawValue): SeiSerie[] => mapItems(value, mapSerieFromMap)
 
 /**
  * Converte o payload de `listarContatos` em lista de {@link SeiContato}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapContatos = (value: SeiRawValue): SeiContato[] =>
   mapItems(value, (item): SeiContato => ({
@@ -408,7 +408,7 @@ export const mapContatos = (value: SeiRawValue): SeiContato[] =>
 
 /**
  * Converte o payload de `listarExtensoesPermitidas` em lista de {@link SeiArquivoExtensao}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapArquivosExtensao = (value: SeiRawValue): SeiArquivoExtensao[] =>
   mapItems(value, (item) => ({
@@ -422,13 +422,13 @@ export const mapArquivosExtensao = (value: SeiRawValue): SeiArquivoExtensao[] =>
 
 /**
  * Converte o payload de `listarUsuarios` em lista de {@link SeiUsuario}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapUsuarios = (value: SeiRawValue): SeiUsuario[] => mapItems(value, mapUsuarioFromMap)
 
 /**
  * Converte o payload de `listarHipotesesLegais` em lista de {@link SeiHipoteseLegal}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapHipotesesLegais = (value: SeiRawValue): SeiHipoteseLegal[] =>
   mapItems(value, (item) => ({
@@ -440,7 +440,7 @@ export const mapHipotesesLegais = (value: SeiRawValue): SeiHipoteseLegal[] =>
 
 /**
  * Converte o payload de `listarTiposConferencia` em lista de {@link SeiTipoConferencia}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapTiposConferencia = (value: SeiRawValue): SeiTipoConferencia[] =>
   mapItems(value, (item) => ({
@@ -453,7 +453,7 @@ export const mapTiposConferencia = (value: SeiRawValue): SeiTipoConferencia[] =>
 
 /**
  * Converte o payload de `listarPaises` em lista de {@link SeiPais}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapPaises = (value: SeiRawValue): SeiPais[] =>
   mapItems(value, (item) => ({
@@ -463,7 +463,7 @@ export const mapPaises = (value: SeiRawValue): SeiPais[] =>
 
 /**
  * Converte o payload de `listarEstados` em lista de {@link SeiEstado}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapEstados = (value: SeiRawValue): SeiEstado[] =>
   mapItems(value, (item) => ({
@@ -476,7 +476,7 @@ export const mapEstados = (value: SeiRawValue): SeiEstado[] =>
 
 /**
  * Converte o payload de `listarCidades` em lista de {@link SeiCidade}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapCidades = (value: SeiRawValue): SeiCidade[] =>
   mapItems(value, (item) => ({
@@ -492,7 +492,7 @@ export const mapCidades = (value: SeiRawValue): SeiCidade[] =>
 
 /**
  * Converte o payload de `listarCargos` em lista de {@link SeiCargo}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapCargos = (value: SeiRawValue): SeiCargo[] =>
   mapItems(value, (item) => ({
@@ -504,14 +504,14 @@ export const mapCargos = (value: SeiRawValue): SeiCargo[] =>
 
 /**
  * Converte o payload de `listarAndamentos` em lista de {@link SeiAndamento}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapAndamentos = (value: SeiRawValue): SeiAndamento[] =>
   mapItems(value, mapAndamentoFromMap)
 
 /**
  * Converte o payload de `listarMarcadoresUnidade` em lista de {@link SeiMarcador}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapMarcadores = (value: SeiRawValue): SeiMarcador[] =>
   mapItems(value, (item) => ({
@@ -523,7 +523,7 @@ export const mapMarcadores = (value: SeiRawValue): SeiMarcador[] =>
 
 /**
  * Converte o payload de `listarAndamentosMarcadores` em lista de {@link SeiAndamentoMarcador}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapAndamentosMarcadores = (value: SeiRawValue): SeiAndamentoMarcador[] =>
   mapItems(value, (item) => {
@@ -546,7 +546,7 @@ export const mapAndamentosMarcadores = (value: SeiRawValue): SeiAndamentoMarcado
 
 /**
  * Converte o payload de `listarFeriados` em lista de {@link SeiFeriado}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapFeriados = (value: SeiRawValue): SeiFeriado[] =>
   mapItems(value, (item) => ({
@@ -556,7 +556,7 @@ export const mapFeriados = (value: SeiRawValue): SeiFeriado[] =>
 
 /**
  * Converte o payload de `gerarProcedimento` em {@link SeiRetornoGeracaoProcedimento}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapRetornoGeracaoProcedimento = (
   value: SeiRawValue,
@@ -577,7 +577,7 @@ export const mapRetornoGeracaoProcedimento = (
 
 /**
  * Converte o payload de `incluirDocumento` em {@link SeiRetornoInclusaoDocumento}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapRetornoInclusaoDocumento = (
   value: SeiRawValue,
@@ -590,7 +590,7 @@ export const mapRetornoInclusaoDocumento = (
 
 /**
  * Converte o payload de `consultarProcedimento` em {@link SeiRetornoConsultaProcedimento}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapRetornoConsultaProcedimento = (
   value: SeiRawValue,
@@ -650,7 +650,7 @@ export const mapRetornoConsultaProcedimento = (
 
 /**
  * Converte o payload de `consultarProcedimentoIndividual` em {@link SeiProcedimentoResumido}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapProcedimentoResumido = (value: SeiRawValue): SeiProcedimentoResumido | null => {
   if (!isMap(value)) {
@@ -661,7 +661,7 @@ export const mapProcedimentoResumido = (value: SeiRawValue): SeiProcedimentoResu
 
 /**
  * Converte o payload de `consultarDocumento` em {@link SeiRetornoConsultaDocumento}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapRetornoConsultaDocumento = (
   value: SeiRawValue,
@@ -700,7 +700,7 @@ export const mapRetornoConsultaDocumento = (
 
 /**
  * Converte o payload de `consultarBloco` em {@link SeiRetornoConsultaBloco}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapRetornoConsultaBloco = (value: SeiRawValue): SeiRetornoConsultaBloco | null => {
   if (!isMap(value)) {
@@ -723,13 +723,13 @@ export const mapRetornoConsultaBloco = (value: SeiRawValue): SeiRetornoConsultaB
 
 /**
  * Converte o payload de `lancarAndamento` em {@link SeiAndamento}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapAndamento = (value: SeiRawValue): SeiAndamento | null => mapAndamentoOrNull(value)
 
 /**
  * Converte o payload de `consultarPublicacao` em {@link SeiRetornoConsultaPublicacao}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapRetornoConsultaPublicacao = (
   value: SeiRawValue,
@@ -746,7 +746,7 @@ export const mapRetornoConsultaPublicacao = (
 
 /**
  * Converte o payload de `enviarEmail` em {@link SeiRetornoEnvioEmail}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapRetornoEnvioEmail = (value: SeiRawValue): SeiRetornoEnvioEmail | null => {
   if (!isMap(value)) {
@@ -761,7 +761,7 @@ export const mapRetornoEnvioEmail = (value: SeiRawValue): SeiRetornoEnvioEmail |
 
 /**
  * Converte o payload de `registrarOuvidoria` em {@link SeiProcedimentoResumido}.
- * @category Mappers
+ * @category Mapeadores
  */
 export const mapProcedimentoResumidoOuvidoria = (
   value: SeiRawValue,

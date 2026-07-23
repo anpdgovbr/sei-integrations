@@ -43,7 +43,7 @@
  * ```
  *
  * @see {@link createSeiClient}
- * @category Configuration
+ * @category Configuração
  */
 export type SeiConfig = Readonly<{
   /**
@@ -92,7 +92,7 @@ export type {
 
 /**
  * Unidade organizacional cadastrada no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiUnidade = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -111,7 +111,7 @@ export type SeiUnidade = Readonly<{
 
 /**
  * Usuário cadastrado no SEI com acesso à unidade.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiUsuario = Readonly<{
   /** Identificador interno do usuário no SEI. */
@@ -124,7 +124,7 @@ export type SeiUsuario = Readonly<{
 
 /**
  * Tipo de procedimento (tipo de processo) cadastrado no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiTipoProcedimento = Readonly<{
   /** Identificador do tipo de procedimento (tipo de processo). */
@@ -137,7 +137,7 @@ export type SeiTipoProcedimento = Readonly<{
 
 /**
  * Tipo de prioridade de processo.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiTipoPrioridade = Readonly<{
   /** Identificador do tipo de prioridade. */
@@ -148,7 +148,7 @@ export type SeiTipoPrioridade = Readonly<{
 
 /**
  * Série (tipo de documento) cadastrada no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiSerie = Readonly<{
   /** Identificador da série (tipo de documento). */
@@ -161,7 +161,7 @@ export type SeiSerie = Readonly<{
 
 /**
  * Assunto (classificação documental) de um processo.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiAssunto = Readonly<{
   /** Código estruturado do assunto (ex.: `"06.01.01"`). */
@@ -172,7 +172,7 @@ export type SeiAssunto = Readonly<{
 
 /**
  * Interessado, remetente ou destinatário de um processo ou documento.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiInteressado = Readonly<{
   /** Identificador do contato no SEI. */
@@ -189,14 +189,14 @@ export type SeiInteressado = Readonly<{
 
 // Aliases semânticos: o WSDL define Destinatario e Remetente como tipos distintos
 // de Interessado, apesar de estruturalmente idênticos. Os aliases preservam essa semântica.
-/** @category Domain Entities */
+/** @category Entidades de Domínio */
 export type SeiDestinatario = SeiInteressado // NOSONAR
-/** @category Domain Entities */
+/** @category Entidades de Domínio */
 export type SeiRemetente = SeiInteressado // NOSONAR
 
 /**
  * Atributo de andamento de processo (par nome/valor).
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiAtributoAndamento = Readonly<{
   /** Nome do registro. */
@@ -209,7 +209,7 @@ export type SeiAtributoAndamento = Readonly<{
 
 /**
  * Andamento (histórico de movimentação) de um processo no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiAndamento = Readonly<{
   /** Identificador do andamento, ou `null`. */
@@ -232,7 +232,7 @@ export type SeiAndamento = Readonly<{
 
 /**
  * Assinatura digital de um documento.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiAssinatura = Readonly<{
   /** Nome do registro. */
@@ -253,7 +253,7 @@ export type SeiAssinatura = Readonly<{
 
 /**
  * Campo de formulário de um documento SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiCampo = Readonly<{
   /** Nome do registro. */
@@ -264,7 +264,7 @@ export type SeiCampo = Readonly<{
 
 /**
  * Seção de conteúdo de um documento SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiSecaoDocumento = Readonly<{
   /** Nome do registro. */
@@ -275,7 +275,7 @@ export type SeiSecaoDocumento = Readonly<{
 
 /**
  * Bloco de assinatura/reunião no SEI (resumo, para uso em listas).
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiBloco = Readonly<{
   /** Identificador do bloco no SEI. */
@@ -302,7 +302,7 @@ export type SeiBloco = Readonly<{
 
 /**
  * Protocolo (documento ou processo) pertencente a um bloco.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiProtocoloBloco = Readonly<{
   /** Protocolo formatado do item do bloco. */
@@ -315,7 +315,7 @@ export type SeiProtocoloBloco = Readonly<{
 
 /**
  * Observação registrada em um processo por uma unidade.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiObservacao = Readonly<{
   /** Descrição textual do registro. */
@@ -326,7 +326,7 @@ export type SeiObservacao = Readonly<{
 
 /**
  * Unidade na qual um processo está aberto, com usuário de atribuição.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiUnidadeProcedimentoAberto = Readonly<{
   /** Unidade associada ao registro. */
@@ -337,7 +337,7 @@ export type SeiUnidadeProcedimentoAberto = Readonly<{
 
 /**
  * Referência resumida a um processo (usada em relacionamentos e anexações).
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiProcedimentoResumido = Readonly<{
   /** Identificador interno do processo no SEI. */
@@ -350,7 +350,7 @@ export type SeiProcedimentoResumido = Readonly<{
 
 /**
  * Extensão de arquivo permitida para upload no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiArquivoExtensao = Readonly<{
   /** Identificador da extensão de arquivo no SEI. */
@@ -363,7 +363,7 @@ export type SeiArquivoExtensao = Readonly<{
 
 /**
  * Hipótese legal de restrição de acesso.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiHipoteseLegal = Readonly<{
   /** Identificador da hipótese legal de restrição de acesso. */
@@ -378,7 +378,7 @@ export type SeiHipoteseLegal = Readonly<{
 
 /**
  * Tipo de conferência para documentos digitalizados.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiTipoConferencia = Readonly<{
   /** Identificador do tipo de conferência (documentos digitalizados). */
@@ -389,7 +389,7 @@ export type SeiTipoConferencia = Readonly<{
 
 /**
  * País cadastrado no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiPais = Readonly<{
   /** Identificador do país no SEI. */
@@ -400,7 +400,7 @@ export type SeiPais = Readonly<{
 
 /**
  * Estado/UF cadastrado no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiEstado = Readonly<{
   /** Identificador do estado/UF no SEI. */
@@ -417,7 +417,7 @@ export type SeiEstado = Readonly<{
 
 /**
  * Município cadastrado no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiCidade = Readonly<{
   /** Identificador do município no SEI. */
@@ -440,7 +440,7 @@ export type SeiCidade = Readonly<{
 
 /**
  * Cargo cadastrado no SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiCargo = Readonly<{
   /** Identificador do cargo no SEI. */
@@ -455,7 +455,7 @@ export type SeiCargo = Readonly<{
 
 /**
  * Contato cadastrado no SEI (pessoa física, jurídica ou unidade externa).
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiContato = Readonly<{
   /** Operação a aplicar: `"A"` cria/altera, `"E"` exclui, `"D"` desativa, `"R"` reativa. */
@@ -564,7 +564,7 @@ export type SeiContato = Readonly<{
 
 /**
  * Marcador de processo da unidade.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiMarcador = Readonly<{
   /** Identificador do marcador no SEI. */
@@ -579,7 +579,7 @@ export type SeiMarcador = Readonly<{
 
 /**
  * Andamento de marcador registrado em um processo.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiAndamentoMarcador = Readonly<{
   /** Identificador do andamento de marcador, ou `null`. */
@@ -596,7 +596,7 @@ export type SeiAndamentoMarcador = Readonly<{
 
 /**
  * Feriado cadastrado no SEI para uma unidade/órgão.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiFeriado = Readonly<{
   /** Data no formato do SEI (`DD/MM/AAAA`). */
@@ -607,7 +607,7 @@ export type SeiFeriado = Readonly<{
 
 /**
  * Dados de publicação no Diário Oficial via Imprensa Nacional.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiPublicacaoImprensaNacional = Readonly<{
   /** Identificador do veículo na Imprensa Nacional, ou `null`. */
@@ -628,7 +628,7 @@ export type SeiPublicacaoImprensaNacional = Readonly<{
 
 /**
  * Publicação oficial associada a um documento do SEI.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiPublicacao = Readonly<{
   /** Identificador da publicação no SEI. */
@@ -659,7 +659,7 @@ export type SeiPublicacao = Readonly<{
 
 /**
  * Atributo adicional de manifestação de ouvidoria.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiAtributoOuvidoria = Readonly<{
   /** Identificador do atributo. */
@@ -674,7 +674,7 @@ export type SeiAtributoOuvidoria = Readonly<{
 
 /**
  * Anexo de uma manifestação de ouvidoria.
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SeiAnexo = Readonly<{
   /** Identificador do anexo, ou `null`. */
@@ -693,7 +693,7 @@ export type SeiAnexo = Readonly<{
 
 /**
  * Retorno da inclusão de um documento via `incluirDocumento`.
- * @category Return Types
+ * @category Tipos de Retorno
  */
 export type SeiRetornoInclusaoDocumento = Readonly<{
   /** Identificador interno do documento no SEI. */
@@ -706,7 +706,7 @@ export type SeiRetornoInclusaoDocumento = Readonly<{
 
 /**
  * Retorno da geração de um processo via `gerarProcedimento`.
- * @category Return Types
+ * @category Tipos de Retorno
  */
 export type SeiRetornoGeracaoProcedimento = Readonly<{
   /** Identificador interno do processo no SEI. */
@@ -721,7 +721,7 @@ export type SeiRetornoGeracaoProcedimento = Readonly<{
 
 /**
  * Retorno completo da consulta de um processo via `consultarProcedimento`.
- * @category Return Types
+ * @category Tipos de Retorno
  */
 export type SeiRetornoConsultaProcedimento = Readonly<{
   /** Identificador interno do processo no SEI. */
@@ -764,7 +764,7 @@ export type SeiRetornoConsultaProcedimento = Readonly<{
 
 /**
  * Retorno completo da consulta de um documento via `consultarDocumento`.
- * @category Return Types
+ * @category Tipos de Retorno
  */
 export type SeiRetornoConsultaDocumento = Readonly<{
   /** Identificador interno do processo no SEI. */
@@ -809,7 +809,7 @@ export type SeiRetornoConsultaDocumento = Readonly<{
 
 /**
  * Retorno completo da consulta de um bloco via `consultarBloco`.
- * @category Return Types
+ * @category Tipos de Retorno
  */
 export type SeiRetornoConsultaBloco = Readonly<{
   /** Identificador do bloco no SEI. */
@@ -838,7 +838,7 @@ export type SeiRetornoConsultaBloco = Readonly<{
 
 /**
  * Retorno da consulta de publicação via `consultarPublicacao`.
- * @category Return Types
+ * @category Tipos de Retorno
  */
 export type SeiRetornoConsultaPublicacao = Readonly<{
   /** Dados da publicação, ou `null`. */
@@ -851,7 +851,7 @@ export type SeiRetornoConsultaPublicacao = Readonly<{
 
 /**
  * Retorno do envio de e-mail via `enviarEmail`.
- * @category Return Types
+ * @category Tipos de Retorno
  */
 export type SeiRetornoEnvioEmail = Readonly<{
   /** Identificador interno do documento no SEI. */
@@ -866,7 +866,7 @@ export type SeiRetornoEnvioEmail = Readonly<{
 
 /**
  * Assunto de entrada para criação/edição de processo.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiAssuntoInput = Readonly<{
   /** Código estruturado do assunto (ex.: `"06.01.01"`). */
@@ -877,7 +877,7 @@ export type SeiAssuntoInput = Readonly<{
 
 /**
  * Interessado de entrada para criação/edição de processo ou documento.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiInteressadoInput = Readonly<{
   /** Identificador do contato no SEI. */
@@ -894,7 +894,7 @@ export type SeiInteressadoInput = Readonly<{
 
 /**
  * Campo de formulário de entrada para criação de documento.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiCampoInput = Readonly<{
   /** Nome do registro. */
@@ -905,7 +905,7 @@ export type SeiCampoInput = Readonly<{
 
 /**
  * Seção de conteúdo de entrada para documento.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiSecaoDocumentoInput = Readonly<{
   /** Nome do registro. */
@@ -916,7 +916,7 @@ export type SeiSecaoDocumentoInput = Readonly<{
 
 /**
  * Dados de um processo a ser criado via `gerarProcedimento`.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiProcedimentoInput = Readonly<{
   /** Identificador do tipo de procedimento (tipo de processo). */
@@ -949,7 +949,7 @@ export type SeiProcedimentoInput = Readonly<{
  * Para conteúdo, use `conteudo` (Base64), `idArquivo` (arquivo já carregado
  * via `adicionarArquivo`) ou `conteudoSecoes` (conteúdo por seção em Base64).
  * Use {@link encodeSeiBase64} para codificar HTML/texto de documentos.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiDocumentoInput = Readonly<{
   /** `"G"` para documento gerado, `"R"` para recebido. */
@@ -1011,7 +1011,7 @@ export type SeiDocumentoInput = Readonly<{
  * `D` desativa e `R` reativa. Para alteração (`A`), envie o cadastro completo
  * do contato; o SEI repassa o DTO inteiro para a regra de alteração.
  *
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiContatoInput = Readonly<{
   /** Operação a aplicar: `"A"` cria/altera, `"E"` exclui, `"D"` desativa, `"R"` reativa. */
@@ -1096,7 +1096,7 @@ export type SeiContatoInput = Readonly<{
 
 /**
  * Atributo de andamento de entrada para `lancarAndamento`.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiAtributoAndamentoInput = Readonly<{
   /** Nome do registro. */
@@ -1113,7 +1113,7 @@ export type SeiAtributoAndamentoInput = Readonly<{
  * O Web Service do SEI registra um andamento de marcador para o processo, sem expor uma
  * operação par de remoção/cancelamento desse marcador.
  *
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiDefinicaoMarcadorInput = Readonly<{
   /** Protocolo do processo (ex.: `"00000.000001/2026-01"`). */
@@ -1131,7 +1131,7 @@ export type SeiDefinicaoMarcadorInput = Readonly<{
  * Para prazo relativo, informe `dias` e `sinDiasUteis` e envie `dataPrazo` como string vazia.
  * Para prazo absoluto, informe `dataPrazo` no formato aceito pelo SEI da instalação.
  *
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiDefinicaoControlePrazoInput = Readonly<{
   /** Protocolo do processo (ex.: `"00000.000001/2026-01"`). */
@@ -1146,7 +1146,7 @@ export type SeiDefinicaoControlePrazoInput = Readonly<{
 
 /**
  * Anotação de processo para `registrarAnotacao`.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiAnotacaoInput = Readonly<{
   /** Protocolo do processo (ex.: `"00000.000001/2026-01"`). */
@@ -1159,7 +1159,7 @@ export type SeiAnotacaoInput = Readonly<{
 
 /**
  * Dados de publicação no Diário Oficial para `agendarPublicacao`.
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiPublicacaoImprensaNacionalInput = Readonly<{
   /** Identificador do veículo na Imprensa Nacional, ou `null`. */
@@ -1184,7 +1184,7 @@ export type SeiPublicacaoImprensaNacionalInput = Readonly<{
  * Use para campos complementares exigidos pela configuração local da ouvidoria.
  * O SEI recebe cada item como `AtributoOuvidoria`.
  *
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiAtributoOuvidoriaInput = Readonly<{
   /** Identificador do atributo, quando conhecido/configurado no SEI. */
@@ -1204,7 +1204,7 @@ export type SeiAtributoOuvidoriaInput = Readonly<{
  * do SEI. Para anexos temporários maiores, valide previamente tamanho e
  * extensão permitida no ambiente.
  *
- * @category Input Types
+ * @category Tipos de Entrada
  */
 export type SeiAnexoInput = Readonly<{
   /** Identificador prévio do anexo, quando aplicável. */
@@ -1221,7 +1221,7 @@ export type SeiAnexoInput = Readonly<{
 
 // ─── Parâmetros de operações ──────────────────────────────────────────────────
 
-/** Parâmetros para {@link SeiConsultasClient.listarUnidades}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarUnidades}. @category Parâmetros de Operação */
 export type SeiListarUnidadesParams = Readonly<{
   /** Identificador do tipo de procedimento (tipo de processo). */
   idTipoProcedimento?: string | null
@@ -1229,7 +1229,7 @@ export type SeiListarUnidadesParams = Readonly<{
   idSerie?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarTiposProcedimento}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarTiposProcedimento}. @category Parâmetros de Operação */
 export type SeiListarTiposProcedimentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1239,13 +1239,13 @@ export type SeiListarTiposProcedimentoParams = Readonly<{
   sinIndividual?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarTiposPrioridade}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarTiposPrioridade}. @category Parâmetros de Operação */
 export type SeiListarTiposPrioridadeParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarSeries}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarSeries}. @category Parâmetros de Operação */
 export type SeiListarSeriesParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1253,7 +1253,7 @@ export type SeiListarSeriesParams = Readonly<{
   idTipoProcedimento?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarContatos}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarContatos}. @category Parâmetros de Operação */
 export type SeiListarContatosParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1277,7 +1277,7 @@ export type SeiListarContatosParams = Readonly<{
   idContatos?: readonly string[]
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.consultarProcedimento}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.consultarProcedimento}. @category Parâmetros de Operação */
 export type SeiConsultarProcedimentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1303,7 +1303,7 @@ export type SeiConsultarProcedimentoParams = Readonly<{
   sinRetornarProcedimentosAnexados?: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.consultarProcedimentoIndividual}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.consultarProcedimentoIndividual}. @category Parâmetros de Operação */
 export type SeiConsultarProcedimentoIndividualParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1317,7 +1317,7 @@ export type SeiConsultarProcedimentoIndividualParams = Readonly<{
   siglaUsuario: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.consultarDocumento}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.consultarDocumento}. @category Parâmetros de Operação */
 export type SeiConsultarDocumentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1335,7 +1335,7 @@ export type SeiConsultarDocumentoParams = Readonly<{
   sinRetornarBlocos?: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.consultarBloco}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.consultarBloco}. @category Parâmetros de Operação */
 export type SeiConsultarBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1345,7 +1345,7 @@ export type SeiConsultarBlocoParams = Readonly<{
   sinRetornarProtocolos?: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarExtensoesPermitidas}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarExtensoesPermitidas}. @category Parâmetros de Operação */
 export type SeiListarExtensoesPermitidasParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1353,7 +1353,7 @@ export type SeiListarExtensoesPermitidasParams = Readonly<{
   idArquivoExtensao?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarUsuarios}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarUsuarios}. @category Parâmetros de Operação */
 export type SeiListarUsuariosParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1361,7 +1361,7 @@ export type SeiListarUsuariosParams = Readonly<{
   idUsuario?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarHipotesesLegais}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarHipotesesLegais}. @category Parâmetros de Operação */
 export type SeiListarHipotesesLegaisParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1369,19 +1369,19 @@ export type SeiListarHipotesesLegaisParams = Readonly<{
   nivelAcesso?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarTiposConferencia}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarTiposConferencia}. @category Parâmetros de Operação */
 export type SeiListarTiposConferenciaParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarPaises}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarPaises}. @category Parâmetros de Operação */
 export type SeiListarPaisesParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarEstados}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarEstados}. @category Parâmetros de Operação */
 export type SeiListarEstadosParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1389,7 +1389,7 @@ export type SeiListarEstadosParams = Readonly<{
   idPais?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarCidades}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarCidades}. @category Parâmetros de Operação */
 export type SeiListarCidadesParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1399,7 +1399,7 @@ export type SeiListarCidadesParams = Readonly<{
   idEstado?: string | null
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarCargos}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarCargos}. @category Parâmetros de Operação */
 export type SeiListarCargosParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1416,7 +1416,7 @@ export type SeiListarCargosParams = Readonly<{
  * mantém o anexo temporário inativo até receber as partes restantes por
  * `adicionarConteudoArquivo`.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiAdicionarArquivoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1438,7 +1438,7 @@ export type SeiAdicionarArquivoParams = Readonly<{
  * `adicionarArquivo`. Quando o conteúdo acumulado atinge `tamanho`, o SEI valida
  * o MD5 informado na criação do arquivo.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiAdicionarConteudoArquivoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1449,7 +1449,7 @@ export type SeiAdicionarConteudoArquivoParams = Readonly<{
   conteudo: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarAndamentos}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarAndamentos}. @category Parâmetros de Operação */
 export type SeiListarAndamentosParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1465,13 +1465,13 @@ export type SeiListarAndamentosParams = Readonly<{
   tarefasModulos?: readonly string[]
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarMarcadoresUnidade}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarMarcadoresUnidade}. @category Parâmetros de Operação */
 export type SeiListarMarcadoresUnidadeParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarAndamentosMarcadores}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarAndamentosMarcadores}. @category Parâmetros de Operação */
 export type SeiListarAndamentosMarcadoresParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1481,7 +1481,7 @@ export type SeiListarAndamentosMarcadoresParams = Readonly<{
   marcadores?: readonly string[]
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.consultarPublicacao}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.consultarPublicacao}. @category Parâmetros de Operação */
 export type SeiConsultarPublicacaoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1497,7 +1497,7 @@ export type SeiConsultarPublicacaoParams = Readonly<{
   sinRetornarAssinaturas?: string
 }>
 
-/** Parâmetros para {@link SeiConsultasClient.listarFeriados}. @category Operation Parameters */
+/** Parâmetros para {@link SeiConsultasClient.listarFeriados}. @category Parâmetros de Operação */
 export type SeiListarFeriadosParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1509,7 +1509,7 @@ export type SeiListarFeriadosParams = Readonly<{
   dataFinal?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.gerarProcedimento}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.gerarProcedimento}. @category Parâmetros de Operação */
 export type SeiGerarProcedimentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1543,7 +1543,7 @@ export type SeiGerarProcedimentoParams = Readonly<{
   sinDiasUteisControlePrazo?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.incluirDocumento}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.incluirDocumento}. @category Parâmetros de Operação */
 export type SeiIncluirDocumentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1551,7 +1551,7 @@ export type SeiIncluirDocumentoParams = Readonly<{
   documento: SeiDocumentoInput
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.atualizarContatos}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.atualizarContatos}. @category Parâmetros de Operação */
 export type SeiAtualizarContatosParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1565,7 +1565,7 @@ export type SeiAtualizarContatosParams = Readonly<{
  * Operação sensível: cancela o documento informado e exige motivo. Em smoke/HML,
  * execute apenas com massa descartável e guarda explícita.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiCancelarDocumentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1582,7 +1582,7 @@ export type SeiCancelarDocumentoParams = Readonly<{
  * Bloqueia o documento informado. O Web Service não expõe, nesta lib, uma
  * operação simétrica de desbloqueio de documento; valide com documento de teste.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiBloquearDocumentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1599,7 +1599,7 @@ export type SeiBloquearDocumentoParams = Readonly<{
  * documentos foram validados em bloco de assinatura (`Tipo=A`), enquanto
  * processos exigiram bloco interno ou outro tipo compatível.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiGerarBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1616,7 +1616,7 @@ export type SeiGerarBlocoParams = Readonly<{
   sinDisponibilizar?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.alterarBloco}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.alterarBloco}. @category Parâmetros de Operação */
 export type SeiAlterarBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1628,7 +1628,7 @@ export type SeiAlterarBlocoParams = Readonly<{
   unidadesDisponibilizacao?: readonly string[]
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.excluirBloco}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.excluirBloco}. @category Parâmetros de Operação */
 export type SeiExcluirBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1642,7 +1642,7 @@ export type SeiExcluirBlocoParams = Readonly<{
  * Operação destrutiva para processo de teste/rascunho. Não use como limpeza
  * genérica de massa sem confirmar previamente as regras do SEI no ambiente.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiExcluirProcessoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1657,7 +1657,7 @@ export type SeiExcluirProcessoParams = Readonly<{
  * Operação destrutiva para documento de teste/rascunho. Em smoke/HML, execute
  * isoladamente com guarda explícita.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiExcluirDocumentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1666,7 +1666,7 @@ export type SeiExcluirDocumentoParams = Readonly<{
   protocoloDocumento: string
 }>
 
-/** Parâmetros para operações simples de bloco (disponibilizar, concluir, etc.). @category Operation Parameters */
+/** Parâmetros para operações simples de bloco (disponibilizar, concluir, etc.). @category Parâmetros de Operação */
 export type SeiOperacaoBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1681,7 +1681,7 @@ export type SeiOperacaoBlocoParams = Readonly<{
  * Validado em HML com bloco de assinatura (`Tipo=A`). Essa regra é diferente de
  * inclusão de processo em bloco.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiIncluirDocumentoBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1700,7 +1700,7 @@ export type SeiIncluirDocumentoBlocoParams = Readonly<{
  * @remarks
  * Validado em HML com bloco de assinatura (`Tipo=A`).
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiRetirarDocumentoBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1718,7 +1718,7 @@ export type SeiRetirarDocumentoBlocoParams = Readonly<{
  * O SEI rejeita inclusão de processo em bloco de assinatura (`Tipo=A`). Em HML,
  * este fluxo foi validado com bloco interno.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiIncluirProcessoBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1738,7 +1738,7 @@ export type SeiIncluirProcessoBlocoParams = Readonly<{
  * Use com bloco compatível com processos. Em HML, o par incluir/retirar processo
  * foi validado com bloco interno.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiRetirarProcessoBlocoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1749,7 +1749,7 @@ export type SeiRetirarProcessoBlocoParams = Readonly<{
   protocoloProcedimento: string
 }>
 
-/** Parâmetros para operações simples de processo (reabrir, concluir, etc.). @category Operation Parameters */
+/** Parâmetros para operações simples de processo (reabrir, concluir, etc.). @category Parâmetros de Operação */
 export type SeiOperacaoProcessoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1764,7 +1764,7 @@ export type SeiOperacaoProcessoParams = Readonly<{
  * `sinManterAbertoUnidade='S'` quando a unidade de origem precisa seguir usando
  * a mesma massa.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiEnviarProcessoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1795,7 +1795,7 @@ export type SeiEnviarProcessoParams = Readonly<{
  * Altera o usuário responsável pelo processo na unidade. O `idUsuario` deve ser
  * válido para a unidade informada.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiAtribuirProcessoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1808,7 +1808,7 @@ export type SeiAtribuirProcessoParams = Readonly<{
   sinReabrir?: string | null
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.lancarAndamento}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.lancarAndamento}. @category Parâmetros de Operação */
 export type SeiLancarAndamentoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1822,7 +1822,7 @@ export type SeiLancarAndamentoParams = Readonly<{
   atributos?: readonly SeiAtributoAndamentoInput[]
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.relacionarProcesso}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.relacionarProcesso}. @category Parâmetros de Operação */
 export type SeiRelacionarProcessoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1832,7 +1832,7 @@ export type SeiRelacionarProcessoParams = Readonly<{
   protocoloProcedimento2: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.sobrestarProcesso}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.sobrestarProcesso}. @category Parâmetros de Operação */
 export type SeiSobrestarProcessoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1844,7 +1844,7 @@ export type SeiSobrestarProcessoParams = Readonly<{
   motivo: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.anexarProcesso}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.anexarProcesso}. @category Parâmetros de Operação */
 export type SeiAnexarProcessoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1854,7 +1854,7 @@ export type SeiAnexarProcessoParams = Readonly<{
   protocoloProcedimentoAnexado: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.desanexarProcesso}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.desanexarProcesso}. @category Parâmetros de Operação */
 export type SeiDesanexarProcessoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1866,7 +1866,7 @@ export type SeiDesanexarProcessoParams = Readonly<{
   motivo: string
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.definirMarcador}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.definirMarcador}. @category Parâmetros de Operação */
 export type SeiDefinirMarcadorParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1874,7 +1874,7 @@ export type SeiDefinirMarcadorParams = Readonly<{
   definicoes: readonly SeiDefinicaoMarcadorInput[]
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.definirControlePrazo}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.definirControlePrazo}. @category Parâmetros de Operação */
 export type SeiDefinirControlePrazoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1882,7 +1882,7 @@ export type SeiDefinirControlePrazoParams = Readonly<{
   definicoes: readonly SeiDefinicaoControlePrazoInput[]
 }>
 
-/** Parâmetros para operações de controle de prazo com lista de processos. @category Operation Parameters */
+/** Parâmetros para operações de controle de prazo com lista de processos. @category Parâmetros de Operação */
 export type SeiControlePrazoProcessosParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1890,7 +1890,7 @@ export type SeiControlePrazoProcessosParams = Readonly<{
   protocolosProcedimentos: readonly string[]
 }>
 
-/** Parâmetros para {@link SeiOperacoesClient.registrarAnotacao}. @category Operation Parameters */
+/** Parâmetros para {@link SeiOperacoesClient.registrarAnotacao}. @category Parâmetros de Operação */
 export type SeiRegistrarAnotacaoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
   idUnidade: string
@@ -1904,7 +1904,7 @@ export type SeiRegistrarAnotacaoParams = Readonly<{
  * Cria agendamento de publicação para documento publicável. Para smoke/HML,
  * prefira parear com `cancelarAgendamentoPublicacao` para limpar o agendamento.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiAgendarPublicacaoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1931,7 +1931,7 @@ export type SeiAgendarPublicacaoParams = Readonly<{
  * Altera um agendamento existente, identificado por `idPublicacao`, `idDocumento`
  * ou `protocoloDocumento`.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiAlterarPublicacaoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1960,7 +1960,7 @@ export type SeiAlterarPublicacaoParams = Readonly<{
  * Cancela um agendamento existente e é a operação de limpeza natural para
  * `agendarPublicacao` em testes.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiCancelarAgendamentoPublicacaoParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -1980,7 +1980,7 @@ export type SeiCancelarAgendamentoPublicacaoParams = Readonly<{
  * finalística, sem par simples de reversão no Web Service. O smoke HML exige
  * `SEI_SMOKE_CONFIRMAR_PUBLICACAO=1` para executar essa chamada.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiConfirmarDisponibilizacaoPublicacaoParams = Readonly<{
   /** Identificador do veículo de publicação no SEI. */
@@ -2001,7 +2001,7 @@ export type SeiConfirmarDisponibilizacaoPublicacaoParams = Readonly<{
  * Esta operação envia e-mail real pelo SEI e gera documento de e-mail no
  * processo informado. Use apenas com destinatários controlados em smoke/HML.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiEnviarEmailParams = Readonly<{
   /** Unidade (`IdUnidade`) usada como contexto da operação no SEI. */
@@ -2040,7 +2040,7 @@ export type SeiEnviarEmailParams = Readonly<{
  * estavam com `sinOuvidoriaAnonimo=false`, então o smoke usa manifestação
  * não-anônima por padrão.
  *
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SeiRegistrarOuvidoriaParams = Readonly<{
   /** Órgão no qual a manifestação será registrada. */

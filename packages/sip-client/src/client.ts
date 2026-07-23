@@ -149,7 +149,7 @@ const booleanReturn = (value: unknown): boolean =>
  *
  * @see {@link SipClient}
  * @see {@link createSipClient}
- * @category Client
+ * @category Cliente
  */
 export class SipConsultasClient {
   /** @param config - Configuração de conexão com o SIP. */
@@ -486,7 +486,7 @@ export class SipConsultasClient {
  *
  * @see {@link SipClient}
  * @see {@link createSipClient}
- * @category Client
+ * @category Cliente
  */
 export class SipReplicacaoClient {
   /** @param config - Configuração de conexão com o SIP. */
@@ -647,7 +647,7 @@ export class SipReplicacaoClient {
  * @see {@link createSipClient}
  * @see {@link SipConsultasClient}
  * @see {@link SipReplicacaoClient}
- * @category Client
+ * @category Cliente
  */
 export class SipClient {
   /** Subclient para operações somente leitura. */
@@ -733,6 +733,6 @@ export class SipClient {
  *
  * const orgaos = await sip.consultas.listarOrgaos()
  * ```
- * @category Client
+ * @category Cliente
  */
 export const createSipClient = (config: SipConfig): SipClient => new SipClient(config)

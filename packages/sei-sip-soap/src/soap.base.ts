@@ -12,9 +12,9 @@
  * sua própria subclasse de {@link SoapError}.
  *
  * @packageDocumentation
- * @categoryDescription Error Handling
+ * @categoryDescription Tratamento de Erros
  * Classe de erro base e tipo de fábrica de erros usados pelos clientes SOAP.
- * @categoryDescription SOAP Transport
+ * @categoryDescription Transporte SOAP
  * Funções para serializar, enviar e desserializar mensagens SOAP.
  */
 import { XMLParser } from "fast-xml-parser"
@@ -37,7 +37,7 @@ import type {
  * Erro SOAP base. Cada client estende esta classe com seu próprio nome
  * (`SipSoapError`, `SeiSoapError`) para permitir `instanceof` específico.
  *
- * @category Error Handling
+ * @category Tratamento de Erros
  */
 export class SoapError extends Error {
   constructor(
@@ -53,7 +53,7 @@ export class SoapError extends Error {
 
 /**
  * Função fábrica que produz uma instância de {@link SoapError} (ou subclasse).
- * @category Error Handling
+ * @category Tratamento de Erros
  */
 export type SoapErrorFactory = (
   message: string,
@@ -139,7 +139,7 @@ const serializeParam = (name: string, value: SoapParamValue, prefix: string): st
  * @param arrayType - Nome do tipo SOAP do array conforme o WSDL.
  * @param itemType  - Nome do tipo SOAP de cada item.
  * @param items     - Itens do array.
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const createSoapArray = (
   arrayType: string,
@@ -152,7 +152,7 @@ export const createSoapArray = (
  *
  * @param options - Operação e parâmetros.
  * @param ns      - Configuração de namespace (URI, prefixo, SOAPAction).
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const buildSoapEnvelope = (options: SoapCallOptions, ns: SoapNamespaceConfig): string => {
   const params = Object.entries(options.params)
@@ -238,7 +238,7 @@ const extractResponsePayload = (parsed: unknown, operation: string): RawValue =>
  * Normaliza XML SOAP em estruturas JS simples.
  *
  * @throws {@link SoapError} quando a resposta contém `<Fault>`.
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const parseSoapResponse = (
   xml: string,
@@ -262,7 +262,7 @@ export const parseSoapResponse = (
  * @param makeError - Fábrica do erro específico do client.
  *
  * @throws {@link SoapError} (ou subclasse) em SOAP Fault, erro HTTP ou timeout.
- * @category SOAP Transport
+ * @category Transporte SOAP
  */
 export const callSoap = async (
   config: BaseSoapConfig,

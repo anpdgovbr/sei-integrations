@@ -47,7 +47,7 @@
  * ```
  *
  * @see {@link createSipClient}
- * @category Configuration
+ * @category Configuração
  */
 export type SipConfig = Readonly<{
   /**
@@ -114,7 +114,7 @@ export type {
  * | `"R"`  | Reativar usuário desativado  |
  *
  * @see {@link SipReplicarUsuario}
- * @category Enumerations
+ * @category Enumerações
  */
 export type SipOperacaoReplicacaoUsuario = "C" | "A" | "E" | "D" | "R"
 
@@ -127,7 +127,7 @@ export type SipOperacaoReplicacaoUsuario = "C" | "A" | "E" | "D" | "R"
  * | `"E"`  | Excluir permissão                |
  *
  * @see {@link SipReplicarPermissao}
- * @category Enumerations
+ * @category Enumerações
  */
 export type SipOperacaoReplicacaoPermissao = "A" | "E"
 
@@ -142,7 +142,7 @@ export type SipOperacaoReplicacaoPermissao = "A" | "E"
  * | `"T"`  | Inclui recursos e menus do perfil            |
  *
  * @see {@link SipListarPerfisParams}
- * @category Enumerations
+ * @category Enumerações
  */
 export type SipFiltroRecursosMenus = "N" | "R" | "M" | "T"
 
@@ -152,7 +152,7 @@ export type SipFiltroRecursosMenus = "N" | "R" | "M" | "T"
  * Órgão cadastrado no SIP.
  *
  * @see {@link SipConsultasClient.listarOrgaos}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipOrgao = Readonly<{
   id: string
@@ -169,7 +169,7 @@ export type SipOrgao = Readonly<{
  * devolve esses dados (depende da versão e dos filtros aplicados).
  *
  * @see {@link SipConsultasClient.listarUnidades}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipUnidade = Readonly<{
   /** Identificador interno da unidade no SIP. */
@@ -199,7 +199,7 @@ export type SipUnidade = Readonly<{
  * @see {@link SipConsultasClient.buscarUsuarios}
  * @see {@link SipConsultasClient.buscarUsuariosSemPermissao}
  * @see {@link SipConsultasClient.buscarUsuarioPorSigla}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipUsuario = Readonly<{
   /** Identificador interno do usuário no SIP. */
@@ -235,7 +235,7 @@ export type SipUsuario = Readonly<{
  *
  * @see {@link SipConsultasClient.carregarUsuario}
  * @see {@link SipConsultasClient.pesquisarUsuario}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipUsuarioDiretorio = Readonly<{
   /** Identificador do órgão ao qual o usuário pertence, ou `null`. */
@@ -258,7 +258,7 @@ export type SipUsuarioDiretorio = Readonly<{
  * Agrupa perfis relacionados. Retornado como parte de {@link SipPerfil | SipPerfil.grupos}.
  *
  * @see {@link SipPerfil}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipGrupoPerfil = Readonly<{
   /** Identificador do grupo. */
@@ -277,7 +277,7 @@ export type SipGrupoPerfil = Readonly<{
  *
  * @see {@link SipPerfil | SipPerfil.recursos}
  * @see {@link SipConsultasClient.listarRecursos}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipRecurso = Readonly<{
   /** Identificador do recurso. */
@@ -294,7 +294,7 @@ export type SipRecurso = Readonly<{
  * Item de menu associado a um perfil no SIP.
  *
  * @see {@link SipMenu | SipMenu.itens}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipItemMenu = Readonly<{
   /** Identificador do item de menu. */
@@ -313,7 +313,7 @@ export type SipItemMenu = Readonly<{
  * Menu de navegação associado a um perfil no SIP.
  *
  * @see {@link SipPerfil | SipPerfil.menus}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipMenu = Readonly<{
   /** Identificador do menu. */
@@ -335,7 +335,7 @@ export type SipMenu = Readonly<{
  *
  * @see {@link SipConsultasClient.listarPerfis}
  * @see {@link SipFiltroRecursosMenus}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipPerfil = Readonly<{
   /** Identificador do perfil. */
@@ -371,7 +371,7 @@ export type SipPerfil = Readonly<{
  *
  * @see {@link SipConsultasClient.listarPermissoes}
  * @see {@link SipConsultasClient.buscarUsuarioComPermissoesPorSigla}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipPermissao = Readonly<{
   /** Identificador do sistema ao qual esta permissão se aplica. */
@@ -412,7 +412,7 @@ export type SipPermissao = Readonly<{
  * {@link SipPermissao | permissões} ativas no sistema configurado.
  *
  * @see {@link SipConsultasClient.buscarUsuarioComPermissoesPorSigla}
- * @category Domain Entities
+ * @category Entidades de Domínio
  */
 export type SipUsuarioComPermissoes = Readonly<{
   /** Dados cadastrais do usuário. */
@@ -425,7 +425,7 @@ export type SipUsuarioComPermissoes = Readonly<{
 
 /**
  * Parâmetros para {@link SipConsultasClient.listarOrgaos}.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipListarOrgaosParams = Readonly<{
   /**
@@ -440,7 +440,7 @@ export type SipListarOrgaosParams = Readonly<{
  *
  * Todos os filtros são opcionais; omiti-los retorna todas as unidades visíveis
  * pelo sistema configurado.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipListarUnidadesParams = Readonly<{
   /** Filtra unidades associadas ao usuário com este ID. */
@@ -454,7 +454,7 @@ export type SipListarUnidadesParams = Readonly<{
  *
  * Todos os filtros são opcionais e combinativos (AND). Pelo menos um filtro
  * deve ser informado para evitar retornos excessivamente grandes.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipBuscarUsuariosParams = Readonly<{
   /** Filtra pelo login do usuário (busca exata). */
@@ -478,7 +478,7 @@ export type SipBuscarUsuariosParams = Readonly<{
  *
  * Retorna usuários cadastrados no SIP que não possuem nenhuma permissão
  * no sistema configurado. Útil para auditorias de acesso.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipBuscarUsuariosSemPermissaoParams = Readonly<{
   /** Filtra usuários pertencentes ao órgão com este ID. */
@@ -496,7 +496,7 @@ export type SipBuscarUsuariosSemPermissaoParams = Readonly<{
  *
  * Consulta o servidor de autenticação configurado no SIP para o órgão
  * informado e retorna os dados do diretório para o usuário.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipCarregarUsuarioParams = Readonly<{
   /**
@@ -516,7 +516,7 @@ export type SipCarregarUsuarioParams = Readonly<{
  * Semelhante a {@link SipCarregarUsuarioParams}, mas usa o nome do campo
  * `sigla` (sem prefixo `Usuario`) e `idOrgao` (sem sufixo `Usuario`),
  * conforme exige o WSDL da operação `pesquisarUsuario`.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipPesquisarUsuarioParams = Readonly<{
   /**
@@ -531,7 +531,7 @@ export type SipPesquisarUsuarioParams = Readonly<{
 
 /**
  * Parâmetros para {@link SipConsultasClient.listarPerfis}.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipListarPerfisParams = Readonly<{
   /** Filtra perfis associados ao usuário com este ID. */
@@ -554,7 +554,7 @@ export type SipListarPerfisParams = Readonly<{
  * @remarks
  * Quando ambos `perfis` e `recursos` são omitidos, o SIP retorna todos os
  * recursos cadastrados para o sistema configurado.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipListarRecursosParams = Readonly<{
   /** Filtra retornando apenas recursos pertencentes a estes perfis (por ID). */
@@ -569,7 +569,7 @@ export type SipListarRecursosParams = Readonly<{
  * Todos os filtros são opcionais e combinativos (AND). Omitir todos retorna
  * todas as permissões do sistema configurado — use com cautela em sistemas
  * grandes.
- * @category Operation Parameters
+ * @category Parâmetros de Operação
  */
 export type SipListarPermissoesParams = Readonly<{
   /** Filtra permissões do usuário com este ID. */
@@ -600,7 +600,7 @@ export type SipListarPermissoesParams = Readonly<{
  *
  * @see {@link SipReplicacaoClient.replicarUsuarios}
  * @see {@link SipOperacaoReplicacaoUsuario}
- * @category Replication
+ * @category Replicação
  */
 export type SipReplicarUsuario = Readonly<{
   /** Operação a ser realizada sobre o usuário. */
@@ -635,7 +635,7 @@ export type SipReplicarUsuario = Readonly<{
  *
  * @see {@link SipReplicacaoClient.replicarPermissoes}
  * @see {@link SipOperacaoReplicacaoPermissao}
- * @category Replication
+ * @category Replicação
  */
 export type SipReplicarPermissao = Readonly<{
   /** Operação a ser realizada sobre a permissão. */

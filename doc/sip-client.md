@@ -1,3 +1,8 @@
+---
+title: Guia do sip-client
+group: Guias
+---
+
 # Guia do sip-client
 
 `@anpdgovbr/sip-client` é um cliente TypeScript para o webservice SOAP do SIP.
@@ -48,7 +53,7 @@ Não libere serviços de replicação para integrações somente leitura.
 
 A aplicação consumidora decide como carregar configuração. Um padrão simples é:
 
-```env
+```dotenv
 SIP_ACCESS_KEY=chave-gerada-no-sip-para-a-aplicacao
 SIP_SYSTEM_ID=100000100
 SIP_SOAP_ENDPOINT=https://sei.exemplo.gov.br/sip/ws/SipWS.php

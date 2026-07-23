@@ -27,7 +27,7 @@
  * ```
  *
  * @see {@link SeiDocumentoInput}
- * @category Encoding
+ * @category Codificação
  */
 export const encodeSeiBase64 = (content: string): string =>
   Buffer.from(content, "utf8").toString("base64")

@@ -1,3 +1,8 @@
+---
+title: Guia do sei-client
+group: Guias
+---
+
 # Guia do sei-client
 
 `@anpdgovbr/sei-client` é um cliente TypeScript para o webservice SOAP do SEI.
@@ -44,7 +49,7 @@ const config: SeiConfig = {
 
 Variáveis de ambiente sugeridas:
 
-```env
+```dotenv
 SEI_SOAP_ENDPOINT=https://sei.orgao.gov.br/sei/ws/SeiWS.php
 SEI_SIGLA_SISTEMA=SGI
 SEI_IDENTIFICACAO_SERVICO=chave-gerada-no-sei
