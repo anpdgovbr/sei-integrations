@@ -269,7 +269,7 @@ export type SeiCampo = Readonly<{
 export type SeiSecaoDocumento = Readonly<{
   /** Nome do registro. */
   nome: string
-  /** Conteúdo em Base64. */
+  /** Conteúdo em Base64 UTF-8. Veja {@link encodeSeiBase64}. */
   conteudo: string
 }>
 
@@ -994,7 +994,10 @@ export type SeiDocumentoInput = Readonly<{
   nivelAcesso?: string | null
   /** Identificador da hipótese legal de restrição de acesso. */
   idHipoteseLegal?: string | null
-  /** Conteúdo em Base64. Exclusivo com `idArquivo` e `conteudoSecoes`. */
+  /**
+   * Conteúdo em Base64 UTF-8 (não Latin-1). Exclusivo com `idArquivo` e
+   * `conteudoSecoes`. Veja {@link encodeSeiBase64}.
+   */
   conteudo?: string | null
   /** Conteúdo por seção em Base64. Exclusivo com `conteudo` e `idArquivo`. */
   conteudoSecoes?: readonly SeiSecaoDocumentoInput[]
