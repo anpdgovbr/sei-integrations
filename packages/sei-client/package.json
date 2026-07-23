@@ -1,6 +1,6 @@
 {
   "name": "@anpdgovbr/sei-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "type": "module",
   "description": "Cliente TypeScript para integração SOAP com o SEI (Sistema Eletrônico de Informações).",
