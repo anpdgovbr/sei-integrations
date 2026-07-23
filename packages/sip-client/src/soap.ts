@@ -48,7 +48,6 @@ const SIP_NS = { uri: "sipns", prefix: "sip", action: "sipnsAction" } as const
 
 /**
  * Erro lançado quando uma chamada SOAP ao SIP falha.
- * @category Tratamento de Erros
  *
  * Pode representar três casos:
  * - **SOAP Fault** — o servidor retornou `<Fault>` (`status` é o HTTP real).
@@ -71,6 +70,7 @@ const SIP_NS = { uri: "sipns", prefix: "sip", action: "sipnsAction" } as const
  * ```
  *
  * @see {@link callSipSoap}
+ * @category Tratamento de Erros
  */
 export class SipSoapError extends SoapError {
   constructor(message: string, operation: string, status: number, fault?: string) {
@@ -95,6 +95,8 @@ const makeSipError = (
  * @param arrayType - Nome do tipo SOAP do array conforme o WSDL.
  * @param itemType  - Nome do tipo SOAP de cada item.
  * @param items     - Itens do array.
+ * @returns O {@link SipSoapArrayValue} pronto para ser usado como parâmetro
+ *   em {@link SipSoapCallOptions}.
  *
  * @see {@link SipSoapArrayValue}
  * @see {@link buildSipSoapEnvelope}

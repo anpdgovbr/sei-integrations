@@ -63,13 +63,13 @@ describe("sei-sip SOAP", () => {
         Usuarios: createSoapArray("ArrayOfUsuarios", "Usuario", [
           {
             StaOperacao: "C",
-            IdOrigem: "ad:luciano.psilva",
+            IdOrigem: "ad:joao.silva",
             IdOrgao: "0",
-            Sigla: "luciano.psilva",
+            Sigla: "joao.silva",
             Nome: "Usuario Teste",
             NomeSocial: null,
             Cpf: "00000000000",
-            Email: "luciano.psilva@anpd.gov.br",
+            Email: "joao.silva@example.gov.br",
           },
         ]),
       },

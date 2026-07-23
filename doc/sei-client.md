@@ -288,6 +288,10 @@ try {
 - Algumas operações retornam `null` quando o registro não existe (ex.:
   `consultarProcedimento` com protocolo inválido), em vez de lançar erro.
 - Não monte XML manualmente fora da lib.
+- Operações e tipos marcados como **Experimental** na referência de API
+  (TypeDoc) têm serialização/desserialização implementada e cobertura de
+  testes unitários, mas ainda não foram validados de ponta a ponta contra um
+  ambiente SEI real. Valide em homologação antes de usar em produção.
 
 ## Fora do escopo
 

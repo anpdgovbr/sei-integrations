@@ -139,6 +139,8 @@ const serializeParam = (name: string, value: SoapParamValue, prefix: string): st
  * @param arrayType - Nome do tipo SOAP do array conforme o WSDL.
  * @param itemType  - Nome do tipo SOAP de cada item.
  * @param items     - Itens do array.
+ * @returns O {@link SoapArrayValue} pronto para ser usado como parâmetro em
+ *   {@link SoapCallOptions}.
  * @category Transporte SOAP
  */
 export const createSoapArray = (
@@ -152,6 +154,8 @@ export const createSoapArray = (
  *
  * @param options - Operação e parâmetros.
  * @param ns      - Configuração de namespace (URI, prefixo, SOAPAction).
+ * @returns O envelope XML completo, pronto para ser enviado no corpo da
+ *   requisição HTTP.
  * @category Transporte SOAP
  */
 export const buildSoapEnvelope = (options: SoapCallOptions, ns: SoapNamespaceConfig): string => {
@@ -237,7 +241,14 @@ const extractResponsePayload = (parsed: unknown, operation: string): RawValue =>
 /**
  * Normaliza XML SOAP em estruturas JS simples.
  *
- * @throws {@link SoapError} quando a resposta contém `<Fault>`.
+ * @param xml       - Corpo XML bruto da resposta HTTP.
+ * @param operation - Nome da operação SOAP chamada (usado para localizar o
+ *   payload em `<{operation}Response>` e para compor o erro em caso de Fault).
+ * @param makeError - Fábrica do erro específico do client; usa
+ *   {@link SoapError} por padrão.
+ * @returns O payload normalizado da operação, ou `null` se a resposta não
+ *   contiver o elemento esperado.
+ * @throws {@link SoapError} (ou subclasse) quando a resposta contém `<Fault>`.
  * @category Transporte SOAP
  */
 export const parseSoapResponse = (
@@ -261,6 +272,7 @@ export const parseSoapResponse = (
  * @param ns        - Namespace (URI, prefixo, SOAPAction).
  * @param makeError - Fábrica do erro específico do client.
  *
+ * @returns O payload normalizado da resposta SOAP.
  * @throws {@link SoapError} (ou subclasse) em SOAP Fault, erro HTTP ou timeout.
  * @category Transporte SOAP
  */

@@ -251,3 +251,8 @@ consumidora.
 - `SinSubunidades` e outros sinalizadores `S/N` são convertidos para boolean.
 - Falhas SOAP são convertidas em `SipSoapError`, preservando operação, status
   HTTP e mensagem de fault.
+- As operações de replicação (`replicarUsuarios`, `replicarPermissoes`,
+  `validarReplicacao`) estão marcadas como **Experimental** na referência de
+  API (TypeDoc): têm serialização e testes unitários, mas ainda não foram
+  validadas de ponta a ponta contra um ambiente SIP real. Valide em
+  homologação antes de usar em produção.
