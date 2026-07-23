@@ -1,5 +1,7 @@
 # @anpdgovbr/sip-client
 
+<img src="../../assets/brand/logo-196.png" alt="SEI.SIP" width="64" align="right">
+
 [![npm](https://img.shields.io/npm/v/%40anpdgovbr%2Fsip-client)](https://www.npmjs.com/package/@anpdgovbr/sip-client)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](package.json)

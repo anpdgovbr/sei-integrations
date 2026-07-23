@@ -1,5 +1,9 @@
 # @anpdgovbr/sei-integrations
 
+<p align="center">
+  <img src="assets/brand/banner-1200x400.png" alt="SEI.SIP — Biblioteca de Integração SEI/SIP" width="600">
+</p>
+
 [![CI](https://github.com/anpdgovbr/sei-integrations/actions/workflows/ci.yml/badge.svg)](https://github.com/anpdgovbr/sei-integrations/actions/workflows/ci.yml)
 [![npm sip-client](https://img.shields.io/npm/v/%40anpdgovbr%2Fsip-client?label=sip-client)](https://www.npmjs.com/package/@anpdgovbr/sip-client)
 [![npm sei-client](https://img.shields.io/npm/v/%40anpdgovbr%2Fsei-client?label=sei-client)](https://www.npmjs.com/package/@anpdgovbr/sei-client)
@@ -32,6 +36,13 @@ específico.
 | [`@anpdgovbr/sip-client`](packages/sip-client)     | 🟢 publicado | Cliente SOAP RPC/encoded para o webservice do SIP.                   |
 | [`@anpdgovbr/sei-client`](packages/sei-client)     | 🟢 publicado | Cliente SOAP RPC/encoded para o webservice do SEI (`SeiWS.php`).     |
 | [`@anpdgovbr/sei-sip-soap`](packages/sei-sip-soap) | 🟢 publicado | Infraestrutura SOAP compartilhada pelos clientes (uso interno/base). |
+
+<details>
+<summary>Visão geral (diagrama)</summary>
+<p align="center">
+  <img src="assets/brand/diagrama-completo.png" alt="Diagrama SEI.SIP: integração, padrão, segurança, escalabilidade, agnóstica, modular, reutilizável" width="500">
+</p>
+</details>
 
 ## Uso rápido
 
