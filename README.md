@@ -16,6 +16,7 @@ específico.
 ## Sumário
 
 - [Pacotes](#pacotes)
+- [Uso rápido](#uso-rápido)
 - [Fronteira de responsabilidade](#fronteira-de-responsabilidade)
 - [Quando usar cada pacote](#quando-usar-cada-pacote)
 - [Desenvolvimento](#desenvolvimento)
@@ -31,6 +32,56 @@ específico.
 | [`@anpdgovbr/sip-client`](packages/sip-client)     | 🟢 publicado | Cliente SOAP RPC/encoded para o webservice do SIP.                   |
 | [`@anpdgovbr/sei-client`](packages/sei-client)     | 🟢 publicado | Cliente SOAP RPC/encoded para o webservice do SEI (`SeiWS.php`).     |
 | [`@anpdgovbr/sei-sip-soap`](packages/sei-sip-soap) | 🟢 publicado | Infraestrutura SOAP compartilhada pelos clientes (uso interno/base). |
+
+## Uso rápido
+
+Instale o(s) pacote(s) que precisar com o gerenciador de sua preferência:
+
+```bash
+npm install @anpdgovbr/sip-client @anpdgovbr/sei-client
+# ou
+yarn add @anpdgovbr/sip-client @anpdgovbr/sei-client
+# ou
+pnpm add @anpdgovbr/sip-client @anpdgovbr/sei-client
+```
+
+Consultar permissões/usuários no SIP:
+
+```ts
+import { createSipClient } from "@anpdgovbr/sip-client"
+
+const sip = createSipClient({
+  endpointUrl: process.env.SIP_SOAP_ENDPOINT!,
+  accessKey: process.env.SIP_ACCESS_KEY!,
+  systemId: process.env.SIP_SYSTEM_ID!,
+  requestTimeoutMs: 30_000,
+})
+
+const usuario = await sip.consultas.buscarUsuarioPorSigla("joao.silva")
+```
+
+Consultar ou operar processos/documentos no SEI:
+
+```ts
+import { createSeiClient } from "@anpdgovbr/sei-client"
+
+const sei = createSeiClient({
+  endpointUrl: process.env.SEI_SOAP_ENDPOINT!,
+  siglaSistema: process.env.SEI_SIGLA_SISTEMA!,
+  identificacaoServico: process.env.SEI_IDENTIFICACAO_SERVICO!,
+  requestTimeoutMs: 30_000,
+})
+
+const proc = await sei.consultas.consultarProcedimento({
+  idUnidade: "110000001",
+  protocoloProcedimento: "00000.000001/2026-01",
+})
+```
+
+Nenhum dos dois pacotes lê `.env` — a aplicação consumidora monta a
+configuração e decide como carregá-la. Veja os guias completos em
+[Documentação](#documentação) para autenticação, tratamento de erros e a API
+completa de cada pacote.
 
 ## Fronteira de responsabilidade
 

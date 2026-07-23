@@ -32,6 +32,10 @@ O guia operacional fica em [`../../doc/sei-client.md`](../../doc/sei-client.md).
 ## Instalação
 
 ```bash
+npm install @anpdgovbr/sei-client
+# ou
+yarn add @anpdgovbr/sei-client
+# ou
 pnpm add @anpdgovbr/sei-client
 ```
 
