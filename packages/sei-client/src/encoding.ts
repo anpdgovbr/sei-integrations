@@ -1,8 +1,12 @@
 /**
  * Utilitários de codificação para campos de conteúdo do SEI.
  *
- * O Web Service do SEI espera `Conteudo` e `ConteudoSecoes[].Conteudo` em
- * Base64.
+ * O Web Service do SEI, de modo geral, opera em Latin-1 (ISO-8859-1) como
+ * charset legado. A exceção conhecida são os campos de conteúdo de documento
+ * — `Documento.Conteudo` e `Documento.ConteudoSecoes[].Conteudo` — que devem
+ * ser enviados em Base64 UTF-8 (não Latin-1) para que acentuação em
+ * português seja preenchida corretamente. Use {@link encodeSeiBase64} para
+ * codificar esses campos.
  *
  * @packageDocumentation
  */
