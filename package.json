@@ -61,7 +61,7 @@
     "@vitest/coverage-v8": "catalog:",
     "eslint": "^9.39.5",
     "fast-xml-parser": "catalog:",
-    "globals": "^17.7.0",
+    "globals": "^17.9.0",
     "prettier": "^3.9.6",
     "rimraf": "catalog:",
     "sonar-scanner": "catalog:",
