@@ -6,20 +6,20 @@
 # COMPONENTES DO CATÁLOGO
 # ==========================================
 include:
-  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-gitleaks@v6.3.1
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-gitleaks@v7.0.1
 
-  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-node@v6.3.1
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-node@v7.0.1
     inputs:
       project_type: "lib"
       cache_node_modules_path: "node_modules/"
 
-  - component: gitlab.anpd.gov.br/publico/ci-templates/sonarqube@v6.3.1
+  - component: gitlab.anpd.gov.br/publico/ci-templates/sonarqube@v7.0.1
     inputs:
       sonar_project_key: "anpd-sei-integrations"
       integration_branch: "dev"
       needs_job: "test"
 
-  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@v6.3.1
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@v7.0.1
     inputs:
       project_type: "lib"
       npm_scope: "@anpdgovbr"
@@ -27,7 +27,7 @@ include:
       global_tag_prefix: "v"
       require_protected_tag: "true"
 
-  - component: gitlab.anpd.gov.br/publico/ci-templates/pages-typedoc@v6.3.1
+  - component: gitlab.anpd.gov.br/publico/ci-templates/pages-typedoc@v7.0.1
     inputs:
       project_type: "lib"
 
