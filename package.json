@@ -18,7 +18,7 @@
     "type": "git",
     "url": "git+https://github.com/anpdgovbr/sei-integrations.git"
   },
-  "packageManager": "pnpm@11.21.0",
+  "packageManager": "pnpm@11.24.0",
   "engines": {
     "node": "^22.13.0 || ^24.0.0 || >=26.0.0",
     "pnpm": ">=10.0.0"
@@ -53,13 +53,13 @@
     "coverage:report": "pnpm run test:coverage && pnpm run coverage:merge"
   },
   "devDependencies": {
-    "@changesets/cli": "^3.0.0",
+    "@changesets/cli": "^3.0.1",
     "@eslint/js": "^10.0.1",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "^8.67.0",
-    "@typescript-eslint/parser": "^8.67.0",
+    "@typescript-eslint/eslint-plugin": "^8.68.0",
+    "@typescript-eslint/parser": "^8.68.0",
     "@vitest/coverage-v8": "catalog:",
-    "eslint": "^10.8.1",
+    "eslint": "^10.9.1",
     "fast-xml-parser": "catalog:",
     "globals": "^17.11.0",
     "prettier": "^3.9.6",
@@ -70,7 +70,7 @@
     "typedoc": "catalog:",
     "typedoc-plugin-mdn-links": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.67.0",
+    "typescript-eslint": "^8.68.0",
     "vitest": "catalog:"
   }
 }
