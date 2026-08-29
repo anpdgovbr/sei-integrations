@@ -1,5 +1,13 @@
 # @anpdgovbr/sei-client
 
+## 1.0.3
+
+### Patch Changes
+
+- 923b6de: Atualiza dependencias de desenvolvimento, ferramenta de release e parser XML usados pelo monorepo.
+- Updated dependencies [923b6de]
+  - @anpdgovbr/sei-sip-soap@1.0.3
+
 ## 1.0.2
 
 ### Patch Changes
