@@ -24,13 +24,13 @@ pnpm build
 
 ## Publicação
 
-Publicação é manual e por pacote, para o registry público (`npmjs.org`):
+Publicação é automatizada pelo workflow de release do monorepo, usando
+Changesets e Trusted Publishing do npmjs.org. Para alterações publicáveis,
+adicione um changeset na raiz:
 
 ```bash
-pnpm --filter @anpdgovbr/sip-client publish --access public --registry https://registry.npmjs.org --no-git-checks
+pnpm changeset
 ```
 
 A ANPD também mantém um espelho interno publicado em paralelo, para uso
 institucional.
-
-Use `changeset version` antes de publicar novas versões.

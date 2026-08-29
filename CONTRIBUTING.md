@@ -31,12 +31,14 @@ Para pacotes publicados:
 
 ```bash
 pnpm changeset
-pnpm changeset:version
-pnpm changeset:publish
 ```
 
 Use bump `patch` para correções compatíveis, `minor` para novas funcionalidades
 compatíveis e `major` para breaking changes.
+
+O versionamento e a publicação são automatizados no GitHub Actions: changesets
+pendentes abrem/atualizam a PR "Version Packages" e, quando essa PR é
+mesclada em `main`, o workflow publica os pacotes no `npmjs.org`.
 
 ## Segurança
 
