@@ -49,20 +49,23 @@ jobs:
 
       # Enquanto houver changesets pendentes, esta action abre/atualiza uma PR
       # "Version Packages" com o bump de versão e changelog. Quando a PR for
-      # mesclada em `main` (sem changesets pendentes), a action roda o
-      # `publish-script:` abaixo, que publica no npmjs.org via Trusted Publishing
-      # (OIDC, sem NPM_TOKEN — é preciso configurar o "Trusted Publisher" de
-      # cada pacote em npmjs.com apontando para este repositório e para este
-      # workflow) e cria a tag + GitHub Release de cada pacote publicado.
-      - name: Aplicar changesets pendentes e publicar no npmjs.org
+      # mesclada em `main` (sem changesets pendentes), o step seguinte publica
+      # no npmjs.org via Trusted Publishing (OIDC, sem NPM_TOKEN — é preciso
+      # configurar o "Trusted Publisher" de cada pacote em npmjs.com apontando
+      # para este repositório e para este workflow) e cria a tag + GitHub
+      # Release de cada pacote publicado.
+      - name: Aplicar changesets pendentes
         id: changesets
         uses: changesets/action@v2
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           version-script: pnpm changeset:version
-          publish-script: pnpm release:npmjs
           commit-message: "chore: version packages"
           pr-title: "chore: version packages"
-          create-github-releases: false
-          push-git-tags: false
+
+      - name: Publicar no npmjs.org
+        if: steps.changesets.outputs.has-changesets == 'false'
+        run: pnpm release:npmjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
