@@ -1,6 +1,6 @@
 {
   "name": "@anpdgovbr/sei-sip-soap",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": false,
   "type": "module",
   "description": "Infraestrutura SOAP interna compartilhada entre sip-client e sei-client.",
