@@ -1,5 +1,11 @@
 # @anpdgovbr/sei-sip-soap
 
+## 1.0.2
+
+### Patch Changes
+
+- 923b6de: Atualiza a toolchain de desenvolvimento e corrige vulnerabilidades em dependências transitivas.
+
 ## 1.0.0
 
 ### Major Changes
