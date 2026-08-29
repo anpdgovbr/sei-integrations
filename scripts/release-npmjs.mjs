@@ -11,7 +11,7 @@
 // e publicar esse tarball com `npm publish`, que respeita --registry e
 // suporta --provenance via Trusted Publishing (OIDC) em CI.
 //
-// Em CI (usado como `publish:` do changesets/action em release.yml), cada
+// Em CI (usado como `publish-script:` do changesets/action em release.yml), cada
 // pacote publicado com sucesso também ganha uma tag `nome@versão` e uma
 // GitHub Release com o changelog daquela versão — o changesets/action só
 // cria releases automaticamente quando é ele mesmo quem publica via

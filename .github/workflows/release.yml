@@ -62,5 +62,7 @@ jobs:
           publish-script: pnpm release:npmjs
           commit-message: "chore: version packages"
           pr-title: "chore: version packages"
+          create-github-releases: false
+          push-git-tags: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
