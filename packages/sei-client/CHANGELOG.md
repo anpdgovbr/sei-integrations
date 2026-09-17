@@ -1,5 +1,13 @@
 # @anpdgovbr/sei-client
 
+## 1.0.5
+
+### Patch Changes
+
+- 9826d3f: Corrige o registry de publicação dos pacotes públicos para o npmjs. Ajusta a configuração do TypeScript e amplia as validações do monorepo, incluindo os testes da camada SOAP compartilhada e corrigindo o comando de relatório de cobertura.
+- Updated dependencies [9826d3f]
+  - @anpdgovbr/sei-sip-soap@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes
