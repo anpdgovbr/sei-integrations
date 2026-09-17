@@ -46,7 +46,7 @@
   "sideEffects": false,
   "publishConfig": {
     "access": "public",
-    "registry": "https://npm.anpd.gov.br"
+    "registry": "https://registry.npmjs.org"
   },
   "author": {
     "name": "Luciano Édipo Pereira da Silva",

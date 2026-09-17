@@ -32,10 +32,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "test": "pnpm test:release && pnpm -r --if-present test",
+    "test": "pnpm test:release && pnpm exec vitest run --config vitest.workspace.config.ts",
     "test:release": "node --test scripts/release-npmjs.test.mjs",
     "test:coverage": "pnpm test:release && pnpm build && pnpm exec vitest run --config vitest.workspace.config.ts --coverage",
-    "typecheck": "pnpm -r --if-present typecheck",
+    "typecheck": "tsc --noEmit && pnpm -r --if-present typecheck",
     "docs": "typedoc",
     "sonar": "set -a && [ -f .env ] && . ./.env; set +a; sonar-scanner -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.token=$SONAR_TOKEN -Dsonar.projectVersion=$(node -p \"require('./packages/sip-client/package.json').version\")",
     "sonar:scan": "pnpm test:coverage && pnpm sonar",
@@ -51,7 +51,7 @@
     "publish:sip:npmjs": "pnpm --filter @anpdgovbr/sip-client publish --access public --registry https://registry.npmjs.org --no-git-checks",
     "publish:sei:npmjs": "pnpm --filter @anpdgovbr/sei-client publish --access public --registry https://registry.npmjs.org --no-git-checks",
     "release:npmjs": "node scripts/release-npmjs.mjs",
-    "coverage:report": "pnpm run test:coverage && pnpm run coverage:merge"
+    "coverage:report": "pnpm run test:coverage"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",

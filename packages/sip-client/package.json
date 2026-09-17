@@ -68,7 +68,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://npm.anpd.gov.br"
+    "registry": "https://registry.npmjs.org"
   },
   "sideEffects": false,
   "author": {
