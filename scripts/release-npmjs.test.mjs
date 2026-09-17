@@ -31,6 +31,16 @@ test("somente E404 permite tratar uma versão como ausente", () => {
   assert.throws(() => isPublished("pkg", "1.0.4", () => '"1.0.3"'))
 })
 
+test("aceita o array retornado pelo npm no runner e rejeita resultados ambíguos", () => {
+  assert.equal(
+    isPublished("pkg", "1.0.4", () => '["1.0.4"]'),
+    true,
+  )
+  for (const output of ["[]", '["1.0.3"]', '["1.0.3", "1.0.4"]', "null", "{}"]) {
+    assert.throws(() => isPublished("pkg", "1.0.4", () => output), /Resposta inesperada/)
+  }
+})
+
 test("publish aceito aguarda propagação antes de concluir", async () => {
   let queries = 0
   let publishes = 0

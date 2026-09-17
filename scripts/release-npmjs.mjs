@@ -55,7 +55,10 @@ export function isPublished(name, version, run = execFileSync) {
     }
     throw new Error(`Não foi possível consultar ${name}@${version}.`, { cause: error })
   }
-  if (JSON.parse(output) !== version) {
+  const result = JSON.parse(output)
+  // O npm pode retornar um array mesmo para a consulta de uma versão exata.
+  const versions = Array.isArray(result) ? result : [result]
+  if (versions.length !== 1 || versions[0] !== version) {
     throw new Error(`Resposta inesperada ao consultar ${name}@${version}: ${output}`)
   }
   return true
