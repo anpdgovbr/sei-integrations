@@ -468,11 +468,16 @@ export class SipConsultasClient {
  * replicação liberados explicitamente no SIP. Não solicite essas permissões
  * para integrações somente leitura.
  *
- * As três operações desta classe (`replicarUsuarios`, `replicarPermissoes` e
- * `validarReplicacao`) ainda não foram validadas de ponta a ponta contra um
- * ambiente SIP real — a suíte de smoke test do repositório cobre apenas as
- * consultas ({@link SipConsultasClient}). Valide em homologação antes de usar
- * em produção.
+ * `replicarUsuarios` com `operacao: "C"`, `"A"` ou `"D"` está confirmado
+ * funcionando contra um ambiente SIP real (uso contínuo em produção pelo
+ * SGI). `operacao: "R"` (reativar) tem um caso confirmado em produção
+ * (17/09/2026) em que o SIP retornou sucesso sem aplicar a reativação — ver
+ * o `@remarks` de {@link SipOperacaoReplicacaoUsuario} antes de depender do
+ * retorno de `"R"` como confirmação. `replicarPermissoes` e
+ * `validarReplicacao` continuam sem validação de ponta a ponta confirmada —
+ * a suíte de smoke test do repositório cobre apenas as consultas
+ * ({@link SipConsultasClient}). Valide essas duas em homologação antes de
+ * usar em produção.
  *
  * Em aplicações que usam {@link SipClient}, acesse esta classe via
  * `sipClient.replicacao`.
@@ -507,6 +512,14 @@ export class SipReplicacaoClient {
    * @returns `true` se o SIP confirmou a operação com sucesso.
    * @throws {@link SipSoapError} em caso de falha de comunicação, SOAP Fault
    *   ou rejeição pelo SIP.
+   *
+   * @remarks
+   * `true` para `operacao: "R"` confirma apenas que o SIP aceitou a
+   * chamada - não que o usuário foi de fato reativado. Nessa operação, o
+   * contrato oficial informa que somente `IdOrigem` é considerado; campos
+   * como `cpf` podem ser ignorados. Ver o `@remarks` de
+   * {@link SipOperacaoReplicacaoUsuario}. Para `"C"`, `"A"` e `"D"` o
+   * retorno reflete a aplicação real, confirmado em produção.
    *
    * @example
    * ```ts

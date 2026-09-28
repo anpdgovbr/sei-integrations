@@ -113,6 +113,26 @@ export type {
  * | `"D"`  | Desativar (soft delete)      |
  * | `"R"`  | Reativar usuário desativado  |
  *
+ * @remarks
+ * `"C"`, `"A"` e `"D"` são usadas em produção e confirmadas funcionando
+ * contra um ambiente SIP real. `"R"` (reativar) tem um caso confirmado em
+ * produção (17/09/2026, AR-20260917-DEAEE51E) em que o SIP retornou sucesso
+ * (`returnReplicarUsuario = true`) sem de fato reativar o usuário — o
+ * usuário continuou aparecendo como desativado no SIP até ser reativado
+ * manualmente pela tela administrativa do SIP. O payload enviado para `"R"`
+ * é idêntico em forma ao de `"D"` (mesmos campos, só o `StaOperacao`
+ * difere), então não há evidência de um problema de serialização deste
+ * cliente. Segundo o contrato oficial, em `"R"` somente `IdOrigem` é
+ * considerado para identificar o usuário; os demais campos do payload,
+ * inclusive `Cpf`, podem ser ignorados nessa operação. Portanto, CPF ausente
+ * no cadastro desativado é um sinal útil de registro legado em fluxos de
+ * recredenciamento, mas não deve ser tratado, sem evidência adicional, como
+ * causa direta da falha de reativação. Verifique principalmente se o
+ * `IdOrigem` enviado coincide com o gravado no SIP. Até que o comportamento
+ * seja investigado com o time do SIP, não trate o retorno `true` de
+ * `replicarUsuarios` com `operacao: "R"` como confirmação de que a
+ * reativação foi aplicada.
+ *
  * @see {@link SipReplicarUsuario}
  * @category Enumerações
  */

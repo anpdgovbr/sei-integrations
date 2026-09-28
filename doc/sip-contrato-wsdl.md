@@ -72,6 +72,30 @@ um tipo global único.
 - `D`: desativar;
 - `R`: reativar.
 
+`C`, `A` e `D` estão confirmadas em uso contínuo em produção pelo SGI.
+
+**`R` (reativar) tem um caso confirmado de falha silenciosa em produção**
+(17/09/2026, AR-20260917-DEAEE51E): `replicarUsuario` com `StaOperacao: "R"`
+retornou sucesso (`returnReplicarUsuario = true`), mas o usuário permaneceu
+inativo no SIP — só foi reativado depois de uma ação manual pela tela
+administrativa do SIP. O payload enviado para `R` é estruturalmente
+idêntico ao de `D` (mesmos campos; só `StaOperacao` muda), então não há
+evidência de bug de serialização no `@anpdgovbr/sip-client` — o
+comportamento é do lado do `SipWS::replicarUsuario` ou de uma condição de
+correspondência do registro.
+
+Conforme o contrato oficial do SIP, nas operações `E`, `D` e `R` somente
+`IdOrigem` é considerado para identificar o usuário. Os demais campos do
+payload, inclusive `Cpf`, podem ser ignorados em `R`. Assim, um CPF ausente
+no cadastro desativado é um sinal relevante de registro legado em fluxos de
+recredenciamento, mas não deve ser tratado, sem evidência adicional, como
+causa direta da falha de reativação. A primeira comparação deve ser entre o
+`IdOrigem` enviado e o valor já gravado no SIP.
+
+Não trate `true` de uma chamada com `operacao: "R"` como confirmação de que
+a reativação foi aplicada — confirme consultando o usuário depois
+(`consultas.buscarUsuarioComPermissoesPorSigla`).
+
 `replicarPermissao` aceita:
 
 - `A`: cadastrar ou alterar;
