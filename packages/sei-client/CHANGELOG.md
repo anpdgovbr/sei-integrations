@@ -1,5 +1,16 @@
 # @anpdgovbr/sei-client
 
+## 1.1.0
+
+### Minor Changes
+
+- e0f3d6b: Update dependencies in pnpm-workspace.yaml.
+
+### Patch Changes
+
+- Updated dependencies [e0f3d6b]
+  - @anpdgovbr/sei-sip-soap@1.1.0
+
 ## 1.0.5
 
 ### Patch Changes
