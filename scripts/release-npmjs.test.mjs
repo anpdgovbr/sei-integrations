@@ -1,6 +1,12 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
-import { isPublished, publishAndWait, runPackages, tagAndRelease } from "./release-npmjs.mjs"
+import {
+  isPublished,
+  publishAndWait,
+  runPackages,
+  tagAndRelease,
+  waitForPublication,
+} from "./release-npmjs.mjs"
 
 function npmError(code, message = "") {
   return Object.assign(new Error(message), {
@@ -88,6 +94,26 @@ test("staging não confirmado falha em vez de anunciar sucesso", async () => {
     }),
     /ainda não está disponível/,
   )
+})
+
+test("aguarda até dez minutos pela propagação antes de falhar", async () => {
+  let queries = 0
+  let waits = 0
+  await waitForPublication("pkg", "1.0.4", {
+    run: () => {
+      queries++
+      if (queries < 61) {
+        throw npmError("E404")
+      }
+      return '"1.0.4"'
+    },
+    wait: async (delay) => {
+      assert.equal(delay, 10000)
+      waits++
+    },
+  })
+  assert.equal(queries, 61)
+  assert.equal(waits, 60)
 })
 
 test("outros erros de publicação não são ignorados", async () => {

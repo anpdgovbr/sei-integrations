@@ -2,14 +2,9 @@
 // Publica os pacotes do monorepo no registry público (npmjs.org), em ordem de
 // dependência, pulando versões já publicadas.
 //
-// Cada pacote tem publishConfig.registry apontando para o registry interno
-// da ANPD (uso institucional). `pnpm publish` sempre respeita esse
-// publishConfig e ignora qualquer --registry passado na linha de comando, ou
-// seja, não dá para usá-lo diretamente para publicar no npmjs.org. A solução
-// é gerar o tarball com `pnpm pack` (que resolve corretamente os protocolos
-// workspace:*/catalog: para versões reais, sem depender de registry nenhum)
-// e publicar esse tarball com `npm publish`, que respeita --registry e
-// suporta --provenance via Trusted Publishing (OIDC) em CI.
+// `pnpm pack` resolve os protocolos workspace:*/catalog: para versões reais.
+// O tarball é publicado com `npm publish`, que suporta --provenance via
+// Trusted Publishing (OIDC) em CI.
 //
 // Em CI (usado pelo step de publicação do release.yml), cada
 // pacote publicado com sucesso também ganha uma tag `nome@versão` e uma
@@ -26,6 +21,10 @@ import { setTimeout } from "node:timers/promises"
 const REGISTRY = "https://registry.npmjs.org"
 const PACKAGES = ["sei-sip-soap", "sei-client", "sip-client"]
 const IS_CI = process.env.CI === "true"
+// O npm pode aceitar o envio e manter a versão em staging por vários minutos.
+// A consulta pública, e não a resposta do publish, confirma a conclusão.
+const PUBLICATION_ATTEMPTS = 61
+const PUBLICATION_DELAY_MS = 10000
 
 function readPackageJson(dir) {
   return JSON.parse(readFileSync(`packages/${dir}/package.json`, "utf8"))
@@ -67,7 +66,12 @@ export function isPublished(name, version, run = execFileSync) {
 export async function waitForPublication(
   name,
   version,
-  { run = execFileSync, wait = setTimeout, attempts = 12, delay = 10000 } = {},
+  {
+    run = execFileSync,
+    wait = setTimeout,
+    attempts = PUBLICATION_ATTEMPTS,
+    delay = PUBLICATION_DELAY_MS,
+  } = {},
 ) {
   let lastError
   for (let attempt = 0; attempt < attempts; attempt++) {
