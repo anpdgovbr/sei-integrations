@@ -63,7 +63,7 @@
     "eslint": "^10.11.0",
     "fast-xml-parser": "catalog:",
     "globals": "^17.13.0",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "rimraf": "catalog:",
     "sonar-scanner": "catalog:",
     "tsup": "catalog:",
