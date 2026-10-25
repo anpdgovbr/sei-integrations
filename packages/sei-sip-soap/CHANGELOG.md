@@ -1,5 +1,11 @@
 # @anpdgovbr/sei-sip-soap
 
+## 1.1.1
+
+### Patch Changes
+
+- 2edc77f: Atualiza as dependências de desenvolvimento e o pnpm, renova as dependências transitivas no lockfile e aplica override do @vitest/mocker para a versão 4.1.12 ou superior.
+
 ## 1.1.0
 
 ### Minor Changes
