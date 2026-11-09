@@ -18,7 +18,7 @@ body:
     id: version
     attributes:
       label: Versão do pacote
-      placeholder: "1.0.0"
+      placeholder: "Versão instalada (consulte package.json/lockfile)"
     validations:
       required: true
 
@@ -42,13 +42,31 @@ body:
     validations:
       required: false
 
+  - type: input
+    id: operation
+    attributes:
+      label: Método da lib e operação SOAP
+      placeholder: "sei.consultas.consultarProcedimento / consultarProcedimento"
+    validations:
+      required: false
+
+  - type: textarea
+    id: failure
+    attributes:
+      label: Retorno ou erro anonimizado
+      description: Informe status HTTP, operation, fault e mensagem quando disponíveis. Distinga lista vazia, null e exceção; não cole envelopes com credenciais ou dados reais.
+    validations:
+      required: false
+
   - type: textarea
     id: environment
     attributes:
       label: Ambiente
       placeholder: |
         Node.js:
+        Gerenciador de pacotes e versão:
         Sistema operacional:
-        Ambiente SEI/SIP (produção, homologação, versão do SEI, se souber):
+        Versão do SEI/SIP e ambiente (produção/homologação):
+        Operação habilitada no serviço e unidade autorizada (se souber):
     validations:
       required: false

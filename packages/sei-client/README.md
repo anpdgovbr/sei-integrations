@@ -3,7 +3,7 @@
 <img src="../../assets/brand/logo-196.png" alt="SEI.SIP" width="64" align="right">
 
 [![npm](https://img.shields.io/npm/v/%40anpdgovbr%2Fsei-client)](https://www.npmjs.com/package/@anpdgovbr/sei-client)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](package.json)
 [![module](https://img.shields.io/badge/module-ESM%20%2B%20CJS-yellow.svg)](package.json)
 [![typescript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](../../tsconfig.base.json)
@@ -23,6 +23,7 @@ O guia operacional fica em [`../../doc/sei-client.md`](../../doc/sei-client.md).
 
 - [Instalação](#instalação)
 - [Uso](#uso)
+- [Capacidades e limites](#capacidades-e-limites)
 - [Métodos principais](#métodos-principais)
 - [Tratamento de erros](#tratamento-de-erros)
 - [Conteúdo de documentos](#conteúdo-de-documentos)
@@ -53,7 +54,7 @@ const sei = createSeiClient({
   requestTimeoutMs: 30_000,
 })
 
-// Consultas (somente leitura)
+// Consulta por protocolo conhecido
 const unidades = await sei.consultas.listarUnidades()
 const proc = await sei.consultas.consultarProcedimento({
   idUnidade: "110000001",
@@ -77,10 +78,26 @@ const retorno = await sei.operacoes.gerarProcedimento({
 > `IdentificacaoServico` são cadastrados no SEI (Administração → Sistemas) e
 > devem ser tratados como segredos server-side.
 
+## Capacidades e limites
+
+A API acompanha as operações SOAP expostas pelo SEI. O WS base examinado não
+oferece listagem geral de processos por unidade, pesquisa geral de processos ou
+listagem dos blocos de uma unidade. Essa limitação é do contrato disponibilizado
+pelo SEI; adicionar um método no cliente não cria uma operação no servidor.
+
+Com protocolos conhecidos, `consultarProcedimento` permite filtrar as unidades
+onde cada processo está aberto. Com ID de bloco interno conhecido,
+`consultarBloco` permite recuperar seus protocolos. Nenhum desses fluxos garante
+cobrir todos os processos da unidade. Marcadores e usuários também não fornecem
+essa lista inicial.
+
+Veja o [guia de capacidades e combinações](../../doc/sei-contrato-wsdl.md) e o
+[guia de diagnóstico](../../doc/integracao-e-diagnostico.md).
+
 ## Métodos principais
 
 A fachada `SeiClient` agrupa dois subclients: `consultas`
-(`SeiConsultasClient`, somente leitura) e `operacoes` (`SeiOperacoesClient`,
+(`SeiConsultasClient`, consultas e upload temporário) e `operacoes` (`SeiOperacoesClient`,
 escrita). Os métodos mais comuns também existem como atalhos na raiz.
 
 ### Consultas (`sei.consultas.*`)
@@ -92,8 +109,8 @@ escrita). Os métodos mais comuns também existem como atalhos na raiz.
 | `listarTiposProcedimento`          | Tipos de processo disponíveis                |
 | `listarSeries`                     | Séries (tipos de documento)                  |
 | `listarContatos`                   | Contatos, com filtros e paginação            |
-| `consultarProcedimento`            | Dados completos de um processo               |
-| `consultarDocumento`               | Dados completos de um documento              |
+| `consultarProcedimento`            | Processo conhecido e blocos solicitados      |
+| `consultarDocumento`               | Metadados de um documento conhecido          |
 | `consultarBloco`                   | Dados de um bloco e seus protocolos          |
 | `consultarPublicacao`              | Publicação oficial de um documento           |
 | `listarAndamentos`                 | Histórico de andamentos de um processo       |
@@ -125,22 +142,32 @@ escrita). Os métodos mais comuns também existem como atalhos na raiz.
 | `enviarEmail`                              | E-mail com documento gerado no processo  |
 | `registrarOuvidoria`                       | Manifestação de ouvidoria                |
 
+O grupo `consultas` também contém `adicionarArquivo` e
+`adicionarConteudoArquivo`, que gravam anexo temporário. O nome do subclient
+não deve ser usado como regra de autorização somente leitura.
+
 A lista completa, com parâmetros e tipos, está na documentação TypeDoc do
 monorepo.
 
 ## Tratamento de erros
 
-Todas as falhas de comunicação viram `SeiSoapError`, com `operation`, `status`
-HTTP (408 em timeout) e `fault` quando o SEI retorna SOAP Fault:
+SOAP Faults, falhas HTTP e timeout usam `SeiSoapError`, com `operation`,
+`status` (408 em timeout) e `fault` quando presente. Falhas de rede, parsing
+e mapeamento também podem propagar outros tipos de erro:
 
 ```ts
 import { SeiSoapError } from "@anpdgovbr/sei-client"
 
 try {
-  await sei.consultas.consultarProcedimento({ ... })
+  await sei.consultas.consultarProcedimento({
+    idUnidade: "110000001",
+    protocoloProcedimento: "00000.000001/2026-01",
+  })
 } catch (error) {
   if (error instanceof SeiSoapError) {
     console.error(error.operation, error.status, error.fault)
+  } else {
+    throw error
   }
 }
 ```

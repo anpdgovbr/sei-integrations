@@ -6,9 +6,9 @@
 # COMPONENTES DO CATÁLOGO
 # ==========================================
 include:
-  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-gitleaks@main
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-gitleaks@v9.2.0
 
-  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-node@main
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-node@v9.2.0
     inputs:
       pnpm_version: "12.15.0"
       dependency_mode: "isolated"
@@ -30,13 +30,13 @@ include:
         done
         [ -z "$FAILED" ] || { echo "Falha:$FAILED"; exit 1; }
 
-  - component: gitlab.anpd.gov.br/publico/ci-templates/sonarqube@main
+  - component: gitlab.anpd.gov.br/publico/ci-templates/sonarqube@v9.2.0
     inputs:
       sonar_project_key: "anpd-sei-integrations"
       integration_branch: "dev"
       needs_job: "Node | Executar testes"
 
-  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@main
+  - component: gitlab.anpd.gov.br/publico/ci-templates/ci-changeset-monorepo@v9.2.0
     inputs:
       project_type: "lib"
       pnpm_version: "12.15.0"
@@ -46,7 +46,7 @@ include:
       global_tag_prefix: "v"
       require_protected_tag: "true"
 
-  - component: gitlab.anpd.gov.br/publico/ci-templates/pages-typedoc@main
+  - component: gitlab.anpd.gov.br/publico/ci-templates/pages-typedoc@v9.2.0
     inputs:
       project_type: "lib"
 
@@ -59,7 +59,7 @@ include:
 # ==========================================
 variables:
   INTEGRATION_BRANCH: "dev"
-  HOMOLOG_BRANCH: "main"
+  HOMOLOG_BRANCH: "v9.2.0"
   NPM_CONFIG_OPTIONAL: "true"
   SECRET_DETECTION_ENABLED: "true"
 
@@ -99,7 +99,7 @@ stages:
       exists:
         - .changeset/*.md
       when: never
-    # Libs publicam na homologacao (main)
+    # Libs publicam na homologacao (v9.2.0)
     - if: '$PROJECT_TYPE == "lib" && $CI_COMMIT_BRANCH == $HOMOLOG_BRANCH'
       when: on_success
     # Apps/APIs publicam na producao (stable)

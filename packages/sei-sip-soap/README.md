@@ -20,3 +20,13 @@ import { SoapError, callSoap } from "@anpdgovbr/sei-sip-soap"
 
 - Node.js 22 ou superior.
 - ESM e CommonJS via `exports`.
+
+## Alcance do transporte
+
+A base não descobre operações pelo WSDL nem acrescenta capacidades ao servidor.
+Não implementa retry, cache ou autorização de usuário final. SOAP Faults, erros
+HTTP e timeout são representados por erros SOAP; outras falhas de rede ou
+parsing podem propagar seu erro original. A aplicação deve tratar esses caminhos.
+
+Veja [Integração e diagnóstico](../../doc/integracao-e-diagnostico.md) para
+consistência de escritas, resultados parciais e limites de validação.

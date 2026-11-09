@@ -71,6 +71,22 @@ Mantenha na aplicação consumidora:
 - Preserve a compatibilidade do consumidor com uma fachada local até trocar os
   imports internos.
 
+## Adoção do cliente SEI
+
+Para SEI, a fachada local recebe `SeiConfig` e usa `createSeiClient`; mantenha
+configuração, cache, autorização, auditoria e persistência no consumidor, como
+no SIP. Preserve a distinção entre ID interno e protocolo formatado.
+
+Antes de substituir uma integração existente, confira a origem dos dados:
+consultas diretas ao banco, automação de interface e módulos locais podem ter
+capacidades que o SOAP base não expõe. Não assuma equivalência só porque a tela
+do SEI possui a função. Use a [matriz SEI](sei-contrato-wsdl.md) para verificar
+os pré-requisitos de cada fluxo, principalmente listagens por unidade.
+
+Preserve os protocolos conhecidos e os IDs de blocos durante a migração.
+Registre resultados parciais e reconcilie escritas antes de repetir chamadas
+que perderam a resposta. Veja [Integração e diagnóstico](integracao-e-diagnostico.md).
+
 ## Validação sugerida
 
 No repositório da lib:

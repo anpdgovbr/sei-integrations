@@ -19,11 +19,18 @@ ambiente SEI/SIP no relato.
 ## Escopo
 
 Este projeto é composto por clientes SOAP para os sistemas SEI e SIP. Ele não
-gerencia autenticação, autorização, cache ou persistência — essas
+implementa login de usuário final, autorização de produto, cache ou persistência — essas
 responsabilidades pertencem à aplicação consumidora. Vulnerabilidades em
 `SeiWS`/`SipWS` ou nos sistemas SEI/SIP em si estão fora do escopo deste
 repositório e devem ser reportadas diretamente à equipe responsável por esses
-sistemas.
+sistemas. A proteção das credenciais de integração durante transporte, a
+serialização/parsing de SOAP e a integridade dos pacotes e workflows deste
+repositório fazem parte do escopo dos clientes.
+
+Ausência de operação no WSDL base (como listagem geral de processos por unidade)
+é um limite funcional do servidor, não uma vulnerabilidade da lib. Para dúvidas
+funcionais, use os guias de capacidades e diagnóstico ou uma issue sem dados
+sensíveis.
 
 ## Versões suportadas
 

@@ -5,7 +5,7 @@
  *
  * Este módulo expõe três classes:
  *
- * - {@link SeiConsultasClient} — operações somente leitura (consultas e listagens).
+ * - {@link SeiConsultasClient} — consultas, listagens e upload temporário.
  * - {@link SeiOperacoesClient} — operações que alteram estado no SEI.
  * - {@link SeiClient} — fachada que combina as duas anteriores.
  *
@@ -269,11 +269,11 @@ const serializedDocumento = (d: SeiIncluirDocumentoParams["documento"]) => ({
 // ─── SeiConsultasClient ───────────────────────────────────────────────────────
 
 /**
- * Operações somente leitura do SEI (listagens e consultas).
+ * Consultas e listagens do SEI, incluindo upload de arquivos temporários.
  *
  * @remarks
- * Esta classe não altera estado no SEI. Ela é deliberadamente fina: recebe
- * config, chama SOAP e devolve tipos TypeScript.
+ * Os métodos de upload gravam arquivos temporários no SEI. A classe recebe
+ * config, chama SOAP e devolve tipos TypeScript; autorize por operação.
  *
  * Em aplicações que usam {@link SeiClient}, acesse via `seiClient.consultas`.
  *
@@ -394,7 +394,10 @@ export class SeiConsultasClient {
   }
 
   /**
-   * Consulta os dados completos de um processo pelo protocolo.
+   * Consulta os dados de um processo conhecido pelo protocolo.
+   *
+   * `idUnidade` define o contexto de acesso; não lista processos da unidade.
+   * O WS base não oferece a descoberta geral de processos por unidade.
    *
    * @remarks
    * Por padrão todos os sinalizadores `sinRetornar*` são enviados como `"S"`,
@@ -495,7 +498,8 @@ export class SeiConsultasClient {
 
   /**
    * Consulta um bloco (assinatura, reunião ou interno) e, opcionalmente, seus
-   * protocolos.
+   * protocolos. O ID do bloco deve ser conhecido; o WS base não expõe
+   * listagem dos blocos por unidade.
    *
    * @param params - Unidade, ID do bloco e sinalizador de retorno de protocolos.
    * @returns Dados do bloco, ou `null` quando o SEI não retorna corpo.
@@ -761,6 +765,7 @@ export class SeiConsultasClient {
 
   /**
    * Lista os marcadores configurados para a unidade.
+   * Não retorna os processos associados a cada marcador.
    *
    * @param params - Unidade de contexto da consulta.
    * @returns Lista de marcadores da unidade.
@@ -2113,7 +2118,7 @@ export class SeiOperacoesClient {
  * @category Cliente
  */
 export class SeiClient {
-  /** Subclient para operações somente leitura (consultas e listagens). */
+  /** Subclient para consultas, listagens e upload temporário. */
   readonly consultas: SeiConsultasClient
   /** Subclient para operações que alteram estado no SEI. */
   readonly operacoes: SeiOperacoesClient

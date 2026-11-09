@@ -1,5 +1,5 @@
 name: Sugerir uma melhoria
-description: Sugerir uma nova funcionalidade ou operação SOAP ainda não coberta.
+description: Sugerir melhoria na API, documentação ou cobertura de uma operação SOAP.
 labels: ["enhancement"]
 body:
   - type: dropdown
@@ -26,5 +26,28 @@ body:
     attributes:
       label: Proposta
       description: Descreva a solução desejada. Se envolver uma operação SOAP específica do SEI/SIP, cite o nome da operação no WSDL.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: contract
+    attributes:
+      label: Disponibilidade no contrato do servidor
+      description: A existência da função na interface do SEI/SIP não garante que ela esteja exposta no WS.
+      options:
+        - Não sei / preciso de ajuda para verificar
+        - Existe no WSDL base, mas falta na lib
+        - Composição de operações já disponíveis
+        - Disponível apenas em módulo ou extensão
+        - Não existe no WS base
+        - Melhoria de documentação ou infraestrutura
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Referência e alcance esperado
+      description: Se disponível, informe versão do servidor, operação/parâmetros do WSDL e referência pública anonimizada. Explique se precisa de cobertura completa ou de um conjunto conhecido e se há escrita.
     validations:
       required: false

@@ -108,6 +108,12 @@ aplicação consumidora ──▶ sip-client ──▶ SIP SOAP (usuários, unid
 aplicação consumidora ──▶ sei-client ──▶ SEI SOAP (processos, documentos, blocos, publicações, ...)
 ```
 
+O WS base do SEI não expõe todas as funções da interface web. Por exemplo,
+listar todos os processos a partir de uma unidade não é uma operação disponível
+no contrato examinado; a lib permite acompanhar protocolos ou blocos conhecidos.
+Veja a [matriz de capacidades do SEI](doc/sei-contrato-wsdl.md) e a
+[separação de responsabilidades e diagnóstico](doc/integracao-e-diagnostico.md).
+
 ## Quando usar cada pacote
 
 **`@anpdgovbr/sip-client`** — quando a aplicação precisa consultar ou
@@ -119,7 +125,8 @@ vinculadas ao SIP.
 SEI (`SeiWS.php`): consulta e criação de processos e documentos, tramitação,
 blocos, marcadores, controle de prazo, anotações, publicações, e-mail e
 ouvidoria. A API segue o contrato do SEI 5.0.4 e foi validada contra o
-código-fonte oficial e em ambiente de homologação.
+código-fonte de referência, com validação em homologação de parte das operações.
+A referência de API identifica operações ainda experimentais.
 
 **`@anpdgovbr/sei-sip-soap`** — não consuma diretamente em aplicações finais.
 É a base compartilhada de transporte SOAP (envelope, parsing, erros) publicada
@@ -149,12 +156,14 @@ gerada com TypeDoc: **https://anpdgovbr.github.io/sei-integrations/**
 Guias de uso, também disponíveis na própria referência acima (seção
 "Guias"):
 
-| Documento                                                | Conteúdo                          |
-| -------------------------------------------------------- | --------------------------------- |
-| [Guia do sip-client](doc/sip-client.md)                  | Uso detalhado do cliente SIP      |
-| [Guia do sei-client](doc/sei-client.md)                  | Uso detalhado do cliente SEI      |
-| [Contrato SIP WSDL](doc/sip-contrato-wsdl.md)            | Contrato público do webservice    |
-| [Migração de consumidores](doc/migracao-consumidores.md) | Passo a passo de adoção do pacote |
+| Documento                                                   | Conteúdo                                     |
+| ----------------------------------------------------------- | -------------------------------------------- |
+| [Guia do sip-client](doc/sip-client.md)                     | Uso detalhado do cliente SIP                 |
+| [Guia do sei-client](doc/sei-client.md)                     | Uso detalhado do cliente SEI                 |
+| [Capacidades e contrato SEI](doc/sei-contrato-wsdl.md)      | Recursos, combinações e limites do WS SEI    |
+| [Integração e diagnóstico](doc/integracao-e-diagnostico.md) | Retornos, erros, escrita e responsabilidades |
+| [Contrato SIP WSDL](doc/sip-contrato-wsdl.md)               | Contrato público do webservice               |
+| [Migração de consumidores](doc/migracao-consumidores.md)    | Passo a passo de adoção do pacote            |
 
 ## CI/CD e ferramental
 

@@ -31,6 +31,8 @@
   "projectDocuments": [
     "doc/sip-client.md",
     "doc/sei-client.md",
+    "doc/sei-contrato-wsdl.md",
+    "doc/integracao-e-diagnostico.md",
     "doc/sip-contrato-wsdl.md",
     "doc/migracao-consumidores.md"
   ],

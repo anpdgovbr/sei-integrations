@@ -10,13 +10,17 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  pull-requests: write
-  id-token: write # necessário para o Trusted Publishing (OIDC) do npm
+  contents: read
 
 jobs:
   release:
     name: Version / Publish (npmjs.org)
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write # Trusted Publishing (OIDC) do npm
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -32,9 +36,8 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
-          registry-url: https://registry.npmjs.org
 
       - name: Atualizar npm (necessário para Trusted Publishing/OIDC)
         run: npm install -g npm@latest
@@ -42,11 +45,21 @@ jobs:
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
+      - name: Formatação
+        run: pnpm format:check
 
-      - name: Testes
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # test:coverage também compila os pacotes.
+      - name: Testes com cobertura e build
         run: pnpm test:coverage
+
+      - name: Validar documentação
+        run: pnpm run docs
 
       # Enquanto houver changesets pendentes, esta action abre/atualiza uma PR
       # "Version Packages" com o bump de versão e changelog. Quando a PR for
@@ -70,3 +83,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resumo da etapa de release
+        env:
+          HAS_CHANGESETS: ${{ steps.changesets.outputs.has-changesets }}
+          VERSION_PR: ${{ steps.changesets.outputs.pr-number }}
+        run: |
+          if [ "$HAS_CHANGESETS" = "true" ]; then
+            echo "Changesets pendentes: PR de versões #${VERSION_PR}. A publicação depende do merge dessa PR." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Publicação/reconciliação concluída pelo script release:npmjs. Consulte o log para versões publicadas ou já existentes." >> "$GITHUB_STEP_SUMMARY"
+          fi

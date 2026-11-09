@@ -33,6 +33,18 @@ Isso não é integração direta com o SEI. Integrações diretas com operaçõe
 (geração de processos, inclusão de documentos, envio e outras operações) pertencem
 ao `@anpdgovbr/sei-client`. Veja [sei-client.md](sei-client.md).
 
+## Capacidades e limites
+
+Permissões do SIP descrevem vínculos de acesso ao sistema alvo; não enumeram
+processos do SEI nem garantem acesso a um processo específico. Os nomes de
+métodos do cliente nem sempre coincidem com os nomes SOAP: por exemplo,
+`listarPermissoes` chama `listarPermissao`. O [contrato SIP](sip-contrato-wsdl.md)
+distingue operações diretas de helpers compostos.
+
+Timeout, erros de rede, resultados parciais e repetição de escritas seguem as
+orientações de [Integração e diagnóstico](integracao-e-diagnostico.md). A lib
+não oferece cache, retry ou paginação automática.
+
 ## Cadastro e permissões no SIP
 
 A aplicação consumidora deve ser cadastrada como sistema próprio no SIP e deve
@@ -143,6 +155,8 @@ type SipUnidade = {
 esses blocos, especialmente com `filtroRecursosMenus` igual a `R`, `M` ou `T`:
 
 ```ts
+import type { SipGrupoPerfil, SipRecurso, SipMenu } from "@anpdgovbr/sip-client"
+
 type SipPerfil = {
   id: string
   nome: string
@@ -164,11 +178,7 @@ duas etapas é obrigatório:
 ```ts
 const usuario = await sip.consultas.buscarUsuarioPorSigla("usuario.exemplo")
 
-if (!usuario) {
-  return null
-}
-
-return sip.consultas.listarPermissoes({ idUsuario: usuario.id })
+const permissoes = usuario ? await sip.consultas.listarPermissoes({ idUsuario: usuario.id }) : []
 ```
 
 ## Perfis de um usuário em uma unidade
@@ -249,8 +259,9 @@ consumidora.
 - Não monte XML manualmente fora da lib.
 - Datas vêm como texto no padrão usado pelo SIP, normalmente `dd/mm/aaaa`.
 - `SinSubunidades` e outros sinalizadores `S/N` são convertidos para boolean.
-- Falhas SOAP são convertidas em `SipSoapError`, preservando operação, status
-  HTTP e mensagem de fault.
+- SOAP Faults, falhas HTTP e timeout usam `SipSoapError`, preservando operação,
+  status e fault quando presente. Falhas de rede, parsing e mapeamento também
+  podem propagar outros tipos de erro.
 - As operações de replicação (`replicarUsuarios`, `replicarPermissoes`,
   `validarReplicacao`) estão marcadas como **Experimental** na referência de
   API (TypeDoc): têm serialização e testes unitários, mas ainda não foram

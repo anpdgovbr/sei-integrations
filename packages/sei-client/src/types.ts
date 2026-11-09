@@ -61,8 +61,9 @@ export type SeiConfig = Readonly<{
    */
   siglaSistema: string
   /**
-   * Chave de identificação do serviço (IdentificacaoServico) gerada no
-   * cadastro do sistema no SEI. Deve ser carregada de variável de ambiente.
+   * Identificação/chave do serviço (IdentificacaoServico), conforme cadastro
+   * e modo de autenticação da instalação SEI. Proteja em contexto server-side;
+   * a aplicação decide como carregar esse valor.
    */
   identificacaoServico: string
   /**

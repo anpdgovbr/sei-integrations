@@ -3,7 +3,7 @@
 <img src="../../assets/brand/logo-196.png" alt="SEI.SIP" width="64" align="right">
 
 [![npm](https://img.shields.io/npm/v/%40anpdgovbr%2Fsip-client)](https://www.npmjs.com/package/@anpdgovbr/sip-client)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](package.json)
 [![module](https://img.shields.io/badge/module-ESM%20%2B%20CJS-yellow.svg)](package.json)
 [![typescript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](../../tsconfig.base.json)
@@ -17,6 +17,7 @@ consumidora resolve configuração, cache, autorização e persistência.
 - [Instalação](#instalação)
 - [Uso](#uso)
 - [Métodos principais](#métodos-principais)
+- [Limites e tratamento de falhas](#limites-e-tratamento-de-falhas)
 - [Responsabilidades do consumidor](#responsabilidades-do-consumidor)
 - [Documentação](#documentação)
 
@@ -73,6 +74,17 @@ const usuario = await sip.consultas.buscarUsuarioPorSigla("usuario.exemplo")
 | `sip.replicacao.replicarUsuarios(usuarios)`      | Replica usuários para o SIP          |
 | `sip.replicacao.replicarPermissoes(permissoes)`  | Replica permissões para o SIP        |
 | `sip.replicacao.validarReplicacao(idReplicacao)` | Valida o resultado de uma replicação |
+
+## Limites e tratamento de falhas
+
+As permissões retornadas se referem ao sistema alvo no SIP. Elas não listam
+processos nem substituem os critérios de acesso do WS SEI. Helpers por sigla
+compõem consultas existentes; não acrescentam filtros ao WSDL.
+
+SOAP Faults, HTTP e timeout usam `SipSoapError`; rede, parsing e mapeamento
+podem propagar outros erros. Não há retry automático. Em replicações, uma
+resposta perdida pode ocorrer depois da escrita: reconcilie antes de repetir.
+Veja [Integração e diagnóstico](../../doc/integracao-e-diagnostico.md).
 
 ## Responsabilidades do consumidor
 
